@@ -1,6 +1,8 @@
 # Lantern Offline Survival Resource
 
-Lantern is an offline library for a household. It's a Raspberry Pi 5 with an NVMe drive that broadcasts its own Wi-Fi network, called LIBRARY (no password). Anyone in the house can join it with a phone or laptop, open http://library.lan, and get medical references, Wikipedia, repair manuals, maps, audiobooks for the kids and a few thousand other books and films. Once the box is built, none of it needs the internet.
+Lantern is an offline library for a household. It's a Raspberry Pi 5 that broadcasts its own Wi-Fi network, called LIBRARY (no password). Anyone in the house can join it with a phone or laptop, open http://library.lan, and get medical references, Wikipedia, repair manuals, maps, audiobooks for the kids and a few thousand other books and films. Once the box is built, none of it needs the internet.
+
+In the reference build, the Pi boots from an NVMe drive that holds both the system and the library. It can also boot from a microSD card and serve the library read-only from a USB drive (a partition labelled LANTERN_BAK); that's also how the backup drive works if the NVMe fails. Kolibri needs to write to its data, so it doesn't run in that mode.
 
 The reference build holds 1.2 TB in 379,624 files. The two largest items are Project Gutenberg (221 GB) and the full English Wikipedia (127 GB).
 
@@ -36,7 +38,7 @@ A HISTORICAL section holds 4,752 Survivor Library scans of pre-1950 books and so
 
 ![PDF reader](docs/screenshots/reader.jpg)
 
-The Ask page works without any AI. It shows the matching emergency cards and a list of pages from the library's books. If a laptop on the LIBRARY network is running llamafile with Llama 3.2 3B or Llama 3.1 8B, the Ask page uses it to put the most useful pages first. The model writes nothing the reader sees, and it runs on the laptop because the Pi is too small to run a chat model well.
+The Ask page works without any AI. It shows the matching emergency cards and a list of pages from the library's books. If a computer on the LIBRARY network is running Ollama or llamafile, the Ask page uses it to put the most useful pages first. With Ollama, it uses whatever model is installed (the first one Ollama lists, or the one picked on the Ask page); with llamafile, it uses the model llamafile was started with, and the box includes Llama 3.2 3B and Llama 3.1 8B for that. The model only sees the question and the list of page titles, and it answers with the numbers of the pages to show first. It doesn't write answers, so everything the reader sees comes from the books themselves. The model runs on another computer because the Pi is too small to run one well.
 
 On a phone, the tabs move to the bottom and the "Hurt or sick" button sits in the middle of them. The site follows the phone's light or dark setting.
 
