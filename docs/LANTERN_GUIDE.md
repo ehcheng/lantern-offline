@@ -26,6 +26,8 @@ Power draw is about 5 W for the Pi and 5 W for the router. One bank runs the Pi 
 
 The Pi 5 asks for 5 V at 5 A over USB-C and the banks supply 3 A. A headless Pi runs on a power limit set in the boot configuration.
 
+All of the electronics are stored in a Faraday cage (a closed metal box), which shields them from an electromagnetic pulse: the Pi, the router, the NVMe drive, the backup SSD and the recovery cards. The backup SSD comes out every 3 months to be powered up, synced and checked, because an unpowered SSD slowly loses its data.
+
 ### Redundancy
 
 The design goal was a box that survives its owner. If only one person can recover it from a bad disk, the household has no library.

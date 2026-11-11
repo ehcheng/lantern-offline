@@ -83,7 +83,7 @@ Topology: `[phones] ⇄ wifi ⇄ [GL.iNet router: DHCP+DNS] ⇄ ethernet ⇄ [Pi
 
 - **Primary: 4 TB NVMe** (WD Black SN770 / Crucial P3 Plus class, ~$200–250). NVMe over SATA/USB for reliability (no cable/bridge chipset) and idle power (~0.3 W ASPM).
 - **Boot:** on the same NVMe (Pi 5 boots NVMe natively via HAT). Keep a flashed microSD clone of the boot partition taped inside the case as a recovery path.
-- **Cold backup: 2nd identical 4 TB SSD**, updated via `rsync` before grid-down, then **unplugged and stored in an anti-static bag in a metal box** (cheap Faraday hedge). SSDs retain data unpowered for years but **power it up and re-verify checksums every 6–12 months** — flash charge does leak. Add a `sha256sum` manifest at copy time.
+- **Cold backup: 2nd identical 4 TB SSD**, updated via `rsync` before grid-down, then **unplugged and stored in a closed metal box (a Faraday cage) with all of the other electronics**: the server, the router and the recovery cards go in it too, not only the backup SSD. SSDs retain data unpowered for years but **power it up and re-verify checksums every 6–12 months** — flash charge does leak. Add a `sha256sum` manifest at copy time.
 - Third copy of the *irreplaceable* subset (your curated docs, not re-downloadable ZIMs) on a 512 GB microSD in the go-bag.
 - Filesystem: plain ext4. ZFS on a survival box is complexity you can't repair offline. `ponytail:` ext4 + rsync + checksums; upgrade to ZFS mirror only if you go N100 with dual drives and want bitrot self-healing.
 
@@ -140,7 +140,7 @@ Run this loop **quarterly**, ~2 hours:
 1. **Content refresh:** download updated ZIMs (`kiwix-manage` + rsync from download.kiwix.org — ZIMs are versioned monthly), Kolibri channel updates, new OSM extract yearly.
 2. **OS packages:** `apt update && apt upgrade` *within the pinned stable release only*; refresh the local apt mirror afterward.
 3. **Verify serving:** join the wifi with a phone, confirm captive-pop, search Kiwix, open a map tile, play one video. A 5-minute manual smoke test beats monitoring infrastructure you can't act on anyway.
-4. **Backup sync:** plug in cold SSD → `rsync -a --delete --checksum-choice=xxh3` → regenerate sha256 manifest → spot-verify 5 random files → unplug, back in the Faraday box.
+4. **Backup sync:** plug in cold SSD → `rsync -a --delete --checksum-choice=xxh3` → regenerate sha256 manifest → spot-verify 5 random files → unplug, back in the Faraday box with the rest of the electronics.
 5. **Battery care:** LiFePO4 stored at 50–60% SoC if the box is in standby mode; top-charge and log resting voltage quarterly. Exercise the solar charge path once a year.
 6. **Image the boot drive:** after any config change, `dd`/rpi-clone the boot SSD to the spare microSD.
 7. **Freeze protocol (grid-down imminent):** final content sync, final backup sync, `apt-mark hold` everything, print this document + the network config + IPs and tape it inside the lid.

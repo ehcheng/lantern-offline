@@ -22,7 +22,7 @@ Status legend:
 
 - Digital content: **$0** (everything digital is free or public domain; the only paid digital items are optional DRM-free ebooks)
 - Purchase layer (print + ebook): **~$340 core / ~$1,180 core+extended / ~$3,795 everything** (see §6)
-- Hardware excluded from this document — EXCEPT client devices: 2 cheap Android tablets in the Faraday box, preloaded with Kiwix app + WikiMed + Organic Maps (library survives box death; phone fleet degrades to zero over years), plus a 12V charging path. ~$200. Content-access dependency, same class as the SSD.
+- Hardware excluded from this document — EXCEPT client devices: 2 cheap Android tablets, stored in the Faraday box with all of the other electronics, preloaded with Kiwix app + WikiMed + Organic Maps (library survives box death; phone fleet degrades to zero over years), plus a 12V charging path. ~$200. Content-access dependency, same class as the SSD.
 
 **Why this beats Prepper Disk ($199–279, 256–512 GB) and SurvivalNet ($89–499, ~700 GB):**  
 

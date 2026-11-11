@@ -192,7 +192,7 @@ You cannot perform these steps. Present them to the operator clearly.
 >
 > The sync copies only what changed, usually a few minutes. The `sha256sum -c` line then checks every file on the SSD against the seal, which takes 1.5 to 2 hours. You will see "backup OK", or a list of the files that failed.
 >
-> 4. Unplug the T5 and put it back with the spare microSD card.
+> 4. Unplug the T5 and put it back with the spare microSD card. When the session is over, all of the electronics (the Pi with its drive, the router, the T5 and the recovery cards) go back in the Faraday box, not only the T5.
 >
 > **B. T5 power-on verify (quarterly)**
 >

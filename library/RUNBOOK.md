@@ -72,6 +72,13 @@ what is actually running.
 Wait 30 seconds after the last person is done, then unplug the Pi. The worst
 case is that the box checks its disk on the next start, which adds a minute.
 
+**Put it away**
+
+When the library is not in use, all of the electronics go back in the Faraday
+box (a closed metal box, which shields them from an electromagnetic pulse):
+the Pi with its drive, the router, the backup SSD and the recovery cards.
+Close the lid fully.
+
 **How long the batteries last**
 
 Each Anker PowerCore III Elite bank (25,600 mAh, about 92 Wh) runs the Pi
@@ -482,6 +489,8 @@ By hand:
    cards (Part 3).
 8. Write the date and anything unusual in the paper notebook kept with the
    box.
+9. Put all of the electronics back in the Faraday box (Part 1, "Put it
+   away") and close the lid.
 
 Once a year, in addition: start the Pi from the recovery card with the SSD
 attached (Part 2, steps 3a and 3b, on purpose) and confirm the library loads

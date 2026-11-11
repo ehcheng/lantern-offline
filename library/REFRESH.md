@@ -322,8 +322,9 @@ Every PDF must have a text layer and be re-indexed before it is findable. Scanne
 > **C3. Cold SSD backup**
 >
 > After any tool or model replacement this session, sync the cold SSD backup
-> following MAINTENANCE_PROMPT.md Step 3A. This ensures the Faraday backup
-> has the updated binaries.
+> following MAINTENANCE_PROMPT.md Step 3A. This ensures the backup SSD
+> has the updated binaries. Afterwards all of the electronics, not only
+> the SSD, go back in the Faraday box.
 
 ---
 
@@ -366,7 +367,9 @@ with a 50-file spot-check (double the normal 20). Run the full manifest verify
 
 **D4. Seal the Faraday box**
 
-After the cold SSD backup is verified: seal the Faraday box. Write the
+After the cold SSD backup is verified: put all of the electronics in the
+Faraday box (the Pi with its drive, the router, the backup SSD and the
+recovery cards), then seal it. Write the
 freeze date and tool versions on a card inside the box.
 
 **D5. Note the fallback access paths**
