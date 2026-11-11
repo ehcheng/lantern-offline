@@ -368,8 +368,9 @@ with a 50-file spot-check (double the normal 20). Run the full manifest verify
 **D4. Seal the Faraday box**
 
 After the cold SSD backup is verified: put all of the electronics in the
-Faraday box (the Pi with its drive, the router, the backup SSD and the
-recovery cards), then seal it. Write the
+Faraday box (the Pi with its drive, the router, the backup SSD, the
+recovery cards and the power banks), then seal it. The power banks still
+need charging at least every 6 months. Write the
 freeze date and tool versions on a card inside the box.
 
 **D5. Note the fallback access paths**

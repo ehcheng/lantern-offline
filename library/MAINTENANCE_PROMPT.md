@@ -192,7 +192,7 @@ You cannot perform these steps. Present them to the operator clearly.
 >
 > The sync copies only what changed, usually a few minutes. The `sha256sum -c` line then checks every file on the SSD against the seal, which takes 1.5 to 2 hours. You will see "backup OK", or a list of the files that failed.
 >
-> 4. Unplug the T5 and put it back with the spare microSD card. When the session is over, all of the electronics (the Pi with its drive, the router, the T5 and the recovery cards) go back in the Faraday box, not only the T5.
+> 4. Unplug the T5 and put it back with the spare microSD card. When the session is over, all of the electronics (the Pi with its drive, the router, the T5, the recovery cards and the power banks) go back in the Faraday box, not only the T5.
 >
 > **B. T5 power-on verify (quarterly)**
 >
@@ -204,7 +204,7 @@ You cannot perform these steps. Present them to the operator clearly.
 >
 > **D. Battery top-up (per RUNBOOK Part 4 chemistry rules)**
 >
-> - USB battery banks (Li-ion): top up to 50–60% (2–3 LEDs on a 4-LED indicator). Replace any bank that noticeably holds less charge than before.
+> - USB battery banks (Li-ion): top up to 50–60% (2–3 LEDs on a 4-LED indicator) every time the T5 is plugged in for step A, and at least every 6 months. They are stored in the Faraday box with the rest of the electronics. Replace any bank that noticeably holds less charge than before.
 > - LiFePO4 large battery (if installed): top-charge, measure resting voltage after 1 hour off charger (healthy = ~13.2–13.3 V). Log in paper notebook.
 >
 > **E. Spare router power-on (yearly — skip if not a yearly cycle)**

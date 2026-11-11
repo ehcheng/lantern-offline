@@ -76,8 +76,9 @@ case is that the box checks its disk on the next start, which adds a minute.
 
 When the library is not in use, all of the electronics go back in the Faraday
 box (a closed metal box, which shields them from an electromagnetic pulse):
-the Pi with its drive, the router, the backup SSD and the recovery cards.
-Close the lid fully.
+the Pi with its drive, the router, the backup SSD, the recovery cards and
+both power banks. Close the lid fully. The power banks need charging at
+least every 6 months (Part 4, item 6).
 
 **How long the batteries last**
 
@@ -483,7 +484,9 @@ By hand:
    lines only run when the SSD is mounted.
    Unplug the SSD and put it back with the spare card.
 6. Batteries: store the two power banks at 50 to 60% (about half the
-   lights). Top them up to that level. Replace a bank that clearly holds
+   lights). Top them up to that level every time the backup SSD is plugged
+   in for this check, and never leave them longer than 6 months without a
+   charge. They live in the Faraday box with the rest of the electronics. Replace a bank that clearly holds
    less than it used to; it will fail on the day you need it.
 7. If the image version changed since last time, rewrite both recovery
    cards (Part 3).

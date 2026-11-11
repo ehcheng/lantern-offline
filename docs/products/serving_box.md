@@ -83,7 +83,7 @@ Topology: `[phones] ⇄ wifi ⇄ [GL.iNet router: DHCP+DNS] ⇄ ethernet ⇄ [Pi
 
 - **Primary: 4 TB NVMe** (WD Black SN770 / Crucial P3 Plus class, ~$200–250). NVMe over SATA/USB for reliability (no cable/bridge chipset) and idle power (~0.3 W ASPM).
 - **Boot:** on the same NVMe (Pi 5 boots NVMe natively via HAT). Keep a flashed microSD clone of the boot partition taped inside the case as a recovery path.
-- **Cold backup: 2nd identical 4 TB SSD**, updated via `rsync` before grid-down, then **unplugged and stored in a closed metal box (a Faraday cage) with all of the other electronics**: the server, the router and the recovery cards go in it too, not only the backup SSD. SSDs retain data unpowered for years but **power it up and re-verify checksums every 6–12 months** — flash charge does leak. Add a `sha256sum` manifest at copy time.
+- **Cold backup: 2nd identical 4 TB SSD**, updated via `rsync` before grid-down, then **unplugged and stored in a closed metal box (a Faraday cage) with all of the other electronics**: the server, the router, the recovery cards and the power banks go in it too, not only the backup SSD. Charge the power banks whenever the SSD is powered up, and at least every 6 months. SSDs retain data unpowered for years but **power it up and re-verify checksums every 6–12 months** — flash charge does leak. Add a `sha256sum` manifest at copy time.
 - Third copy of the *irreplaceable* subset (your curated docs, not re-downloadable ZIMs) on a 512 GB microSD in the go-bag.
 - Filesystem: plain ext4. ZFS on a survival box is complexity you can't repair offline. `ponytail:` ext4 + rsync + checksums; upgrade to ZFS mirror only if you go N100 with dual drives and want bitrot self-healing.
 
