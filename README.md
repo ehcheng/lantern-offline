@@ -38,9 +38,18 @@ A HISTORICAL section holds 4,752 Survivor Library scans of pre-1950 books and so
 
 The Ask page works without any AI. It shows the matching emergency cards and a list of pages from the library's books. If a laptop on the LIBRARY network is running llamafile with Llama 3.2 3B or Llama 3.1 8B, the Ask page uses it to put the most useful pages first. The model writes nothing the reader sees, and it runs on the laptop because the Pi is too small to run a chat model well.
 
-On a phone, the tabs move to the bottom and the "Hurt or sick" button sits in the middle of them.
+On a phone, the tabs move to the bottom and the "Hurt or sick" button sits in the middle of them. The site follows the phone's light or dark setting.
 
-<img src="docs/screenshots/phone-triage.jpg" alt="Severe bleeding card on a phone" width="300">
+<p>
+<img src="docs/screenshots/phone-home.jpg" alt="Front page on a phone" width="250">
+<img src="docs/screenshots/phone-triage.jpg" alt="Severe bleeding card on a phone" width="250">
+<img src="docs/screenshots/phone-search.jpg" alt="Search on a phone" width="250">
+</p>
+<p>
+<img src="docs/screenshots/phone-plants.jpg" alt="Plant identification on a phone, dark mode" width="250">
+<img src="docs/screenshots/phone-map.jpg" alt="Offline map on a phone" width="250">
+<img src="docs/screenshots/phone-listening.jpg" alt="Audiobooks on a phone, dark mode" width="250">
+</p>
 
 The screenshots come from a test build of this repository with a 33 GB part of the library, with the map set to start in San Francisco.
 
