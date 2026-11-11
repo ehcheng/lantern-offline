@@ -1,0 +1,1309 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search — Lantern</title>
+<link rel="icon" href="_app/brand/lantern-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_app/fonts/fonts.css">
+<link rel="stylesheet" href="_app/app.26829533.css">
+<script src="_app/app.7858fbba.js" defer></script>
+<style>
+  .s-layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  @media (min-width: 900px) { .s-layout { grid-template-columns: 200px 1fr; } }
+  /* compact filter lines (the owner rounds 3-4): plain text, multiselect;
+     nothing selected = everything included. Phone: dot-separated inline,
+     labels visually distinct from values. Desktop rail: labels become
+     section headers, one option per line, no dots. */
+  .s-fline { font-size: 13px; color: var(--l-text2); line-height: 1.9; margin: 4px 0; }
+  .s-fline > b {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .12em; color: var(--l-muted);
+    background: var(--l-surface2); border-radius: 4px; padding: 1px 6px;
+    margin-right: 10px; vertical-align: 1px;
+  }
+  .s-fitem { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--l-text2); cursor: pointer; }
+  .s-fitem:hover { color: var(--l-text); }
+  .s-fitem[aria-pressed="true"] { color: var(--l-accent); font-weight: 700; }
+  .s-fsep { opacity: .45; margin: 0 5px; color: var(--l-muted); }
+  @media (min-width: 900px) {
+    .s-fline { margin: 0 0 16px; line-height: 1.7; }
+    .s-fline > b {
+      display: block; background: none; padding: 0 0 4px; margin: 0 0 6px;
+      border-bottom: 1px solid var(--l-line); border-radius: 0;
+    }
+    .s-fitem { display: block; text-align: left; width: 100%; }
+    .s-fsep { display: none; }
+  }
+  /* language: segmented control under the search bar — a page-level mode,
+     visually distinct from the rail's text filters */
+  .s-switches { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin: 8px 0 24px; }
+  .s-langswitch { display: flex; }
+  .s-langswitch > span {
+    display: inline-flex;
+    border: 1px solid var(--l-ctl); border-radius: 999px;
+    background: var(--l-surface); overflow: hidden;
+  }
+  .s-langswitch button {
+    font: inherit; font-size: 13px; line-height: 1;
+    min-height: 32px; padding: 0 14px; background: none; border: 0;
+    color: var(--l-muted); cursor: pointer;
+  }
+  .s-langswitch button:hover { color: var(--l-text); }
+  .s-langswitch button[aria-pressed="true"] {
+    background: var(--l-primary); color: var(--l-on-primary);
+    font-weight: 700; border-radius: 999px; cursor: default;
+  }
+  .s-section h2 { font-size: 15px; color: var(--l-muted); text-transform: uppercase; letter-spacing: .04em; margin: 24px 0 4px; }
+  .s-section .coverage { font-size: 12px; color: var(--l-muted); margin: 0 0 8px; }
+  .s-offline { opacity: .55; }
+  .s-pin { border: 2px solid var(--l-danger, #C0392B); border-radius: 8px; margin: 16px 0; }
+  .s-pin .l-doc-row { border: none; }
+  .s-pin .s-pincap { margin: 8px 12px 0; }   /* #236 follow-up 1: the ranked card list's caption */
+  .s-pin summary.s-pincap { margin: 8px 12px; cursor: pointer; font-weight: 700; }   /* #245: the open card list (E19) */
+  .s-pin details .l-doc-row { min-height: 0; padding-top: 6px; padding-bottom: 6px; }
+  /* H37b: historical body hits sit under this divider, never interleaved */
+  .s-histdiv {
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--l-muted); margin: 18px 0 6px; padding-top: 10px; border-top: 1px solid var(--l-line);
+  }
+  .s-related { font-style: italic; }
+</style>
+</head>
+<body class="has-sidebar">
+
+<aside class="l-sidebar">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <!--SIDEPILL--><button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+  <a class="l-cta-triage l-cta-triage--side" href="triage.html">
+    <span class="cross">+</span><span><b>Hurt or sick</b></span>
+  </a>
+  <!--NAV-->
+  <nav class="l-nav" aria-label="Primary">
+    <a href="index.html">Shelves</a>
+    <a href="search.html" aria-current="page">Search</a>
+    <a href="audio.html">Listening</a>
+    <a href="chat.html" class="needs-chat">Ask</a>
+    <a href="map.html" class="needs-maps hide-direct">Map</a>
+    <a href="kids.html">Kids</a>
+  </nav>
+  <!--/NAV-->
+  <div class="l-shelflist" id="sidebar-shelves"></div>
+  <!--SIDEFOOT-->
+  <div class="l-foot"><p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div></div>
+  <!--/SIDEFOOT-->
+</aside>
+
+<main>
+<header class="l-header">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+</header>
+
+<div class="l-wrap">
+  <div class="l-search" style="margin:24px 0 8px">
+    <label for="q" id="q-label">Search the library</label>
+    <input type="search" id="q" placeholder="burns, canning, antenna, water filter…" autocomplete="off" autofocus>
+  </div>
+  <div class="s-switches">
+    <div class="s-langswitch" id="f-mode" role="group" aria-label="Search mode"></div>
+    <div class="s-langswitch" id="f-lang" role="group" aria-label="Language"></div>
+  </div>
+  <noscript><p>Search needs JavaScript. Without it, browse the
+    <a href="index.html">shelves</a> or open <a href="triage.html">triage</a>.</p></noscript>
+
+  <div class="s-layout">
+    <aside class="s-rail" id="rail" hidden>
+      <div class="s-fline"><b>Shelf</b><span id="f-shelf"></span></div>
+      <div class="s-fline"><b>Type</b><span id="f-type"></span></div>
+      <div class="s-fline"><b>Old texts</b><button class="s-fitem" id="f-hist" aria-pressed="false">included</button></div>
+    </aside>
+
+    <div>
+      <div id="r-emerg"></div>   <!-- FIXES #287: the fixed emergency line, above the card list -->
+      <div id="r-pin"></div>
+      <section class="s-section" id="s-titles">
+        <h2>Titles</h2>
+        <p class="coverage">Instant, works offline. Filters apply.</p>
+        <div id="r-titles"></div>
+      </section>
+      <section class="s-section" id="s-fulltext">
+        <h2>Inside the documents</h2>
+        <p class="coverage" id="c-fulltext">Full text of the modern shelves. Filters apply.</p>
+        <div id="r-fulltext"></div>
+      </section>
+      <section class="s-section" id="s-enc">
+        <h2>Encyclopedias</h2>
+        <p class="coverage" id="c-enc">Wikipedia and more. Only the Language filter applies to encyclopedia results.</p>
+        <div id="r-enc"></div>
+      </section>
+      <div id="r-empty"></div>
+    </div>
+  </div>
+</div>
+</main>
+
+<!--TABBAR-->
+<nav class="l-tabbar" aria-label="Tabs">
+  <a href="index.html" class="l-tab l-tab-home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path><path d="M10 20v-5.5h4V20"></path></svg><span class="l-tab-label">Home</span></a>
+  <a href="search.html" class="l-tab l-tab-search" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.75" cy="10.75" r="6.75"></circle><path d="M15.75 15.75 20.5 20.5"></path></svg><span class="l-tab-label">Search</span></a>
+  <a href="triage.html" class="l-tab l-tab-triage"><span class="cross"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></span><span class="l-tab-label">Hurt or sick</span></a>
+  <a href="audio.html" class="l-tab l-tab-listening"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"></path><path d="M4 14.5h2.5A1.5 1.5 0 0 1 8 16v3a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 4 19z"></path><path d="M20 14.5h-2.5A1.5 1.5 0 0 0 16 16v3a1.5 1.5 0 0 0 1.5 1.5h1A1.5 1.5 0 0 0 20 19z"></path></svg><span class="l-tab-label">Listening</span></a>
+  <details class="l-more"><summary class="l-tab l-tab-more"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect></svg><span class="l-tab-label">More</span></summary>
+    <div class="l-msheet">
+      <div class="l-msheet-head"><h2 class="l-msheet-title">More</h2></div>
+      <div class="l-msheet-body">
+        <div class="l-msheet-links">
+          <a href="chat.html" class="needs-chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17H6.5A2.5 2.5 0 0 1 4 14.5z"></path></svg>Ask</a>
+          <a href="map.html" class="needs-maps hide-direct"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5 6-2.5v13.5L15 20l-6-2.5L3 20z"></path><path d="M9 4v13.5M15 6.5V20"></path></svg>Map</a>
+          <a href="kids.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8z"></path></svg>Kids</a>
+          <a href="video.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="m10 9 5 3-5 3z"></path></svg>Video</a>
+          <a href="plants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"></path><path d="M5 19c3-4 6-7 9-9"></path></svg>Plants</a>
+          <a href="tools/suncalc.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg>Sun &amp; moon</a>
+          <a href="tools/convert.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"></path></svg>Converters</a>
+        </div>
+        <p class="l-caption">Shelves</p>
+        <div class="l-shelflist" data-fill="shelves"></div>
+        <p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div>
+      </div>
+      <div class="l-msheet-foot"><button class="l-pill" type="button" data-role="status" onclick="lanternToggleTheme()" aria-label="Server status. Switch theme"><span class="dot"></span>checking…</button></div>
+    </div>
+  </details>
+</nav>
+<!--/TABBAR-->
+
+<script>
+(function () {
+  'use strict';
+  var input = document.getElementById('q');
+  var direct = location.protocol === 'file:';
+  /* language is a page-level mode (the owner R9 round 2): chosen under the search
+     bar, switching reloads (keeping the typed query, #150) — pagefind picks its index
+     bucket from <html lang> at load time, so a live toggle can't rebind it. */
+  var langM = location.search.match(/[?&]lang=(spa|eng)/);
+  var modeM = location.search.match(/[?&]mode=(precise|feeling|both)/);
+  var state = { shelves: {}, types: {}, hist: true, lang: langM ? langM[1] : 'eng',
+                mode: modeM ? modeM[1] : 'both' };  /* precise = words on the page, feeling = meaning, both = fused */
+  /* RT6 a7b F7: app.js builds the breadcrumb from the title ("Español › Search"); in Spanish mode it reads "Buscar". The tab
+     bar and sidebar are made Spanish by app.js spanishChrome() (L1, #212). */
+  if (state.lang === 'spa') { document.documentElement.lang = 'es'; document.title = 'Buscar — Lantern'; }
+  /* K4 hand-off (E6): app.js (deferred, runs after this) renders its chrome and pins in this language; the language
+     buttons reload the page with or without ?lang=spa, so this line also covers switching back to English */
+  window.lanternLang = state.lang === 'spa' ? 'es' : 'en';
+  /* #182 (a7a/a7b note, H2 handoff): the Spanish door landed on English labels. ES(en, es) picks the page's language;
+     the static labels are swapped once here. */
+  function ES(en, es) { return state.lang === 'spa' ? es : en; }
+  if (state.lang === 'spa') {
+    (function () {
+      var t = [['q-label', 'Buscar en la biblioteca'], ['s-titles', 'Títulos', 'Al instante, sin servidor. Los filtros se aplican.'],
+               ['s-fulltext', 'Dentro de los documentos', 'Texto completo de los estantes modernos. Los filtros se aplican.'], ['s-enc', 'Enciclopedias', 'Wikipedia y más. Solo el filtro de idioma se aplica aquí.']], i, sec;
+      document.getElementById('q-label').textContent = t[0][1];
+      document.getElementById('q').placeholder = 'quemaduras, conservas, agua potable, fiebre…';
+      for (i = 1; i < t.length; i++) {
+        sec = document.getElementById(t[i][0]);
+        sec.querySelector('h2').textContent = t[i][1];
+        if (t[i][2]) { sec.querySelector('.coverage').textContent = t[i][2]; }
+      }
+      var b = document.querySelectorAll('#rail .s-fline > b'), w = ['Estante', 'Tipo', 'Textos antiguos'];
+      for (i = 0; i < b.length && i < w.length; i++) { b[i].textContent = w[i]; }
+    })();
+  }
+  var shelves = [];
+  var pagefind = null, pagefindHist = null, pagefindDev = null, pagefindTried = false;
+  /* E1a (2026-10-04): survival synonym table (_app/index/search_synonyms.json, en + es, built from
+     data/search_synonyms.json). Plain words a worried person types ("safe to drink", "hueso roto") become
+     the words the documents use ("potable", "fractura"). Each alternative runs as its own Pagefind query and the hit
+     lists are merged, so a query still needs every one of ITS words on the page. Drug terms are never expanded. */
+  /* #91 (2026-10-06): a ?q= page load used to race this fetch; when the shelves answered first the query ran with no
+     variants, so the same query gave different rows run to run. Full-text now waits for the table (synWait); a failed
+     load still answers (lanternLoadIndex calls back with null) and runs with no variants. */
+  var SYN = null, SYN_REV = null, synWait = [];
+  /* #240 (round 8, E22 B): documents whose excerpts the page never shows (_app/index/title_only.json, written by
+     build_mcp_index.py: the pre-1945 treatment books with the catalogue's historical line). null until loaded; a failed
+     load treats every historical-shelf document as title-only (fail closed). /semantic rows carry their own flags. */
+  var TONLY = null;
+  /* #246 E27 age weight and #252 (a8 F3), both written by build_mcp_index.py beside title_only.json:
+     HY = _app/index/health_years.json {path: year} (health paths with a catalogue year), OUTD = _app/index/outdated_pages.json
+     {path: [pages]} (pages whose text outdated_aid() flags). null until loaded, {} when a load failed (no weight, and the
+     /semantic flags alone decide, as before). */
+  var HY = null, OUTD = null;
+  /* vetted pages the indexes cannot surface — the Hesperian mirror is in neither the title index nor Pagefind, and the
+     title layer is English-only — pinned above the results in both languages ("What to do now" row) */
+  var PINS = [
+    [/\b(?:grease|oil|cooking|kitchen|frying)\b.*\bfire|\bfire\b.*\b(?:grease|oil|cooking|kitchen|frying)\b|(?:fuego|incendio|llamas|se prend).*(?:aceite|grasa|cocina|sart[eé]n|estufa)|(?:aceite|grasa|cocina|sart[eé]n|estufa).*(?:fuego|incendio|llamas|se prend)/i,
+     { t: 'Grease or oil fire: never water — smother it (Hesperian, Fire Safety)', p: 'mirrors/hesperian/en.hesperian.org/hhg/A_Community_Guide_to_Environmental_Health:Fire_Safety.html', pin: 1 },
+     { t: 'Fuego de aceite o grasa: nunca agua — tápelo (Hesperian, Protección contra incendios)', p: 'mirrors/hesperian/es.hesperian.org/hhg/A_Community_Guide_to_Environmental_Health:Protección_contra_incendios.html', pin: 1 }],
+    [/mejill|almeja|marisco|\bostras?\b|molusco|marea roja|shellfish|mussel|\bclams?\b|oyster|red tide/i,
+     { t: 'Mussels, clams, shellfish: biotoxin risk — cooking does NOT destroy it (coastal card)', p: 'plants.html#coastal/bay_mussel', pin: 1 },
+     { t: 'Mejillones, almejas y mariscos: riesgo de biotoxinas — la cocción no las destruye (ficha de la costa)', p: 'plants.html#coastal/bay_mussel', pin: 1 }]
+,
+    /* #182 (red team 2026-10-11 class 4/5, a7a/a7b): covered topics the indexes could not surface */
+    [/water ?heater|hot water tank|calentador de agua|\bcalentador\b.*\bagua\b|\bboiler\b/i,
+     { t: 'Emergency drinking water: a water heater holds about 40 gallons (FEMA P-530, p.26)', p: 'reader.html?f=docs%2Femergency_mgmt%2Ffema_p530_earthquake_safety_at_home_2020.pdf&p=26', pin: 1 },
+     { t: 'Agua de emergencia: el agua del calentador y del tanque del inodoro (no de la taza) es segura (Ready.gov, folleto)', p: 'reader.html?f=mirrors%2Fready_gov%2Fwww.ready.gov%2Fsites%2Fdefault%2Ffiles%2F2023-01%2Fready-gov_nuclear-detonation-safety_flyer_spanish.pdf', pin: 1 }],
+    [/(?:secar|seco|secad|deshidrat).*(?:tomate|frijol|fruta|verdura|hortaliza|vegetal|alimento|comida|chile|mango)|(?:tomate|frijol|fruta|verdura|hortaliza|vegetal|alimento|comida|chile|mango).*(?:secar|secad|deshidrat)/i,
+     null,  /* E6 (#206): English mode never pins a Spanish document */
+     { t: 'Secado y deshidratación de frutas y hortalizas (FAO), p.101', p: 'reader.html?f=docs%2Fcd3wd%2F2012%2Fagriculture%2F_ag_fruit_veg_process_ss_es_unfao_lp_107730_.pdf&p=101', pin: 1 }],
+    [/(?:pozo|noria).*(?:letrina|ba[ñn]o|sanitario|distancia|lejos|metros)|(?:letrina|ba[ñn]o|sanitario).*(?:pozo|noria)|(?:latrine|outhouse|privy|septic).*\bwells?\b|\bwells?\b.*(?:latrine|outhouse|privy|septic)/i,
+     { t: 'Protected wells: keep latrines and animals at least 30 m away (Hesperian)', p: 'mirrors/hesperian/en.hesperian.org/hhg/A_Community_Guide_to_Environmental_Health:Protected_Wells.html', pin: 1 },
+     { t: 'Pozos protegidos: letrinas y animales a 30 m como mínimo (Hesperian)', p: 'mirrors/hesperian/es.hesperian.org/hhg/A_Community_Guide_to_Environmental_Health:Pozos_protegidos.html', pin: 1 }],
+    [/(?:car|truck|auto|vehicle)\s*batter.*(?:phone|charg|cell)|(?:phone|charg|cell).*(?:car|truck|auto|vehicle)\s*batter|(?:celular|tel[eé]fono|cargar).*bater[ií]a.*(?:carro|auto|coche|cami[oó]n)|bater[ií]a del? (?:carro|auto|coche|cami[oó]n).*(?:celular|cargar|tel[eé]fono)/i,
+     { t: 'Charging a phone from a car battery (library note)', p: 'docs/energy/charging_a_phone_from_a_car_battery.html', pin: 1 },
+     /* RT4 J2: the note now has a Spanish version */
+     { t: 'Cargar el teléfono con la batería del carro (nota de la biblioteca)', p: 'docs/energy/cargar_el_telefono_con_la_bateria_del_carro.html', pin: 1 }],
+    /* RT6 b2 F7: plain Spanish words for the vetted Spanish Hesperian page (Spanish mode only, E6). Same patterns and pages,
+       in the same order, as ES_LAY in server/mcp_server.py (there on accent-folded text). */
+    [/\bhuesos?\b.*\b(?:rot[oa]s?|quebrad\w*|partid\w*)\b|\b(?:rot[oa]s?|quebr\w*)\b.*\bhuesos?\b|\bfractur|\b(?:quebr|romp)\S*\s.*\b(?:brazos?|piernas?|mu[nñ]ecas?|tobillos?|pies?|manos?|dedos?|costillas?|clav[ií]culas?|caderas?)\b/i,
+     null,
+     { t: 'Fracturas, dislocaciones y esguinces (Hesperian, Nuevo Donde no hay doctor)', p: 'mirrors/hesperian/es.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Fracturas,_dislocaciones_y_esguinces.html', pin: 1 }],
+    [/desmay|\bno (?:despierta|reacciona|responde)\b|inconscien|perdi[oó] el (?:sentido|conocimiento)/i,
+     null,
+     { t: 'Pérdida del conocimiento (Hesperian, Nuevo Donde no hay doctor)', p: 'mirrors/hesperian/es.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Pérdida_del_conocimiento.html', pin: 1 }],
+    /* #234 (round 7 b4 W3): «después de caerse» and «se cayó» with the head named also open the head page */
+    [/(?:^|\s)(?:golpe\S*|golpe[oó]|peg[oó]|cay[oó]|caerse|ca[ií]da)\s.*\bcabeza\b|\bcabeza\b.*\b(?:golpe|peg[oó]|cay[oó]|caerse)/i,
+     null,
+     { t: 'Lesiones de la cabeza (Hesperian, Nuevo Donde no hay doctor)', p: 'mirrors/hesperian/es.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Lesiones_de_la_cabeza.html', pin: 1 }],
+    /* #240 (round 8 b2 F5, a7b W3): sunken eyes with diarrhea, or eye pain with dengue or fever, are not an eye problem:
+       those queries skip the eye chapter (the diarrhea row below, and the triage pin, take them) */
+    [/^(?!.*(?:hundid|dengue|fiebre|calentura|diarrea|deshidrat|v[oó]mit)).*\bojos?\b/i,
+     null,
+     { t: 'Los problemas de los ojos y de la vista (Hesperian, Nuevo Donde no hay doctor, cap. 9)', p: 'mirrors/hesperian/es.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Capítulo_9:_Los_problemas_de_los_ojos_y_de_la_vista.html', pin: 1 }],
+    [/\b(?:calor|sol|insolaci[oó]n)\b.*\b(?:mare\S*|desmay\S*|calambre\S*)|\b(?:mare\S*|calambre\S*)\s.*\b(?:calor|sol)\b|golpe de calor/i,
+     null,
+     { t: 'Calambres y agotamiento por calor (Hesperian, Nuevo Donde no hay doctor)', p: 'mirrors/hesperian/es.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Calambres_y_agotamiento_por_calor.html', pin: 1 }],
+    [/alacr[aá]n|escorpi[oó]n|(?:^|\s)pic(?:[oó]|ado|ada|adura|aduras)(?=\W|$)|aguij[oó]n|serpiente|v[ií]bora|culebra|\bmord[ií]|mordedura/i,
+     null,
+     { t: 'Picaduras y mordeduras (Hesperian, Nuevo Donde no hay doctor)', p: 'mirrors/hesperian/es.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Picaduras_y_mordeduras.html', pin: 1 }],
+    /* #227 (round 7 class 4): a household product with a swallow verb («mi niño tomó cloro»); pills only with se tomó / tragó */
+    [/gasolina|kerosen|querosen|petr[oó]leo|thinner|veneno|envenen|raticida|insecticida|plaguicida|pesticida|\b(?:tom[oó]|trag[oó]|bebi[oó])\s+(?:(?!agua\b)\S+\s+){0,3}?(?:cloro|lej[ií]a|blanqueador|destapaca[nñ]os)\b|\b(?:se\s+(?:tom[oó]|trag[oó]|bebi[oó])|trag[oó])\s+(?:(?!agua\b)\S+\s+){0,3}?pastillas?\b/i,
+     null,
+     { t: 'Envenenamiento (Hesperian, Nuevo Donde no hay doctor)', p: 'mirrors/hesperian/es.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Envenenamiento.html', pin: 1 }],
+    [/\bdiarrea/i,
+     null,
+     { t: 'Diarrea (Hesperian, Nuevo Donde no hay doctor)', p: 'mirrors/hesperian/es.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Diarrea.html', pin: 1 }],
+    [/\b(?:letrinas?|excusados?|retretes?|sanitarios?)\b/i,
+     null,
+     { t: 'Construcción de sanitarios (Hesperian, Guía comunitaria para la salud ambiental, cap. 7)', p: 'mirrors/hesperian/es.hesperian.org/hhg/A_Community_Guide_to_Environmental_Health:Capítulo_7:_Construcción_de_sanitarios.html', pin: 1 }]
+  ];
+  function pinFor(q) {
+    for (var i = 0; i < PINS.length; i++) { if (PINS[i][0].test(q)) { return PINS[i][state.lang === 'spa' ? 2 : 1]; } }
+    return null;
+  }
+  /* #245 (E26, fix plan "Router API and card rows"): the card rows come from the Ask router, window.lanternRoute in app.js,
+     the one decision path the Ask page and the front page also take (triage_synonyms.json decides no card any more).
+     An amount question shows no card row; a matched card, exact or guessed, or a health question with no card, shows the
+     open list (E19; R1, #283, 10-28: never a lone row, as on the Ask page): the matched cards first, the first bold
+     "Closest match", then every other card in E12 order (window.lanternCardNames, triage.html order); anything else shows
+     no card row.
+     Spanish mode: the same ids on triage_es.html with the Spanish names; English mode never shows a Spanish name (E6). */
+  /* #272 (round 10 a7b W4, b4 F7): one route per question for the card rows, the dose notice and the demotions; its amount
+     flag (router v2: a dose figure in the question, or an amount word with a drug, antivenom or complaint word) refuses the
+     card rows and shows the printed-guide notice, so "how much of the kids fever stuff can i give" gets both */
+  function routeOf(q) { return window.lanternRoute(q, !!drugQuery(q)); }
+  function cardRows(q) {
+    var rt = routeOf(q), es = state.lang === 'spa', base = es ? 'triage_es.html' : 'triage.html',
+        names = window.lanternCardNames, ids = rt.cards.slice(), h = '', i;
+    if (rt.amount || !(ids.length || rt.health)) { return ''; }
+    for (var k in names) { if (ids.indexOf(k) === -1) { ids.push(k); } }
+    function row(id, first) {   /* the open list is one line a card, as on Ask */
+      var nm = (names[id] || [id, id])[es ? 1 : 0];
+      return '<a class="l-doc-row" data-card="' + esc(id) + '" href="' + esc(window.lanternHref({ p: base + '#' + id, pin: 1 })) + '"><span>' +
+        '<span class="l-src l-src--triage">' + ES('TRIAGE', 'TRIAJE') + '</span> ' +
+        (first ? '<b>' + esc(nm) + '</b> ' + ES('← Closest match', '← Lo más parecido') : esc(nm)) + '</span><span class="spacer">›</span></a>';
+    }
+    h += '<details class="s-cards" open data-mode="open"><summary class="l-caption s-pincap">' +
+      ES('Emergency? All emergency cards', '¿Emergencia? Todas las tarjetas de emergencia') + '</summary>';
+    for (i = 0; i < ids.length; i++) { h += row(ids[i], i === 0 && rt.cards.length > 0); }
+    return h + '</details>';
+  }
+  function setPin(q, vp) {
+    var cr = cardRows(q);
+    el('r-pin').innerHTML = cr || vp ? '<div class="s-pin">' + cr + (vp ? rowHTML(vp) : '') + '</div>' : '';
+    return !!cr;
+  }
+
+  /* E6 (10-17, #206: "Spanish should NEVER compromise this English-first resource"): English mode lists no Spanish
+     document. titles.json carries no language, so a title row is Spanish when its title says "(Spanish)", its path is a
+     Spanish mirror or a CD3WD _es_/_sp_ file, or its title holds two or more Spanish-only words and fewer English ones.
+     K2 follow-up 2 (K5 450df4bf): titles.json now carries the row language (packed element 4, ISO 639-1, absent = "en").
+     A row in the index is judged by that field alone (only "es" is dropped; French, Portuguese and the rest show as
+     before); the word vote below is the fallback for a path the index does not list (mirror pages, an old index). */
+  /* the library's own Spanish notes (car battery; E4 wet-wood fire, fast crops, salting meat) by file name */
+  var ES_PATH = /(?:^|\/)es\.hesperian\.org\/|\/www\.ready\.gov\/es\/|_es_|(?:cargar_el_telefono_con_la_bateria_del_carro|encender_fuego_con_lena_mojada|cultivos_de_cosecha_rapida|conservar_carne_con_sal)\.(?:html|md)$/;
+  var ES_TWORDS = /(?:^|[^a-z])(?:el|los|las|del|con|para|por|una|unos|unas|como|sus|al|y|que|sin|mas)(?=$|[^a-z])/g;
+  var ES_WEAK = /(?:^|[^a-z])(?:la|de|en)(?=$|[^a-z])/g;
+  var EN_TWORDS = /(?:^|[^a-z])(?:the|of|and|to|for|with|from|how|in|on|a|an|by|your)(?=$|[^a-z])/g;
+  /* path -> row language from the packed titles index; app.js's decodeTitles drops element 4, so the page reads the raw
+     index itself: window.LANTERN_TITLES (file://, set by titles.js) or _app/index/titles.json (same URL as app.js, so the
+     browser cache serves it). null until loaded or when loading failed (then the fallback alone decides). */
+  var ROWLANG = null;
+  function loadRowLangs(cb) {
+    function build(v) {
+      if (v && v.i && v.d) {
+        ROWLANG = {};
+        for (var i = 0; i < v.i.length; i++) { var it = v.i[i]; ROWLANG[v.d[it[0]] + it[1]] = it[4] || 'en'; }
+      }
+      cb();
+    }
+    if (window.LANTERN_TITLES) { build(window.LANTERN_TITLES); return; }
+    if (direct) {
+      var sc = document.createElement('script');
+      sc.src = '_app/index/titles.js';
+      sc.onload = function () { build(window.LANTERN_TITLES); };
+      sc.onerror = function () { build(null); };
+      document.head.appendChild(sc);
+      return;
+    }
+    var x = new XMLHttpRequest();
+    x.open('GET', '_app/index/titles.json', true); x.timeout = 20000;
+    x.onreadystatechange = function () {
+      if (x.readyState !== 4) { return; }
+      var v = null;
+      if (x.status === 200) { try { v = JSON.parse(x.responseText); } catch (e) {} }
+      build(v);
+    };
+    x.send();
+  }
+  function esDoc(it) {
+    var rl = ROWLANG && ROWLANG[it.p];
+    if (rl) { return rl === 'es'; }
+    if (/\((?:spanish|espa[nñ]ol)\)/i.test(it.t) || /[?&]lang=es(?:&|#|$)/.test(it.p)) { return true; }   /* K5: Spanish species rows */
+    if (/english|ingl[eé]s|\((?:french|portuguese|arabic|swahili|german|italian|chinese|hindi|bengali)\)/i.test(it.t)) { return false; }
+    if (ES_PATH.test(it.p)) { return true; }
+    var l = it.t.split(' — ')[0].toLowerCase(), t = fold(l), es = (t.match(ES_TWORDS) || []).length, en = (t.match(EN_TWORDS) || []).length;
+    if (en) { return es >= 2 && es > en; }
+    return es >= 2 || (es + (t.match(ES_WEAK) || []).length >= 1 && /ñ|ci[oó]n(?:es)?\b|í[ao]s?\b/.test(l));
+  }
+  document.addEventListener('DOMContentLoaded', function () {   /* app.js is deferred: not callable at parse time */
+    function flush() {
+      if (SYN === null || TONLY === null || HY === null || OUTD === null) { return; }
+      var w = synWait; synWait = [];
+      for (var j = 0; j < w.length; j++) { w[j](); }
+    }
+    window.lanternLoadIndex('search_synonyms', function (o) {
+      SYN = o || {}; SYN_REV = {};
+      for (var k in SYN) { for (var i = 0; i < SYN[k].length; i++) { var a = SYN[k][i].toLowerCase(); (SYN_REV[a] = SYN_REV[a] || []).push(k); } }
+      flush();
+    });
+    window.lanternLoadIndex('title_only', function (v) {
+      TONLY = { ok: !!(v && v.length !== undefined), p: {} };
+      for (var i = 0; TONLY.ok && i < v.length; i++) { TONLY.p[v[i]] = 1; }
+      flush();
+    });
+    window.lanternLoadIndex('health_years', function (v) { HY = v || {}; flush(); });
+    window.lanternLoadIndex('outdated_pages', function (v) { OUTD = v || {}; flush(); });
+  });
+  function expandQuery(q, max) {
+    if (!SYN || drugQuery(q)) { return []; }
+    var ql = ' ' + q.toLowerCase().replace(/\s+/g, ' ').trim() + ' ', out = [], seen = {};
+    function alts(key) { return (SYN[key] || []).concat(SYN_REV[key] || []); }
+    var keys = Object.keys(SYN).concat(Object.keys(SYN_REV)).sort(function (a, b) { return b.length - a.length; });
+    for (var i = 0; i < keys.length && out.length < max; i++) {
+      var k = keys[i], at = ql.indexOf(' ' + k + ' ');
+      if (at === -1) { continue; }
+      var al = alts(k);
+      for (var j = 0; j < al.length && out.length < max; j++) {
+        var v = (ql.slice(0, at + 1) + al[j] + ql.slice(at + 1 + k.length)).trim();
+        if (v !== q.toLowerCase() && !seen[v] && !drugQuery(v)) { seen[v] = 1; out.push(v); }
+      }
+    }
+    return out;
+  }
+  /* run a Pagefind index for q plus its synonym variants; hits merged in rank order, first occurrence wins.
+     The user's own words outrank a paraphrase: a variant's rank-r hit joins the merge at rank r + SYN_LAG
+     (2026-10-05: round-robin at equal rank let "gasoline gauge" hits push the fuel-gauge page out of the top 8). */
+  var SYN_LAG = 4;
+  function pfSearchAll(idx, q, variants, cap) {
+    /* #193 (b4 N2): the searches run one after another. Started together on a cold index, a variant search sometimes
+       came back with a different hit count (20 or 23 for "... with temperature", 4 of 30 loads), so the keyword list
+       changed between reloads. A failed variant is retried once, then given up (the user's own query still fails the part). */
+    var rs = [], chain = idx.search(q).then(function (r) { rs.push(r); });
+    variants.forEach(function (v) {
+      chain = chain.then(function () {
+        return idx.search(v).then(null, function () { return idx.search(v); }).then(null, function () { return { results: [] }; });
+      }).then(function (r) { rs.push(r); });
+    });
+    return chain.then(function () {
+      var out = [], seen = {}, r = 0, k, more = true;
+      for (k = 0; k < rs.length; k++) { rs[k] = (rs[k] && rs[k].results) || []; }
+      while (out.length < cap && more) {
+        more = false;
+        for (k = 0; k < rs.length; k++) {
+          var at = k === 0 ? r : r - SYN_LAG;
+          if (at < 0) { more = true; continue; }
+          if (at < rs[k].length) { more = true; var h = rs[k][at]; if (!seen[h.id]) { seen[h.id] = 1; out.push(h); } }
+        }
+        r++;
+      }
+      return { results: out };
+    });
+  }
+
+  function el(id) { return document.getElementById(id); }
+  function esc(s) { return window.lanternEsc(s); }  /* app.js loaded before boot() runs */
+
+  /* G3 (09-19): drug-name queries hide book snippets (they can quote dose
+     figures) and show the printed-dosing-card notice instead. Titles/links
+     still render; only the quoted excerpt text is suppressed. */
+  var DRUGS = ('aspirin ibuprofen advil motrin naproxen aleve acetaminophen paracetamol tylenol ' +
+    'castor-oil gentian-violet ' +  /* round 10: dose_r39.txt DRUGS_EN_ADD */
+    'amoxicillin augmentin penicillin ampicillin azithromycin zithromax doxycycline ciprofloxacin cipro ' +
+    'levofloxacin metronidazole flagyl cephalexin keflex clindamycin erythromycin trimethoprim ' +
+    'sulfamethoxazole bactrim septra nitrofurantoin macrobid tetracycline vancomycin gentamicin ' +
+    'codeine morphine oxycodone hydrocodone vicodin percocet tramadol fentanyl naloxone narcan ' +
+    'prednisone prednisolone dexamethasone hydrocortisone epinephrine adrenaline albuterol salbutamol ' +
+    'diphenhydramine benadryl loratadine claritin cetirizine zyrtec fexofenadine allegra ' +
+    'pseudoephedrine sudafed dextromethorphan guaifenesin loperamide imodium ondansetron zofran ' +
+    'promethazine phenergan meclizine dramamine omeprazole prilosec ranitidine famotidine pepcid ' +
+    'insulin metformin glipizide lisinopril amlodipine losartan metoprolol atenolol propranolol ' +
+    'atorvastatin lipitor simvastatin warfarin coumadin heparin clopidogrel plavix nitroglycerin ' +
+    'furosemide lasix hydrochlorothiazide digoxin amiodarone fluconazole diflucan nystatin ' +
+    'acyclovir valacyclovir valtrex oseltamivir tamiflu ivermectin permethrin albendazole ' +
+    'mebendazole chloroquine hydroxychloroquine doxylamine lorazepam ativan diazepam valium ' +
+    'alprazolam xanax zolpidem ambien gabapentin phenytoin dilantin carbamazepine levothyroxine ' +
+    'synthroid sertraline zoloft fluoxetine prozac lithium haloperidol naltrexone misoprostol ' +
+    'oxytocin magnesium-sulfate ceftriaxone rocephin chloramphenicol streptomycin rifampin isoniazid ' +
+    'melatonin bismuth pepto-bismol simethicone docusate senna bisacodyl lidocaine benzocaine bacitracin neosporin ' +
+    'polysporin phenylephrine oxymetazoline afrin chlorpheniramine calcium-carbonate tums milk-of-magnesia ' +  /* F2 A1 en58: OTC names */
+    'cotrimoxazole co-trimoxazole cotrimoxazol benzylpenicillin benzathine procaine phenoxymethylpenicillin cloxacillin flucloxacillin dicloxacillin cefixime cefotaxime spectinomycin kanamycin amikacin tinidazole praziquantel niclosamide pyrantel artesunate artemether lumefantrine coartem sulfadoxine pyrimethamine fansidar primaquine quinine mefloquine griseofulvin miconazole clotrimazole zidovudine nevirapine lamivudine efavirenz tenofovir ergometrine methylergometrine carbetocin glibenclamide gliclazide chlorphenamine aminophylline theophylline phenobarbital phenobarbitone amitriptyline chlorpromazine risperidone cimetidine hyoscine atropine ketamine nifedipine enalapril hydralazine methyldopa labetalol tranexamic phytomenadione pyrazinamide ethambutol rifampicin dapsone clofazimine diclofenac mefenamic bupivacaine'  /* G2 b2 F2: MSF essential drugs */
+  ).split(' ');
+  var TABLET_RE = /^(pill|pills|tablet|tablets|tab|tabs|pastilla|pastillas|tableta|tabletas|comprimido|comprimidos)$/;
+  var WATER_RE = /\b(water|agua|purif\w*|potabiliz\w*|chlorine|cloro|iodine|yodo|bleach|lejia|aquatabs?)\b/;
+  /* #171 (round 4): in a water-treatment TEXT (not a query) "dose", "dosage" and "mg" name the amount of disinfectant,
+     beside an amount per volume of water ("4 drops per litre", "1 quart/liter 2 drops"); a drug or medicine word still
+     trips. Same lists as TREAT_RE / TREAT_WORD_RE / WATER_AMOUNT_RE in server/mcp_server.py. */
+  var TREAT_RE = /\b(bleach|chlorin\w*|hypochlorite|cloro|clorad\w*|lejia|blanqueador|iodine|yodo|purif\w*|potabiliz\w*|aquatabs?|disinfect\w*|desinfec\w*)\b/;
+  var WITHOUT_DRUG_RE = /\b(?:without|w\/o|no|other than|instead of|besides|sin|en lugar de|en vez de)\s+(?:any\s+|using\s+|taking\s+|usar\s+|tomar\s+)?(?:medicine|medicines|medication|medications|drugs|pills|medicina|medicinas|medicamentos?|pastillas|farmacos)\b/g;
+  var TREAT_WORD_RE = /^(dose|doses|dosage|dosages|dosing|dosis|mg|milligram|milligrams|miligramo|miligramos)$/;
+  /* #207 (a7a S3b): "how do I keep insulin cold?" is a storage question, not a dose search; a dose word still trips. Same
+     pattern as STORAGE_RE in server/mcp_server.py dose_guard() */
+  var STORAGE_RE = /\b(?:keep|keeping|store|storing|storage|guardar|guardo|conservar|conservo|mantener|mantengo)\b[^.?!]{0,40}\b(?:cold|cool|fresh|refrigerat\w*|fridge|cooler|ice|frozen|freez\w*|heat|hot|warm|temperature|fri[oa]|fresc[oa]|refrigera\w*|nevera|heladera|hielo|calor|temperatura)\b|\b(?:without|with no|no|sin)\s+(?:a\s+)?(?:fridge|refrigerator|refrigeration|electricity|power|nevera|refrigerador|electricidad|luz)\b/;
+  var STORAGE_DOSE_RE = /^(dose|doses|dosage|dosages|dosing|mg|milligram|milligrams|dosis|miligramo|miligramos)$/;
+  var WATER_AMOUNT_RE = /\b(?:drops?|gotas?|teaspoons?|tablespoons?|cucharaditas?|cucharadas?|tablets?|tabletas?|pastillas?|mg|ml|ppm)\s*(?:per|por|\/|for\s+each|in\s+each|para\s+cada|cada)\s*(?:\d+\s*)?(?:lit(?:re|er)s?|litros?|l|gal(?:lons?)?|galon(?:es)?|quarts?|qt|cuartos?)\b|\b(?:lit(?:re|er)s?|litros?|gallons?|galon(?:es)?|quarts?)(?:\/lit(?:re|er))?\s+\d+\s*(?:drops?|gotas?)\b/;
+  /* red team 2026-10-09 (#146): Spanish class words and drug names, accent-folded (same lists as DOSE_KEYWORD_ES_RE and
+     DRUGS_ES in server/mcp_server.py); a match also switches the dose notice to Spanish */
+  var DOSE_ES_RE = /^(dosis|medicina|medicinas|medicamento|medicamentos|antibiotico|antibioticos|analgesico|analgesicos|farmaco|farmacos|pastilla|pastillas|tableta|tabletas|comprimido|comprimidos|capsula|capsulas|jarabe|jarabes|inyeccion|inyecciones|miligramo|miligramos|antiacido|antiacidos|laxante|laxantes)$/;
+  var DRUGS_ES = ('amoxicilina ampicilina penicilina bencilpenicilina benzatinica espectinomicina doxiciclina tetraciclina eritromicina ' +
+    'ricino violeta-de-genciana ' +  /* round 10: dose_r39.txt DRUGS_ES_ADD */
+    'azitromicina ciprofloxacina cefalexina cefixima ceftriaxona gentamicina cloranfenicol estreptomicina rifampicina ' +
+    'isoniacida metronidazol cotrimoxazol sulfametoxazol trimetoprima nitrofurantoina clindamicina paracetamol ' +
+    'acetaminofen ibuprofeno aspirina naproxeno diclofenaco codeina morfina tramadol albendazol mebendazol piperazina ' +
+    'praziquantel ivermectina permetrina cloroquina primaquina quinina artemeter fluconazol nistatina clotrimazol ' +
+    'aciclovir misoprostol oxitocina ergometrina insulina metformina prednisona prednisolona dexametasona hidrocortisona ' +
+    'epinefrina adrenalina salbutamol difenhidramina loratadina clorfeniramina diazepam fenobarbital fenitoina ' +
+    'carbamazepina omeprazol loperamida sertralina fluoxetina haloperidol melatonina'
+  ).split(' ');
+  /* acceptance 2026-10-03: symptom-phrased drug questions ("fever medicine for a child") carry no drug name, so the
+     keyword list above also names the classes, and every snippet shown is scrubbed of dose figures regardless of
+     the query (same regex as DOSE in acceptance_run.py and gen_doc_answers.py and DOSE_FIGURE in mcp_server.py; red team
+     2026-10-09 #146/#149: English + Spanish, a range or compound goes whole, ORS/water-treatment amounts stay;
+     logs/audit/redteam_20261009_scripts/fix_f1_test.py checks all four are identical). */
+  var DOSE_RE = /(?!(?<=iphone\s)[2-5]\s?g\b)(?!(?<=phone\s)[2-5]\s?g\b)(?![2-5]\s?g\b(?=\s*(?:lte|networks?|phones?|iphones?|modems?|signal|wi-?fi|cellular|data|service|coverage|speeds?|internet|front|back|screen|battery|case|replacement|red|se[nñ]al|celular|m[oó]vil)\b))(?<!\bFM\s)(?<!\bTM\s)(?<!\bTC\s)(?<!\bATP\s)(?<!\bSTP\s)(?<!\d-)(?<!\d\.)(?<!gallon\s)(?<!gallons\s)(?<!quart\s)(?<!quarts\s)(?<!liter\s)(?<!liters\s)(?<!litre\s)(?<!litres\s)(?<!litro\s)(?<!litros\s)(?<!gal[oó]n\s)(?<!galones\s)(?<!barrel\s)(?<!barrels\s)(?<!barril\s)(?<!barriles\s)(?<!drum\s)(?<!drums\s)(?<!tank\s)(?<!tanks\s)(?<!tambo\s)(?<!tambos\s)(?<!tanque\s)(?<!tanques\s)(?<!drops\s\()(?<!gotas\s\()(?<!\d\/)(?<!\d\/)(?<!\d\/)(?!(?<=\bdrops\s)\d+\s*drops\b)(?!(?<=\bgotas\s)\d+\s*gotas\b)(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*(?:(?:parte\s+)?de\s+(?:una?\s+)?)?(?:mg|mcg|µg|ug|g|ml|cc|mililitros?|millilit(?:er|re)s?|m\s?iu|m\s?ui|iu|ui|(?:million|mill[oó]n(?:es)?)\s+(?:de\s+)?(?:(?:international\s+)?(?:units?|unidades)|ui|iu)|units?|unidades|grams?|gramos?|milligrams?|miligramos?|micrograms?|microgramos?|tabs?|tablets?|tabletas?|pills?|pastillas?|comprimidos?|caps?|capsules?|c[aá]psulas?|(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|capfuls?|dropperfuls?|tsp|tbsp|c[àá]c|c[àá]s|c\.[àá]\.[cs](?=\.)|cucharaditas?|cucharadas?|drops?|gotas?|ampoules?|ampules?|ampuls?|ampollas?|ampolletas?|vials?|frascos?[-\s]ampollas?)\b(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))(?:\s*(?:\/|per|por(?:\s+cada)?)\s*(?:kg|kilos?|kilogramos?|kilograms?|d[ií]a|day|dose|dosis|m2)\b(?:\s+(?:of\s+body\s+weight|de\s+peso(?:\s+corporal)?))?)*(?:\s*x\s*\d+(?:\s*(?:[-–]|or|o|to|a)\s*\d+)?\b)?(?:,?\s+(?:daily|a\s+day|per\s+day|each\s+day|al\s+d[ií]a|por\s+d[ií]a|cada\s+d[ií]a|diari[oa]s?))?|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|o|ó|u|a|y|and)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+(?:of\s+)?an?)?|cuarto\s+de(?:\s+una?)?|an?(?=\s+(?:(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|capfuls?|dropperfuls?|ampoules?|ampules?|vials?)\b))\s+(?:tabletas?|pastillas?|comprimidos?|c[aá]psulas?|tablets?|pills?|capsules?|ampoules?|ampules?|vials?|(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|capfuls?|dropperfuls?|cucharaditas?|cucharadas?|goteros?|ampolletas?|frascos?[-\s]ampollas?|drops?|gotas?|ampollas?(?=\s+(?:de\s+(?:\w*ina\b|suero|antiveneno|antiof[ií]dico|antitet[aá]nic)|i\.?[mv]\b|intramuscular|intraven)))\b(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))(?:\s*(?:\/|per|por(?:\s+cada)?)\s*(?:kg|kilos?|kilogramos?|kilograms?|d[ií]a|day|dose|dosis|m2)\b(?:\s+(?:of\s+body\s+weight|de\s+peso(?:\s+corporal)?))?)*(?:\s*x\s*\d+(?:\s*(?:[-–]|or|o|to|a)\s*\d+)?\b)?(?:,?\s+(?:daily|a\s+day|per\s+day|each\s+day|al\s+d[ií]a|por\s+d[ií]a|cada\s+d[ií]a|diari[oa]s?))?|(?:(?=every\s|cada\s)(?<!compost\s)(?<!pile\s)(?<!dough\s)(?<!wake\s)(?<!wake\sthem\s)(?<!wake\shim\s)(?<!wake\sher\s)(?<!wake\sit\s)(?<!wake\sup\s)(?<!wake\sthem\sup\s)(?<!wake\shim\sup\s)(?<!wake\sher\sup\s)(?<!wake\son\sthem\s)(?<!wake\son\shim\s)(?<!wake\son\sher\s)(?<!wake\sthe\sperson\s)(?<!wake\sthe\schild\s)(?<!wake\sthe\sbaby\s)(?<!wake\sthe\spatient\s)(?<!wake\son\sthe\sperson\s)(?<!wake\son\sthe\schild\s)(?<!wake\son\sthe\spatient\s)(?<!waken\s)(?<!waken\sthem\s)(?<!waken\shim\s)(?<!waken\sher\s)(?<!waken\sit\s)(?<!waken\sup\s)(?<!waken\sthem\sup\s)(?<!waken\shim\sup\s)(?<!waken\sher\sup\s)(?<!waken\son\sthem\s)(?<!waken\son\shim\s)(?<!waken\son\sher\s)(?<!waken\sthe\sperson\s)(?<!waken\sthe\schild\s)(?<!waken\sthe\sbaby\s)(?<!waken\sthe\spatient\s)(?<!waken\son\sthe\sperson\s)(?<!waken\son\sthe\schild\s)(?<!waken\son\sthe\spatient\s)(?<!awaken\s)(?<!awaken\sthem\s)(?<!awaken\shim\s)(?<!awaken\sher\s)(?<!awaken\sit\s)(?<!awaken\sup\s)(?<!awaken\sthem\sup\s)(?<!awaken\shim\sup\s)(?<!awaken\sher\sup\s)(?<!awaken\son\sthem\s)(?<!awaken\son\shim\s)(?<!awaken\son\sher\s)(?<!awaken\sthe\sperson\s)(?<!awaken\sthe\schild\s)(?<!awaken\sthe\sbaby\s)(?<!awaken\sthe\spatient\s)(?<!awaken\son\sthe\sperson\s)(?<!awaken\son\sthe\schild\s)(?<!awaken\son\sthe\spatient\s)(?<!waking\s)(?<!waking\sthem\s)(?<!waking\shim\s)(?<!waking\sher\s)(?<!waking\sit\s)(?<!waking\sup\s)(?<!waking\sthem\sup\s)(?<!waking\shim\sup\s)(?<!waking\sher\sup\s)(?<!waking\son\sthem\s)(?<!waking\son\shim\s)(?<!waking\son\sher\s)(?<!waking\sthe\sperson\s)(?<!waking\sthe\schild\s)(?<!waking\sthe\sbaby\s)(?<!waking\sthe\spatient\s)(?<!waking\son\sthe\sperson\s)(?<!waking\son\sthe\schild\s)(?<!waking\son\sthe\spatient\s)(?<!check\s)(?<!check\sthem\s)(?<!check\shim\s)(?<!check\sher\s)(?<!check\sit\s)(?<!check\sup\s)(?<!check\sthem\sup\s)(?<!check\shim\sup\s)(?<!check\sher\sup\s)(?<!check\son\sthem\s)(?<!check\son\shim\s)(?<!check\son\sher\s)(?<!check\sthe\sperson\s)(?<!check\sthe\schild\s)(?<!check\sthe\sbaby\s)(?<!check\sthe\spatient\s)(?<!check\son\sthe\sperson\s)(?<!check\son\sthe\schild\s)(?<!check\son\sthe\spatient\s)(?<!checking\s)(?<!checking\sthem\s)(?<!checking\shim\s)(?<!checking\sher\s)(?<!checking\sit\s)(?<!checking\sup\s)(?<!checking\sthem\sup\s)(?<!checking\shim\sup\s)(?<!checking\sher\sup\s)(?<!checking\son\sthem\s)(?<!checking\son\shim\s)(?<!checking\son\sher\s)(?<!checking\sthe\sperson\s)(?<!checking\sthe\schild\s)(?<!checking\sthe\sbaby\s)(?<!checking\sthe\spatient\s)(?<!checking\son\sthe\sperson\s)(?<!checking\son\sthe\schild\s)(?<!checking\son\sthe\spatient\s)(?<!recheck\s)(?<!recheck\sthem\s)(?<!recheck\shim\s)(?<!recheck\sher\s)(?<!recheck\sit\s)(?<!recheck\sup\s)(?<!recheck\sthem\sup\s)(?<!recheck\shim\sup\s)(?<!recheck\sher\sup\s)(?<!recheck\son\sthem\s)(?<!recheck\son\shim\s)(?<!recheck\son\sher\s)(?<!recheck\sthe\sperson\s)(?<!recheck\sthe\schild\s)(?<!recheck\sthe\sbaby\s)(?<!recheck\sthe\spatient\s)(?<!recheck\son\sthe\sperson\s)(?<!recheck\son\sthe\schild\s)(?<!recheck\son\sthe\spatient\s)(?<!despi[eé]rtela\s)(?<!despi[eé]rtela\sa\sla\spersona\s)(?<!despi[eé]rtela\sal\sni[nñ]o\s)(?<!despi[eé]rtela\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtela\sal\senfermo\s)(?<!despi[eé]rtela\sa\sla\senferma\s)(?<!despi[eé]rtela\sal\sbeb[eé]\s)(?<!despi[eé]rtelo\s)(?<!despi[eé]rtelo\sa\sla\spersona\s)(?<!despi[eé]rtelo\sal\sni[nñ]o\s)(?<!despi[eé]rtelo\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtelo\sal\senfermo\s)(?<!despi[eé]rtelo\sa\sla\senferma\s)(?<!despi[eé]rtelo\sal\sbeb[eé]\s)(?<!despi[eé]rtele\s)(?<!despi[eé]rtele\sa\sla\spersona\s)(?<!despi[eé]rtele\sal\sni[nñ]o\s)(?<!despi[eé]rtele\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtele\sal\senfermo\s)(?<!despi[eé]rtele\sa\sla\senferma\s)(?<!despi[eé]rtele\sal\sbeb[eé]\s)(?<!despi[eé]rtenla\s)(?<!despi[eé]rtenla\sa\sla\spersona\s)(?<!despi[eé]rtenla\sal\sni[nñ]o\s)(?<!despi[eé]rtenla\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtenla\sal\senfermo\s)(?<!despi[eé]rtenla\sa\sla\senferma\s)(?<!despi[eé]rtenla\sal\sbeb[eé]\s)(?<!despi[eé]rtenlo\s)(?<!despi[eé]rtenlo\sa\sla\spersona\s)(?<!despi[eé]rtenlo\sal\sni[nñ]o\s)(?<!despi[eé]rtenlo\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtenlo\sal\senfermo\s)(?<!despi[eé]rtenlo\sa\sla\senferma\s)(?<!despi[eé]rtenlo\sal\sbeb[eé]\s)(?<!despi[eé]rtenle\s)(?<!despi[eé]rtenle\sa\sla\spersona\s)(?<!despi[eé]rtenle\sal\sni[nñ]o\s)(?<!despi[eé]rtenle\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtenle\sal\senfermo\s)(?<!despi[eé]rtenle\sa\sla\senferma\s)(?<!despi[eé]rtenle\sal\sbeb[eé]\s)(?<!despi[eé]rtala\s)(?<!despi[eé]rtala\sa\sla\spersona\s)(?<!despi[eé]rtala\sal\sni[nñ]o\s)(?<!despi[eé]rtala\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtala\sal\senfermo\s)(?<!despi[eé]rtala\sa\sla\senferma\s)(?<!despi[eé]rtala\sal\sbeb[eé]\s)(?<!despi[eé]rtalo\s)(?<!despi[eé]rtalo\sa\sla\spersona\s)(?<!despi[eé]rtalo\sal\sni[nñ]o\s)(?<!despi[eé]rtalo\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtalo\sal\senfermo\s)(?<!despi[eé]rtalo\sa\sla\senferma\s)(?<!despi[eé]rtalo\sal\sbeb[eé]\s)(?<!despertarla\s)(?<!despertarla\sa\sla\spersona\s)(?<!despertarla\sal\sni[nñ]o\s)(?<!despertarla\sa\sla\sni[nñ]a\s)(?<!despertarla\sal\senfermo\s)(?<!despertarla\sa\sla\senferma\s)(?<!despertarla\sal\sbeb[eé]\s)(?<!despertarlo\s)(?<!despertarlo\sa\sla\spersona\s)(?<!despertarlo\sal\sni[nñ]o\s)(?<!despertarlo\sa\sla\sni[nñ]a\s)(?<!despertarlo\sal\senfermo\s)(?<!despertarlo\sa\sla\senferma\s)(?<!despertarlo\sal\sbeb[eé]\s)(?<!despertarle\s)(?<!despertarle\sa\sla\spersona\s)(?<!despertarle\sal\sni[nñ]o\s)(?<!despertarle\sa\sla\sni[nñ]a\s)(?<!despertarle\sal\senfermo\s)(?<!despertarle\sa\sla\senferma\s)(?<!despertarle\sal\sbeb[eé]\s)(?<!despierte\s)(?<!despierte\sa\sla\spersona\s)(?<!despierte\sal\sni[nñ]o\s)(?<!despierte\sa\sla\sni[nñ]a\s)(?<!despierte\sal\senfermo\s)(?<!despierte\sa\sla\senferma\s)(?<!despierte\sal\sbeb[eé]\s)(?<!despertar\s)(?<!despertar\sa\sla\spersona\s)(?<!despertar\sal\sni[nñ]o\s)(?<!despertar\sa\sla\sni[nñ]a\s)(?<!despertar\sal\senfermo\s)(?<!despertar\sa\sla\senferma\s)(?<!despertar\sal\sbeb[eé]\s)(?<!rev[ií]sela\s)(?<!rev[ií]sela\sa\sla\spersona\s)(?<!rev[ií]sela\sal\sni[nñ]o\s)(?<!rev[ií]sela\sa\sla\sni[nñ]a\s)(?<!rev[ií]sela\sal\senfermo\s)(?<!rev[ií]sela\sa\sla\senferma\s)(?<!rev[ií]sela\sal\sbeb[eé]\s)(?<!rev[ií]selo\s)(?<!rev[ií]selo\sa\sla\spersona\s)(?<!rev[ií]selo\sal\sni[nñ]o\s)(?<!rev[ií]selo\sa\sla\sni[nñ]a\s)(?<!rev[ií]selo\sal\senfermo\s)(?<!rev[ií]selo\sa\sla\senferma\s)(?<!rev[ií]selo\sal\sbeb[eé]\s)(?<!rev[ií]sele\s)(?<!rev[ií]sele\sa\sla\spersona\s)(?<!rev[ií]sele\sal\sni[nñ]o\s)(?<!rev[ií]sele\sa\sla\sni[nñ]a\s)(?<!rev[ií]sele\sal\senfermo\s)(?<!rev[ií]sele\sa\sla\senferma\s)(?<!rev[ií]sele\sal\sbeb[eé]\s)(?<!revise\s)(?<!revise\sa\sla\spersona\s)(?<!revise\sal\sni[nñ]o\s)(?<!revise\sa\sla\sni[nñ]a\s)(?<!revise\sal\senfermo\s)(?<!revise\sa\sla\senferma\s)(?<!revise\sal\sbeb[eé]\s)(?<!revisar\s)(?<!revisar\sa\sla\spersona\s)(?<!revisar\sal\sni[nñ]o\s)(?<!revisar\sa\sla\sni[nñ]a\s)(?<!revisar\sal\senfermo\s)(?<!revisar\sa\sla\senferma\s)(?<!revisar\sal\sbeb[eé]\s)(?<!revisarla\s)(?<!revisarla\sa\sla\spersona\s)(?<!revisarla\sal\sni[nñ]o\s)(?<!revisarla\sa\sla\sni[nñ]a\s)(?<!revisarla\sal\senfermo\s)(?<!revisarla\sa\sla\senferma\s)(?<!revisarla\sal\sbeb[eé]\s)(?<!revisarlo\s)(?<!revisarlo\sa\sla\spersona\s)(?<!revisarlo\sal\sni[nñ]o\s)(?<!revisarlo\sa\sla\sni[nñ]a\s)(?<!revisarlo\sal\senfermo\s)(?<!revisarlo\sa\sla\senferma\s)(?<!revisarlo\sal\sbeb[eé]\s)(?<!vig[ií]lela\s)(?<!vig[ií]lela\sa\sla\spersona\s)(?<!vig[ií]lela\sal\sni[nñ]o\s)(?<!vig[ií]lela\sa\sla\sni[nñ]a\s)(?<!vig[ií]lela\sal\senfermo\s)(?<!vig[ií]lela\sa\sla\senferma\s)(?<!vig[ií]lela\sal\sbeb[eé]\s)(?<!vig[ií]lelo\s)(?<!vig[ií]lelo\sa\sla\spersona\s)(?<!vig[ií]lelo\sal\sni[nñ]o\s)(?<!vig[ií]lelo\sa\sla\sni[nñ]a\s)(?<!vig[ií]lelo\sal\senfermo\s)(?<!vig[ií]lelo\sa\sla\senferma\s)(?<!vig[ií]lelo\sal\sbeb[eé]\s)(?<!vig[ií]lele\s)(?<!vig[ií]lele\sa\sla\spersona\s)(?<!vig[ií]lele\sal\sni[nñ]o\s)(?<!vig[ií]lele\sa\sla\sni[nñ]a\s)(?<!vig[ií]lele\sal\senfermo\s)(?<!vig[ií]lele\sa\sla\senferma\s)(?<!vig[ií]lele\sal\sbeb[eé]\s)(?<!vigile\s)(?<!vigile\sa\sla\spersona\s)(?<!vigile\sal\sni[nñ]o\s)(?<!vigile\sa\sla\sni[nñ]a\s)(?<!vigile\sal\senfermo\s)(?<!vigile\sa\sla\senferma\s)(?<!vigile\sal\sbeb[eé]\s)(?<!vigilar\s)(?<!vigilar\sa\sla\spersona\s)(?<!vigilar\sal\sni[nñ]o\s)(?<!vigilar\sa\sla\sni[nñ]a\s)(?<!vigilar\sal\senfermo\s)(?<!vigilar\sa\sla\senferma\s)(?<!vigilar\sal\sbeb[eé]\s)(?<!vigilarla\s)(?<!vigilarla\sa\sla\spersona\s)(?<!vigilarla\sal\sni[nñ]o\s)(?<!vigilarla\sa\sla\sni[nñ]a\s)(?<!vigilarla\sal\senfermo\s)(?<!vigilarla\sa\sla\senferma\s)(?<!vigilarla\sal\sbeb[eé]\s)(?<!vigilarlo\s)(?<!vigilarlo\sa\sla\spersona\s)(?<!vigilarlo\sal\sni[nñ]o\s)(?<!vigilarlo\sa\sla\sni[nñ]a\s)(?<!vigilarlo\sal\senfermo\s)(?<!vigilarlo\sa\sla\senferma\s)(?<!vigilarlo\sal\sbeb[eé]\s)(?:every|cada)\s+(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)|\b(?:two|three|four|five|six|seven|eight|nine|ten|twelve|twenty-four|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|veinticuatro)(?:\s+(?:to|or|and|o|a|y)\s+(?:two|three|four|five|six|seven|eight|nine|ten|twelve|twenty-four|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|veinticuatro))?)\s*(?:h|hrs?|hours?|horas?)\b(?!\s*,?\s*(?:turn|stir|mix|knead|rotate)\b)|(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)|(?:one|two|three|four|five|six|una|dos|tres|cuatro|cinco|seis))\s*(?:times?|x|veces|vez)\s*(?:(?:a|per|al|por|each|cada)\s*(?:day|d[ií]a)|daily|diari[oa]s?)|(?:once|twice|thrice)\s+(?:(?:a|per|each)\s+day|daily)|(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s+(?:doses|dosis)\b)(?:,?\s*(?:for|por|durante)\s+(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*(?:days?|d[ií]as|weeks?|semanas)\b)?|(?:en\s+)?una\s+sola\s+dosis|\b1\s+sola\s+vez|(?:again|repeat(?:ed)?|otra\s+vez|de\s+nuevo|repetir|repita)\s+(?:in|after|en|despu[eé]s\s+de)\s+(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*(?:h|hrs?|hours?|horas?)\b|\b(?:every\s+(?:[\w-]+\s+){0,2}?hours?|hourly|cada\s+(?:\w+\s+){0,2}?horas?|doses?|dosis|dosage|given|give|gives|giving|administer\w*|administr\w*|take|takes|taken|inject\w*|ivermectin|dele|dale|darle|dar|d[eé]selo|d[eé]sele|tome|tomar|toma|tomando|tinctures?|tintura|infusions?|infusi[oó]n|decoctions?|remed(?:y|ies)|remedios?|medicinal(?:ly)?|medicines?|medicinas?|mixtures?|prescrib\w*|recommend\w*|purgatives?|purgantes?|cathartics?|emetics?|vomitivos?|antispasmodic|anodyne|laxatives?|laxantes?|tonics?|t[oó]nicos?|physic|draughts?|drench\w*|bolus|pills?|liniments?|ointments?|salves?|embrocations?|poultices?|gargles?|lotions?|eye-?waters?|collyri\w*|pomadas?|ung[uü]entos?|linimentos?|cataplasmas?|quinine|quinina|opium|opio|laudanum|l[aá]udano|morphi\w*|morfina|calomel|camphor\w*|alcanfor|digitalis|foxglove|strychni\w*|estricnina|bromides?|bromuro|salicin|salicyl\w*|buchu|creosote|creosota|elaterium|ipecac\w*|paregoric|parag[oó]rico|castor\s+oil|ricino|epsom|glauber|iodides?|yoduro|aloes|rhubarb|ruibarbo|senna|jalap|turpentine|trementina|chloral|chloroform|cloroformo|ether|belladonn?a|aconite|ac[oó]nito|ergot\w*|arseni\w*|ars[eé]nico|mercury|mercurio|antitoxins?|antitoxina|serum|suero|antimony|tartar\s+emetic|pine\s+tar|penny\s*royal|carbolic|creolin|sulphur|azufre|magnesia|bismuth|santonin|cocaine|atropine|aspirin\w*|chlorodyne|squills?|antipyrin\w*|acetanilid\w*|phenacetin|cod[\s-]liver\s+oil|vermifuge|nux\s+vomica|nitre|lobelia|asaf\w*tida|valerian|hyoscyam\w*|cannabis|cantharides|croton\s+oil|podophyll\w*|sarsaparilla|guaiac\w*|colchicum|stramonium|hellebore|savin|tansy|wormwood|quassia|gentian|cinchona)\b[^;!?]{0,80}?(?:(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:fluid\s+|fl\.\s*)?(?:(?:grains?|minims?|drachms?|drams?|ounces?|gills?|scruples?|granos?|dracmas?|onzas?|escr[uú]pulos?)\b|(?:grs?|oz)(?:\.|\b)|oz\b|c\.\s?c\.)|\b(?:a\s+few\s+drops|a\s+drop\s+or\s+two|unas\s+(?:cuantas\s+|pocas\s+)?gotas)\b)(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))(?!\s*(?:(?:of|de)\s+)?(?:wheat|corn|oats?|barley|rye|bran|meal|seeds?|feed|hay|yeast|lard|suet|starch|gelatine?|cheese|meat|beef|tea(?!\s+tree)|coffee|cocoa|chocolate|vinegar|gold|silver|sand|clay|wax|beeswax|rosin|resin|gunpowder|trigo|ma[ií]z|cebada|avena|salvado|semillas?|levadura|manteca|almid[oó]n|queso|carne|caf[eé]|cacao|vinagre|oro|plata|arena|cera)\b)|(?:(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:fluid\s+|fl\.\s*)?(?:(?:grains?|minims?|drachms?|drams?|ounces?|gills?|scruples?|granos?|dracmas?|onzas?|escr[uú]pulos?)\b|(?:grs?|oz)(?:\.|\b)|oz\b|c\.\s?c\.)|\b(?:a\s+few\s+drops|a\s+drop\s+or\s+two|unas\s+(?:cuantas\s+|pocas\s+)?gotas)\b)(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))(?!\s*(?:(?:of|de)\s+)?(?:wheat|corn|oats?|barley|rye|bran|meal|seeds?|feed|hay|yeast|lard|suet|starch|gelatine?|cheese|meat|beef|tea(?!\s+tree)|coffee|cocoa|chocolate|vinegar|gold|silver|sand|clay|wax|beeswax|rosin|resin|gunpowder|trigo|ma[ií]z|cebada|avena|salvado|semillas?|levadura|manteca|almid[oó]n|queso|carne|caf[eé]|cacao|vinagre|oro|plata|arena|cera)\b)(?=[^;!?]{0,80}?\b(?:every\s+(?:[\w-]+\s+){0,2}?hours?|hourly|cada\s+(?:\w+\s+){0,2}?horas?|doses?|dosis|dosage|given|give|gives|giving|administer\w*|administr\w*|take|takes|taken|inject\w*|ivermectin|dele|dale|darle|dar|d[eé]selo|d[eé]sele|tome|tomar|toma|tomando|tinctures?|tintura|infusions?|infusi[oó]n|decoctions?|remed(?:y|ies)|remedios?|medicinal(?:ly)?|medicines?|medicinas?|mixtures?|prescrib\w*|recommend\w*|purgatives?|purgantes?|cathartics?|emetics?|vomitivos?|antispasmodic|anodyne|laxatives?|laxantes?|tonics?|t[oó]nicos?|physic|draughts?|drench\w*|bolus|pills?|liniments?|ointments?|salves?|embrocations?|poultices?|gargles?|lotions?|eye-?waters?|collyri\w*|pomadas?|ung[uü]entos?|linimentos?|cataplasmas?|quinine|quinina|opium|opio|laudanum|l[aá]udano|morphi\w*|morfina|calomel|camphor\w*|alcanfor|digitalis|foxglove|strychni\w*|estricnina|bromides?|bromuro|salicin|salicyl\w*|buchu|creosote|creosota|elaterium|ipecac\w*|paregoric|parag[oó]rico|castor\s+oil|ricino|epsom|glauber|iodides?|yoduro|aloes|rhubarb|ruibarbo|senna|jalap|turpentine|trementina|chloral|chloroform|cloroformo|ether|belladonn?a|aconite|ac[oó]nito|ergot\w*|arseni\w*|ars[eé]nico|mercury|mercurio|antitoxins?|antitoxina|serum|suero|antimony|tartar\s+emetic|pine\s+tar|penny\s*royal|carbolic|creolin|sulphur|azufre|magnesia|bismuth|santonin|cocaine|atropine|aspirin\w*|chlorodyne|squills?|antipyrin\w*|acetanilid\w*|phenacetin|cod[\s-]liver\s+oil|vermifuge|nux\s+vomica|nitre|lobelia|asaf\w*tida|valerian|hyoscyam\w*|cannabis|cantharides|croton\s+oil|podophyll\w*|sarsaparilla|guaiac\w*|colchicum|stramonium|hellebore|savin|tansy|wormwood|quassia|gentian|cinchona)\b)|\b(?:emetics?|vomitivos?|laxatives?|laxantes?|purgatives?|purgantes?|purg(?:e|es|ed|ing)|cathartics?|physic)\b[^;!?]{0,80}?(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|cucharaditas?|cucharadas?|cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b(?:[\s,]+(?:(?:or|and|to|o|y)\s+)?(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|cucharaditas?|cucharadas?|cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b)*|(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|cucharaditas?|cucharadas?|cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b(?:[\s,]+(?:(?:or|and|to|o|y)\s+)?(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|cucharaditas?|cucharadas?|cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b)*(?=[^;!?]{0,80}?\b(?:emetics?|vomitivos?|laxatives?|laxantes?|purgatives?|purgantes?|purg(?:e|es|ed|ing)|cathartics?|physic)\b)|(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:fluid\s+|fl\.\s*)?(?:drachms?|minims?|scruples?|dracmas?|escr[uú]pulos?)\b|\b(?:castor\s+oil|ricino|emetics?|vomitivos?|laxatives?|laxantes?|purgatives?|purgantes?|cathartics?|quinine|quinina|opium|opio|laudanum|l[aá]udano|morphi\w*|morfina|calomel|camphor\w*|alcanfor|digitalis|foxglove|strychni\w*|estricnina|bromides?|bromuro|salicin|salicyl\w*|buchu|creosote|creosota|elaterium|ipecac\w*|paregoric|parag[oó]rico|epsom|glauber|iodides?|yoduro|aloes|senna|jalap|turpentine|trementina|chloral|chloroform|cloroformo|belladonn?a|aconite|ac[oó]nito|ergot\w*|arseni\w*|ars[eé]nico|antitoxins?|antitoxina|antimony|tartar\s+emetic|pine\s+tar|penny\s*royal|carbolic|creolin|magnesia|bismuth|santonin|cocaine|atropine|aspirin\w*|chlorodyne|squills?|antipyrin\w*|acetanilid\w*|phenacetin|cod[\s-]liver\s+oil|vermifuge|nux\s+vomica|lobelia|asaf\w*tida|valerian|hyoscyam\w*|cannabis|cantharides|croton\s+oil|podophyll\w*|colchicum|stramonium|hellebore|savin|tansy|wormwood|quassia|gentian|cinchona|ivermectin)\b[^;!?]{0,80}?(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:de\s+(?:una?\s+)?)?(?:cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))|(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:de\s+(?:una?\s+)?)?(?:cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))(?=[^;!?]{0,80}?\b(?:castor\s+oil|ricino|emetics?|vomitivos?|laxatives?|laxantes?|purgatives?|purgantes?|cathartics?|quinine|quinina|opium|opio|laudanum|l[aá]udano|morphi\w*|morfina|calomel|camphor\w*|alcanfor|digitalis|foxglove|strychni\w*|estricnina|bromides?|bromuro|salicin|salicyl\w*|buchu|creosote|creosota|elaterium|ipecac\w*|paregoric|parag[oó]rico|epsom|glauber|iodides?|yoduro|aloes|senna|jalap|turpentine|trementina|chloral|chloroform|cloroformo|belladonn?a|aconite|ac[oó]nito|ergot\w*|arseni\w*|ars[eé]nico|antitoxins?|antitoxina|antimony|tartar\s+emetic|pine\s+tar|penny\s*royal|carbolic|creolin|magnesia|bismuth|santonin|cocaine|atropine|aspirin\w*|chlorodyne|squills?|antipyrin\w*|acetanilid\w*|phenacetin|cod[\s-]liver\s+oil|vermifuge|nux\s+vomica|lobelia|asaf\w*tida|valerian|hyoscyam\w*|cannabis|cantharides|croton\s+oil|podophyll\w*|colchicum|stramonium|hellebore|savin|tansy|wormwood|quassia|gentian|cinchona|ivermectin)\b)/gi;
+  /* Pagefind excerpts carry <mark> around query words ("2 <mark>gramos</mark>"), which would split a dose; a snippet
+     with a dose loses its highlights rather than keep a figure */
+  function scrubDose(s) {
+    if (!s) { return s; }
+    var plain = s.replace(/<\/?mark>/g, '');
+    DOSE_RE.lastIndex = 0;
+    /* an excerpt can end between a figure and its unit ("Niños: 50"): on a dose snippet a trailing bare number goes too */
+    return DOSE_RE.test(plain) ? plain.replace(DOSE_RE, '[dose removed; printed guide]').replace(/\s\d+(?:[.,]\d+)*\s*(…|\.\.\.)?\s*$/, ' …') : s;
+  }
+  function fold(s) { return s.normalize ? s.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : s; }
+  /* false, or 'es' / 'en': which language's word tripped the guard */
+  /* #215 (a8 F1): "tetanus shot" asks for an injection; "got shot", "shot in the leg", "gun shot" name a wound and keep
+     their quotes. Query only. Same words and pattern as SHOT_WORD_RE / SHOT_WOUND_RE in server/mcp_server.py */
+  var SHOT_WORD_RE = /^(shot|shots|jab|jabs|vial|vials|ampolla|ampollas|ampolleta|ampolletas|ampoule|ampoules|ampule|ampules)$/;
+  var SHOT_WOUND_RE = /\b(?:(?:got|get|gets|getting|was|were|been|being|is|are|accidentally|gun|bullet|arrow|pellet|bird|buck)\s+(?:shot|jabbed)|(?:shot|shots|jab|jabbed)\s+(?:in|through|by|with|at|myself|himself|herself|themselves|me|him|her|them|us|you|wounds?|injur\w*|dead|fired)|shotguns?|gun\s*shots?|gunshots?)\b/g;
+  var AMPOLLA_CTX_RE = /\b(?:inyect\w*|inyecci\w*|suero\w*|vacun\w*|tetan\w*|antiven\w*|antiofidic\w*|antialacran\w*|intramuscular\w*|intraven\w*|im|iv|vial\w*|frasco\w*|jeringa\w*|aguja\w*|ampolletas?|penicilin\w*|antibiotic\w*)\b/;
+  function drugQuery(q) {
+    /* drugQuery(text, true): the snippet rule (doseText); the signature stays (q) for fix_f2_test's identity block */
+    var text = arguments[1], f = fold(q.toLowerCase()), toks, i, t, en = false;
+    /* #171: EPA "iodine in your medicine cabinet" is a cupboard; #193 (a1a en60): "anxiety without medicine" asks for no
+       drug (a drug name still trips). Same as dose_guard() in server/mcp_server.py. */
+    f = text ? f.replace(/\bmedicine cabinets?\b/g, ' ') : f.replace(WITHOUT_DRUG_RE, ' ').replace(SHOT_WOUND_RE, ' ');
+    f = f.replace(/\b(?:milk of|leche de) magnesia\b/g, ' milk-of-magnesia ').replace(/\bcastor oil\b/g, ' castor-oil ').replace(/\b(?:gentian violet|purple of gentian)\b/g, ' gentian-violet ').replace(/\bvioleta de genciana\b/g, ' violeta-de-genciana ');  /* #228 #263 #264: the phrases, not bare magnesia / castor / gentian */
+    /* round 10 (#269, a7a F5, a7b note 2): a takeover "poison pill" names no medicine; a swallowed one, a child or an animal keeps it */
+    if (!text && /\bpoison pills?\b/.test(f) && !/swallow|\bate\b|took|kid|child|baby|toddler|\bdog|trag|comio|tomo|nin[oa]|bebe|hij[oa]/.test(f)) { f = f.replace(/\bpoison pills?\b/g, ' '); }
+    toks = f.split(/[^a-z-]+/);
+    var treat = !!text && TREAT_RE.test(f) && WATER_AMOUNT_RE.test(f), storage = !text && STORAGE_RE.test(f);
+    for (i = 0; i < toks.length; i++) {
+      t = toks[i];
+      if (!t) { continue; }
+      if (storage && !STORAGE_DOSE_RE.test(t)) { continue; }
+      /* a bare tablet word next to water context is purification, not a drug (en20/es20: "water purification tablets",
+         "pastillas potabilizadoras"); a drug name still trips the guard */
+      if (TABLET_RE.test(t) && WATER_RE.test(fold(q))) { continue; }
+      if (treat && TREAT_WORD_RE.test(t)) { continue; }
+      /* round 10 (#269, a8 F5; dose_r39.txt NOTE-USE-AMPOLLA): «ampolla» is also a blister: a drug word only beside an injection,
+         serum or tetanus word; «ampolleta» always. Both are Spanish for the language flag */
+      if (!text && /^ampoll/.test(t) && SHOT_WORD_RE.test(t)) { if (/^ampollet/.test(t) || AMPOLLA_CTX_RE.test(f)) { return 'es'; } continue; }
+      if (/^(dose|doses|dosage|dosages|dosing|mg|milligram|milligrams|medicine|medicines|medication|medications|antibiotic|antibiotics|painkiller|painkillers|drug|drugs|pill|pills|tablet|tablets|injection|injections|inject|injects|injected|injecting|injectable|injectables|ampoule|ampoules|ampule|ampules|ampul|ampuls|antacid|antacids|laxative|laxatives)$/.test(t) ||
+          DRUGS.indexOf(t) !== -1 || (!text && SHOT_WORD_RE.test(t))) { en = true; continue; }  /* "paracetamol" is both: English unless a Spanish word says otherwise */
+      if (DOSE_ES_RE.test(t) || DRUGS_ES.indexOf(t) !== -1) { return 'es'; }
+    }
+    return en ? 'en' : false;
+  }
+
+  /* red team 2026-10-11 class 1 (#181): an excerpt or summary is withheld whole, not scrubbed, when it is dose-bearing
+     (same rule as safe_snippet() in server/mcp_server.py): the dose pattern matches, or a drug or dose word sits
+     beside a figure, or it already carries a removal mark (the Pagefind index stores scrubbed text). Scrubbing left "half tablet ([dose removed]) per day for 10-14 days" readable. */
+  /* #199 (es25): relative-dose words too; byte-identical to DOSE_NUMERAL in mcp_server.py and DOSE_NUM_RE in chat.html */
+  var DOSE_NUM_RE = /\d|[½¼¾⅓⅔⅛]|&#\d|&frac|\b(?:half|quarter|media|medio|cuarto|million|millones|double|doble|twice|triple|dos veces)\b/i;
+  var NOT_DOSE_FIG = /\d+(?:[.,]\d+)?(?:\s*(?:-|–|to|a)\s*\d+)?\s*(?:min(?:ute)?s?|minutos?|h(?:ou)?rs?|horas?|days?|d[ií]as?|weeks?|semanas?|months?|mes(?:es)?|years?|a[nñ]os?|°\s*[cf]?|degrees?|grados?)(?![a-z])|\b(?:page|pages|p\.|chapter|cap[ií]tulo|p[aá]gina)\s*\d+/gi;
+  function doseText(s) {
+    if (!s) { return false; }
+    var plain = s.replace(/<\/?mark>/g, '');
+    DOSE_RE.lastIndex = 0;
+    return plain.indexOf('[dose removed') !== -1 || DOSE_RE.test(plain) || (!!drugQuery(plain, true) && DOSE_NUM_RE.test(plain.replace(NOT_DOSE_FIG, ' ')));
+  }
+  /* type from path */
+  function typeOf(p) {
+    if (p.indexOf('shelf:') === 0) { return 'shelf'; }
+    if (/\.(mp3)$/i.test(p)) { return 'audio'; }
+    if (/\.(mp4)$/i.test(p)) { return 'video'; }
+    if (p.indexOf('maps/') === 0 || /\.(mbtiles|pmtiles|kap|obf|zip)$/i.test(p)) { return 'maps'; }
+    if (/\.zim$/i.test(p)) { return 'encyclopedia'; }
+    return 'docs';
+  }
+  function shelfOf(p) {
+    if (p.indexOf('plants.html') === 0) { return 'docs/plant_id'; }  /* species rows (H26) */
+    for (var i = 0; i < shelves.length; i++) {
+      if (p.indexOf(shelves[i].path) === 0) { return shelves[i].path; }
+    }
+    return null;
+  }
+
+  /* ── filter rail: dot-separated text items, MULTISELECT; nothing
+     selected in a group = the whole group passes ── */
+  function selCount(o) { var n = 0, k; for (k in o) { n++; } return n; }
+  function fitem(label, cb) {
+    var b = document.createElement('button');
+    b.className = 's-fitem'; b.type = 'button'; b.textContent = label;
+    b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', cb);
+    return b;
+  }
+  function sep() {
+    var s = document.createElement('span');
+    s.className = 's-fsep'; s.textContent = '·';
+    return s;
+  }
+  var TYPES = ['docs', 'audio', 'video', 'maps'];
+  /* single-select, English default (the owner R9). No "both": kiwix-serve rejects
+     multi-book search across mixed languages, pagefind buckets per language. */
+  var LANGS = [['eng', 'English'], ['spa', 'Español']];
+  (function () {
+    var fl = document.createElement('span');
+    el('f-lang').appendChild(fl);
+    for (var k = 0; k < LANGS.length; k++) {
+      (function (l) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.textContent = l[1];
+        b.setAttribute('aria-pressed', l[0] === state.lang ? 'true' : 'false');
+        b.addEventListener('click', function () {
+          if (l[0] === state.lang) { return; }
+          /* red team 2026-10-09 (#150): the typed query goes along, the reader does not retype it */
+          var tq = input.value.replace(/^\s+|\s+$/g, '');
+          location.href = 'search.html?' + (l[0] === 'eng' ? '' : 'lang=' + l[0] + '&') + 'mode=' + state.mode +
+            (tq ? '&q=' + encodeURIComponent(tq) : '');
+        });
+        fl.appendChild(b);
+      })(LANGS[k]);
+    }
+  })();
+  /* search mode (2026-09-26): Default = Pagefind + semantic fused,
+     Exact words = Pagefind only. Titles and encyclopedias ignore it.
+     'feeling' (semantic only) stays URL-only for cache/eval; the
+     validation run showed it empties on 15% of queries, so no button. */
+  var MODES = [['both', ES('Default', 'Normal')], ['precise', ES('Exact words', 'Palabras exactas')]];
+  (function () {
+    var fm = document.createElement('span');
+    el('f-mode').appendChild(fm);
+    for (var k = 0; k < MODES.length; k++) {
+      (function (m) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.textContent = m[1];
+        b.setAttribute('aria-pressed', m[0] === state.mode ? 'true' : 'false');
+        b.addEventListener('click', function () {
+          if (m[0] === state.mode) { return; }
+          state.mode = m[0];
+          var bs = fm.children;
+          for (var i = 0; i < bs.length; i++) { bs[i].setAttribute('aria-pressed', bs[i] === b ? 'true' : 'false'); }
+          run();
+        });
+        fm.appendChild(b);
+      })(MODES[k]);
+    }
+  })();
+  var railShelves = [];   /* shelves.json ships the ordering convention:
+                             priority shelves first, rest alphabetical */
+  function buildRail() {
+    railShelves = shelves.slice();
+    var fs = el('f-shelf');
+    for (var i = 0; i < railShelves.length; i++) {
+      (function (s) {
+        if (fs.children.length) { fs.appendChild(sep()); }
+        fs.appendChild(fitem(s.title, function () {
+          if (state.shelves[s.path]) { delete state.shelves[s.path]; }
+          else { state.shelves[s.path] = 1; }
+          syncRail(); run();
+        }));
+      })(railShelves[i]);
+    }
+    var ft = el('f-type');
+    for (var j = 0; j < TYPES.length; j++) {
+      (function (t) {
+        if (ft.children.length) { ft.appendChild(sep()); }
+        ft.appendChild(fitem(ES(t, { docs: 'documentos', audio: 'audio', video: 'video', maps: 'mapas' }[t]), function () {
+          if (state.types[t]) { delete state.types[t]; }
+          else { state.types[t] = 1; }
+          syncRail(); run();
+        }));
+      })(TYPES[j]);
+    }
+    el('f-hist').addEventListener('click', function () {
+      state.hist = !state.hist; syncRail(); run();
+    });
+    el('rail').hidden = false;
+    syncRail();
+  }
+  function syncRail() {
+    var cs = el('f-shelf').querySelectorAll('.s-fitem'), i;
+    for (i = 0; i < cs.length; i++) {
+      cs[i].setAttribute('aria-pressed', state.shelves[railShelves[i].path] ? 'true' : 'false');
+    }
+    var ts = el('f-type').querySelectorAll('.s-fitem');
+    for (i = 0; i < ts.length; i++) {
+      ts[i].setAttribute('aria-pressed', state.types[TYPES[i]] ? 'true' : 'false');
+    }
+    /* highlighted = deviating from the default (old texts hidden) */
+    el('f-hist').setAttribute('aria-pressed', state.hist ? 'false' : 'true');
+    el('f-hist').textContent = state.hist ? ES('included', 'incluidos') : ES('hidden', 'ocultos');
+  }
+  function shelfPass(p) {
+    if (!selCount(state.shelves)) { return true; }
+    if (p.indexOf('shelf:') === 0) { return !!state.shelves[p.slice(6)]; }
+    return !!state.shelves[shelfOf(p)];
+  }
+  function passes(item) {
+    if (!state.hist && item.h) { return false; }
+    if (!shelfPass(item.p)) { return false; }
+    if (selCount(state.types) && !state.types[typeOf(item.p)] &&
+        typeOf(item.p) !== 'shelf') { return false; }
+    return true;
+  }
+
+  /* ── render helpers ── */
+  /* M3 hand-off (round 8): _app/historical.html shows its warning in Spanish when the link says so */
+  function hrefOf(item) {
+    var h = window.lanternHref(item);
+    return state.lang === 'spa' && h.indexOf('_app/historical.html?') !== -1 ? h + '&lang=es' : h;
+  }
+  function rowHTML(item) {
+    var badge = item.pin ? '<span class="l-src l-src--triage">' + ES('TRIAGE', 'TRIAJE') + '</span>'
+      : item.h ? '<span class="l-src l-src--hist">' + ES('HISTORICAL', 'HISTÓRICO') + '</span>'
+      : '<span class="l-src l-src--title">' + ES('TITLE', 'TÍTULO') + '</span>';
+    var meta = item.pin ? ES('What to do now', 'Qué hacer ahora') : item.p.indexOf('shelf:') === 0 ? ES('Shelf', 'Estante') : esc(item.p);
+    /* E6: a plant or coast card title carries its Spanish names after " — " (for Spanish-mode matching); English mode
+       shows the English name only */
+    var t = state.lang !== 'spa' && item.p.indexOf('plants.html#') === 0 ? item.t.split(' — ')[0] : item.t;
+    return '<a class="l-doc-row" href="' + esc(hrefOf(item)) + '">' +
+      '<span>' + badge + ' <b>' + esc(t) + '</b>' +
+      '<div class="meta">' + meta + '</div></span><span class="spacer">›</span></a>';
+  }
+
+  /* ── layers ── */
+  var STOP = /^(from|with|that|this|what|when|where|which|your|have|into|than|then|them|they|there|their|will|been|being|were|about|after|before|does|some|such|only|over|under|very|just|also|make|made|need|like|want|should|would|could|without|because)$/;
+  function runTitles(q, cb) {
+    if (state.lang === 'spa') {
+      /* the title index is English-only; card rows open the Spanish triage page (E6), the vetted PINS above sit beside them */
+      setPin(q, pinFor(q));
+      /* #193 (a7a W9, a7b F15): the plant and coast cards carry their Spanish names in the title ("mejillones", "hongo
+         pollo"); a Spanish query shows the titles that hold one of its content words whole. Most titles are English.
+         #252 (b2 W10): 3-letter words count too («VIH», «SRO»); QWORDS keeps out «que», «los», «una» */
+      var ws = encWords(fold(q)).map(fold).filter(function (w) { return w.length >= 3 && QWORDS.indexOf(w) === -1; }).slice(0, 4);
+      var got = {}, rows = [], left = ws.length;
+      var none = function () {
+        el('s-titles').className = 's-section s-offline';
+        el('r-titles').innerHTML = '<p class="l-caption">Los títulos de la colección están en inglés — vea los resultados en español abajo.</p>';
+        cb([]);
+      };
+      if (!left) { none(); return; }
+      ws.forEach(function (w) {
+        window.lanternTitleSearch(w, 40, function (hits) {
+          for (var i = 0; i < hits.length; i++) {
+            if (hits[i].pin || !passes(hits[i])) { continue; }
+            if ((' ' + fold(hits[i].t.toLowerCase()).replace(/[^a-z0-9]+/g, ' ') + ' ').indexOf(' ' + w + ' ') === -1) { continue; }
+            if (!got[hits[i].p]) { got[hits[i].p] = { h: hits[i], n: 0, at: rows.length }; rows.push(got[hits[i].p]); }
+            got[hits[i].p].n++;
+          }
+          if (--left) { return; }
+          /* E5 (#207): ties by path, never by which callback answered first */
+          rows.sort(function (a, b) { return b.n - a.n || (a.h.p < b.h.p ? -1 : a.h.p > b.h.p ? 1 : 0); });
+          var out = rows.slice(0, 12).map(function (r) { return r.h; });
+          if (!out.length) { none(); return; }
+          el('r-titles').innerHTML = out.map(rowHTML).join('') +
+            '<p class="l-caption">La mayoría de los títulos están en inglés: vea también los resultados en español abajo.</p>';
+          cb(out);
+        });
+      });
+      return;
+    }
+    window.lanternTitleSearch(q, 40, function (hits) {
+      /* display floor: rows whose title/path share NO query token are pure
+         bigram fuzz — junk under a correct triage pin (agent-judged). Keep
+         them only as labeled "closest titles" when nothing real matched. */
+      /* 4+ letter function words ('from', 'with', 'that'…) matched 7,448
+         historical titles once Survivor Library came in; drop them */
+      var toks = q.toLowerCase().split(/\s+/).filter(function (w) { return w.length >= 4 && !STOP.test(w); });
+      /* RT6 a7a F8: a query word counts only at the start of a title or path word ("tarp roof" no longer takes Khan
+         "Proof" videos as matching rows; "tarp" still finds "tarpaulin") */
+      var tokRe = toks.map(function (w) { return new RegExp('(?:^|[^a-z0-9])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')); });
+      function strongRow(item) {
+        if (!toks.length) { return true; }         /* short queries: old behavior */
+        var hay = (item.t + ' ' + item.p).toLowerCase();
+        for (var k = 0; k < tokRe.length; k++) {
+          if (tokRe[k].test(hay)) { return true; }
+        }
+        return false;
+      }
+      var pin = null, out = [], weak = [], dev = [], i;
+      for (i = 0; i < hits.length; i++) {
+        if (hits[i].pin) { pin = hits[i]; continue; }
+        if (!passes(hits[i]) || esDoc(hits[i])) { continue; }   /* E6: English mode lists no Spanish document */
+        /* development handbooks and textbooks rank after everything else (2026-09-30):
+           6,400 CD3WD titles were pushing the modern and historical shelves out of the top rows */
+        if (strongRow(hits[i])) { (devPath(hits[i].p) ? dev : out).push(hits[i]); } else if (!hits[i].h) { weak.push(hits[i]); }  /* fuzz fallback: modern only */
+        if (out.length >= 12) { break; }
+      }
+      out = out.concat(dev).slice(0, 12);
+      pin = setPin(q, pinFor(q));   /* G2: a vetted page pin sits beside the card rows; #245: the rows come from lanternRoute */
+      el('r-titles').innerHTML = out.length
+        ? out.map(rowHTML).join('')
+        : weak.length
+          ? '<p class="l-caption">' + (pin
+              ? 'No document titles match — start with the pinned guidance above.'
+              : 'Nothing matches that exactly — check spelling.') + ' Closest titles:</p>' +
+            weak.slice(0, 3).map(rowHTML).join('')
+          : '<p class="l-caption">No title matches' + (q.length > 3 ? ' — check spelling, or try fewer words.' : '.') + '</p>';
+      cb(out.length ? out : weak.slice(0, 3));
+    });
+  }
+
+  function runFulltext(q, titlePaths) {
+    var sec = el('s-fulltext'), out = el('r-fulltext');
+    if (direct || document.documentElement.getAttribute('data-cap-fulltext') !== '1') {
+      sec.className = 's-section s-offline';
+      out.innerHTML = '<p class="l-caption">' + (direct
+        ? '<span class="l-badge">' + ES('NEEDS THE SERVER', 'NECESITA EL SERVIDOR') + '</span> ' + ES('Full-text search runs on the Lantern box.', 'La búsqueda en el texto completo funciona en la caja Lantern.')
+        : ES('Full-text index not available.', 'El índice de texto completo no está disponible.')) + '</p>';
+      return;
+    }
+    sec.className = 's-section';
+    if (state.mode !== 'feeling' && !pagefindTried) {
+      pagefindTried = true;
+      try {
+        /* H37c: the historical shelves (~1.9M pages) are a separate index so
+           their word statistics never reorder modern results; optional, so a
+           missing/failed historical bundle still lets modern search run */
+        var loadHist = new Function('return import("./_app/pagefind_hist/pagefind.js")')().then(function (pf) {
+          return pf.options({ baseUrl: '/' }).then(function () { pagefindHist = pf; });
+        }, function () {});
+        /* third index: CD3WD development handbooks, one record per document (2026-09-30) */
+        var loadDev = new Function('return import("./_app/pagefind_dev/pagefind.js")')().then(function (pf) {
+          return pf.options({ baseUrl: '/' }).then(function () { pagefindDev = pf; });
+        }, function () {});
+        new Function('return import("./_app/pagefind/pagefind.js")')().then(function (pf) {
+          /* bundle lives at /_app/pagefind but pages are addressed from the
+             library root — without this, urls come back /_app/_app/text/… */
+          return pf.options({ baseUrl: '/' }).then(function () { return loadHist; }).then(function () { return loadDev; }).then(function () {
+            pagefind = pf; runFulltext(q, titlePaths);
+          });
+        }, function () { out.innerHTML = '<p class="l-caption">' + ES('Full-text engine failed to load.', 'El buscador de texto completo no cargó.') + '</p>'; });
+        out.innerHTML = '<p class="l-caption">' + ES('Loading full-text engine…', 'Cargando el buscador de texto completo…') + '</p>';
+        return;
+      } catch (e) {
+        out.innerHTML = '<p class="l-caption">' + ES('This browser can’t run full-text search; titles still work.', 'Este navegador no puede buscar en el texto completo; los títulos sí funcionan.') + '</p>';
+        return;
+      }
+    }
+    if (state.mode !== 'feeling' && !pagefind) { return; }
+    if ((SYN === null && state.mode !== 'feeling') || TONLY === null || HY === null || OUTD === null) {   /* #91: wait for the synonym table (and #240 the title-only list, #246/#252 the year and outdated-page lists), then run this query once */
+      synWait.push(function () { if (input.value.replace(/^\s+|\s+$/g, '') === q) { runFulltext(q, titlePaths); } });
+      return;
+    }
+    /* H37b: Pagefind (exact) and /semantic (meaning) run in parallel and are
+       fused by reciprocal rank fusion; seq drops a stale answer when the
+       query changed underneath. Mode drops one side. */
+    var seq = ++ftSeq, semDocs = null, semFail = false;
+    /* #90 (2026-10-06): three Pagefind indexes answer at their own pace. Modern rows render as soon as the modern
+       index and /semantic answer; the development (CD3WD, textbooks) and historical indexes merge in when they
+       arrive, under their own dividers, with a visible "still searching" line until then. The old 5 s race cap
+       silently dropped them on 18/80 dev and 24/80 Pi loads. parts[k]: null = pending, array = data, 'fail' =
+       the index errored or passed PART_WAIT (shown, never silent). */
+    var parts = { m: null, d: null, h: null }, PART_WAIT = 30000;
+    if (state.mode === 'precise') { semDocs = []; }
+    else { semanticFetch(q, function (list, failed) { semDocs = list; semFail = !!failed; maybeRender(); }); }
+    if (state.mode === 'feeling') { parts = { m: [], d: [], h: [] }; maybeRender(); return; }
+    var variants = expandQuery(q, 3);
+    /* #87 (2026-10-06): Pagefind needs every word of the query on the page, so the question words of a typed question
+       ("¿Qué hacer si hay una explosión cerca de mí?": "hay", "cerca", "mí") hid the page that answers it. The
+       content words alone run as one more variant, merged SYN_LAG ranks late like a synonym. */
+    /* #252 (b2 W15): «cuántas gotas de cloro le echo a un galón de agua» found nothing: the pages say "gotas", "cloro",
+       "galón", never "echo". Filler verbs leave this variant too (only this one; the reader's own words still run). */
+    var rq = encWords(q).filter(function (w) { return FILLER.indexOf(w) === -1; }).join(' ');
+    if (rq && rq !== q.toLowerCase().replace(/\s+/g, ' ').trim() && variants.indexOf(rq) === -1) { variants = [rq].concat(variants); }
+    /* function words alone ('the', 'of') panic the historical wasm (1.9M pages: wasm 'unreachable' / truncated
+       JSON on common-word questions) and are meaningless there; keep the content words for that index */
+    function contentWords(s) { return s.split(/\s+/).filter(function (w) { return w.length > 3 && !STOP.test(w.toLowerCase()); }).join(' '); }
+    var hq = contentWords(q), hvariants = [];
+    /* #90: synonym variants get the same content-word filter on that index (they used to carry "my", "to", "a" into
+       it, and 4 such searches took 17-30 s on dev for "tree spacing around my house to slow a wildfire") */
+    for (var vi = 0; vi < variants.length; vi++) { var hv = contentWords(variants[vi]); if (hv && hv !== hq && hvariants.indexOf(hv) === -1) { hvariants.push(hv); } }
+    function part(k, idx, qq, cap, keep, vs) {
+      if (!idx || !qq) { parts[k] = []; return; }
+      var t = setTimeout(function () { if (parts[k] === null) { parts[k] = 'fail'; maybeRender(); } }, PART_WAIT);
+      pfSearchAll(idx, qq, vs, cap).then(function (r) {
+        var rs = r.results.slice(0, keep);
+        return Promise.all(rs.map(function (x) { return x.data().then(null, function () { return x.data(); }).then(null, function () { return null; }); }));
+      }).then(function (done) { clearTimeout(t); parts[k] = done; maybeRender(); },
+              function () { clearTimeout(t); if (parts[k] === null) { parts[k] = 'fail'; } maybeRender(); });
+    }
+    /* H37c: historical and development rows capped at 8 each, so they never push modern hits out */
+    part('m', pagefind, q, 40, 20, variants);
+    part('d', pagefindDev, q, 16, 8, variants);
+    part('h', pagefindHist, hq, 16, 8, hvariants);
+    /* E1b (2026-10-04) re-ranked these fulltext docs by cosine as a third RRF list; removed 2026-10-05: known-item
+       gold v2 24/40 -> 31/40 and v3 61 -> 64 without it, at every weight tried (1, .5, .1, .05). */
+    function maybeRender() {
+      if (seq !== ftSeq || parts.m === null || semDocs === null) { return; }
+      var pf = [], k, ks = ['m', 'h', 'd'], wait = [], failed = [];   /* merged-list order as before #90 */
+      for (k = 0; k < 3; k++) {
+        var v = parts[ks[k]];
+        if (v === null) { wait.push(ks[k]); } else if (v === 'fail') { failed.push(ks[k]); } else { pf = pf.concat(groupPf(v)); }
+      }
+      render(fuse(pf, semDocs, !wait.length), pf, wait, failed);
+    }
+    /* E6: English mode lists no Spanish document in the body results either (a Spanish note page or a CD3WD Spanish
+       textbook tagged English by the index) */
+    function enHidesEs(rel, title) { return state.lang !== 'spa' && esDoc({ t: title || '', p: rel }); }
+    /* result filters shared by both lists */
+    function ftPass(rel) {
+      if (titlePaths[rel]) { return false; }                     /* dedupe vs titles */
+      if (selCount(state.shelves)) {
+        var okShelf = false;
+        for (var sp in state.shelves) { if (rel.indexOf(sp) === 0) { okShelf = true; break; } }
+        if (!okShelf) { return false; }
+      }
+      if (selCount(state.types) && !state.types.docs) { return false; } /* body hits are docs only */
+      if (!state.hist && histPath(rel)) { return false; }
+      return true;
+    }
+    /* #193 (a7b F15): Spanish stemming joins "mejillones" (mussels) with "mejilla" (cheek), so dental pages answered a
+       mussel question. A hit whose marked words hold the false friend and never the asked word is dropped.
+       ponytail: one pair; add pairs as they are found */
+    var FALSE_FRIENDS = [[/mejill[oó]n/i, /^mejillas?$/i]];
+    function falseFriend(d) {
+      var marks = (d.excerpt || '').match(/<mark>[^<]*<\/mark>/g) || [], f, j, bad, good;
+      for (f = 0; f < FALSE_FRIENDS.length; f++) {
+        if (!FALSE_FRIENDS[f][0].test(q)) { continue; }
+        for (bad = good = false, j = 0; j < marks.length; j++) {
+          var w = marks[j].replace(/<\/?mark>/g, '').replace(/[^A-Za-z\u00C0-\u024F]/g, '');  /* Pagefind marks "mejillas," */
+          if (FALSE_FRIENDS[f][1].test(w)) { bad = true; } else if (FALSE_FRIENDS[f][0].test(w)) { good = true; }
+        }
+        if (bad && !good) { return true; }
+      }
+      return false;
+    }
+    function groupPf(done) {
+      var qn = q.toLowerCase().replace(/\s+/g, ' '), PHRASE = qn.trim().split(' ').length >= 3;
+      /* page pick: a sub-result whose excerpt contains the query as an
+         exact phrase wins outright; else most matched-word locations
+         (first-with-anchor lands on stopword-only pages) */
+      /* #207 (a7a S2, a7b W7): the excerpt shown is the chosen page's own sub-result excerpt, never the document's top
+         excerpt from another page (1 search excerpt in 5 sat on a different PDF page than its link) */
+      function pick(d) {
+        var subs = d.sub_results || [], m, best = -1, page = 0, hit = false, ex0 = null;
+        var toks = qn.split(' ').filter(function (w) { return w.length >= 4 && !STOP.test(w); });
+        for (var s = 0; s < subs.length; s++) {
+          if (!subs[s].url || !(m = subs[s].url.match(/#p(\d+)/))) { continue; }
+          var ex = (subs[s].excerpt || '').replace(/<[^>]+>/g, ' ')
+            .toLowerCase().replace(/\s+/g, ' ');
+          if (ex.indexOf(qn) !== -1) { return { page: +m[1], hit: true, excerpt: subs[s].excerpt || '' }; }
+          var nloc = (subs[s].locations || []).length;
+          if (nloc > best) {
+            best = nloc; page = +m[1]; ex0 = subs[s].excerpt || '';
+            /* every content word on this page = trust it (phrase checks);
+               fewer = the embedding's page wins in fuse() */
+            hit = toks.length > 0 && toks.every(function (w) { return ex.indexOf(w) !== -1; });
+          }
+        }
+        return { page: page, hit: hit, excerpt: ex0 };
+      }
+      /* best candidate per doc: an exact-phrase chunk beats a merely
+         higher-ranked sibling chunk of the same PDF */
+      var byDoc = {}, order = [], list = [];
+      for (var i = 0; i < done.length; i++) {
+        var d = done[i];
+        if (!d || falseFriend(d)) { continue; }
+        var pdf = d.meta && d.meta.pdf;                        /* wrapper pages carry the real doc path */
+        var rel = pdf || d.url.replace(/^\//, '');
+        if (!ftPass(rel) || enHidesEs(rel, d.meta && d.meta.title)) { continue; }
+        var cand = { rel: rel, d: d, pdf: pdf, page: 0, hit: false,
+                     title: d.meta && d.meta.title || rel, excerpt: d.excerpt || '',
+                     summary: d.meta && d.meta.summary || '' };   /* E1c: "what this answers", gen_text wrapper meta */
+        if (pdf) { var pk = pick(d); cand.page = pk.page; cand.hit = pk.hit; if (pk.excerpt !== null) { cand.excerpt = pk.excerpt; } }
+        /* r39 acceptance (T7): a typed phrase of 3+ words found verbatim in the row's own excerpt marks the row exact; fuse()
+           lists exact rows first, so a near-tie in Pagefind's scores cannot push the page that prints the phrase past the
+           8-row cut (CGEH ch.15 p.35 at modern #9, 0.13 under a framework PDF that holds the words apart) */
+        cand.exact = PHRASE && cand.excerpt.replace(/<[^>]+>/g, ' ').toLowerCase().replace(/\s+/g, ' ').indexOf(qn) !== -1;
+        if (!byDoc[rel]) { byDoc[rel] = cand; order.push(rel); }
+        else if (cand.exact && !byDoc[rel].exact) { byDoc[rel] = cand; }
+        else if (cand.hit && !byDoc[rel].hit) { byDoc[rel] = cand; }
+      }
+      for (var j = 0; j < order.length; j++) { list.push(byDoc[order[j]]); }
+      return list;
+    }
+    /* reciprocal rank fusion: score = sum over lists of 1/(60 + rank).
+       In both lists = rises; only in one = still shows. Semantic-only rows
+       carry no excerpt and get a "related" label. */
+    /* #87 (2026-10-06) tried ranking each Pagefind row inside its own index (and the semantic rows inside their
+       section): v2 31 -> 31, v3 65 -> 63 (K349, K357, K373 lost), so rows keep their rank in the merged list
+       (modern, historical, development), as before. Ties keep insertion order (Array.prototype.sort is stable). */
+    /* #240 (E22 B, title-only rule; a8 F2): a document is title-only on this page when build_mcp_index.py lists it
+       (_app/index/title_only.json: the catalogue's historical line), or when any of its /semantic rows comes flagged
+       title_only or outdated (an outdated passage or a dose_page): then neither the server quote nor the Pagefind excerpt
+       of that document is shown, on any page of it. The title, page number and link stay. */
+    function titleOnly(rel) { return TONLY && TONLY.ok ? !!TONLY.p[rel] : histPath(rel); }
+    /* #252 (b5 W13): rows that answer another sense of the words go below the rest (kept, never dropped), decided by the
+       Ask router's reading of the question (window.lanternRoute, E26): children's storybooks and activity sheets under a
+       health or emergency question («se ahogó en el río»: three Pedro storybooks first), and breast and breastfeeding pages
+       under the chest card («dolor de pecho»: «pecho» is chest and breast) unless the question names the breast or feeding.
+       #272 (round 10, a7b W6): the rules live in one per-card table, window.lanternOffTopic in app.js (OFFTOPIC-BEGIN), which
+       the Ask page's demote() also reads, so a row is demoted alike on both doors and readers go down on every path.
+       A demoted row is listed lower and bare (N1, #284: no note). D4 (#278): no row shows an excerpt now; the excerpts are
+       read here only to pick the page, mark an exact phrase and drop a false friend. */
+    function demoted(rt, c) {
+      return window.lanternOffTopic ? window.lanternOffTopic(rt, { title: c.title, path: c.rel, excerpt: (c.excerpt || '').replace(/<[^>]+>/g, '') }, q) : null;
+    }
+    /* #252 (a8 F3, #229): the page shown is listed as outdated (CGEH p.163 dengue) although /semantic sent a sibling page:
+       its excerpt is withheld. A page-less row (HTML) is withheld when its path is listed at all. */
+    function outdPage(rel, page) { var l = OUTD && OUTD[rel]; return !!l && (!page || l.indexOf(page) !== -1); }
+    function fuse(pf, sem, final) {
+      var by = {}, order = [], i, c, semTO = {};
+      for (i = 0; i < sem.length; i++) { if (sem[i].path && (sem[i].title_only || sem[i].outdated)) { semTO[sem[i].path] = 1; } }
+      for (i = 0; i < pf.length; i++) { c = pf[i]; c.score = 1 / (61 + i); by[c.rel] = c; order.push(c.rel); }
+      for (i = 0; i < sem.length; i++) {
+        var s = sem[i], rel = s.path;
+        if (!rel || !ftPass(rel) || enHidesEs(rel, s.title)) { continue; }
+        /* floor sweep 2026-09-26: the server floor went 0.65 -> 0.60 to fill
+           empty semantic lists. Rows in the weak band (< 0.65) only fill
+           gaps: no boost, no page override, ranked under every Pagefind
+           row (a 0.62 pair pushed an exact-phrase hit out of the top 8) */
+        var weak = typeof s.score === 'number' && s.score < 0.65;
+        if (by[rel]) {
+          if (weak) { continue; }
+          by[rel].score += 1 / (61 + i);
+          /* eval 2026-09-26: the embedding's page lands within 2 pages of
+             the answer 18/22 times, Pagefind's most-locations guess 7/22;
+             only an exact-phrase chunk beats it */
+          /* #207: the page and the excerpt come from the same hit: the embedding's page brings its own server quote (or
+             none, e.g. withheld for a dose) */
+          if (s.page && !by[rel].hit && s.page !== by[rel].page) { by[rel].page = s.page; by[rel].excerpt = s.excerpt ? esc(s.excerpt) : ''; }
+        } else {
+          /* server quote is plain text (Pagefind's carries <mark>) */
+          by[rel] = { rel: rel, pdf: /\.pdf$/i.test(rel) ? rel : null, page: s.page || 0,
+                      title: s.title || rel, excerpt: s.excerpt ? esc(s.excerpt) : '',
+                      related: true, score: 1 / ((weak ? 81 : 61) + i) };
+          order.push(rel);
+        }
+      }
+      /* E5 (#207): equal scores order by path, then page (fix plan key; the RRF sums are not rounded to 3 decimals, which
+         would merge neighbouring ranks: 1/61 and 1/62 both round to 0.016) */
+      /* #246 E27: an older health document moves down by the age weight (the server's formula; the page shows no score,
+         so the fused score is weighted unrounded: rounding RRF sums to 3 decimals would merge neighbouring ranks) */
+      for (i = 0; i < order.length; i++) { by[order[i]].score *= 1 - ageW(order[i]); }
+      order.sort(function (a, b) { return (by[b].exact ? 1 : 0) - (by[a].exact ? 1 : 0) || by[b].score - by[a].score || (a < b ? -1 : a > b ? 1 : 0) || (by[a].page || 0) - (by[b].page || 0); });
+      var fused = [], low = [], rt = window.lanternRoute ? routeOf(q) : null;
+      for (i = 0; i < order.length; i++) {
+        c = by[order[i]]; c.to = semTO[c.rel] || titleOnly(c.rel) || outdPage(c.rel, c.page);
+        c.off = rt ? demoted(rt, c) : null;
+        (c.off ? low : fused).push(c);
+      }
+      fused = fused.concat(low);
+      /* eval hook (server/eval_gold.py, t4_coverage.py read this): set only once every index has
+         answered or failed, so "settled" still means final rows */
+      if (final) {
+        window.__lanternFT = { q: q, pf: pf.map(function (x) { return x.rel; }),
+          sem: sem.map(function (x) { return x.path; }),
+          titles: Object.keys(titlePaths), fused: fused.map(function (x) { return x.rel; }) };
+      }
+      return fused;
+    }
+    function ftRow(c) {
+      var href;
+      if (histPath(c.rel)) { href = hrefOf({ p: c.rel, h: 1 }); }
+      else if (c.pdf) {
+        href = 'reader.html?f=' + encodeURIComponent(c.pdf) +
+          (c.page ? '&p=' + c.page : '') + '&q=' + encodeURIComponent(q) +
+          (c.title ? '&t=' + encodeURIComponent(c.title) : '');
+      } else { href = c.d ? c.d.url : c.rel; }
+      return '<div class="l-result"><a class="title" href="' + esc(href) + '">' +
+        '<span class="l-src l-src--docs">' + ES('DOCS', 'DOCUMENTO') + '</span> ' + esc(c.title) +
+        (c.page ? ' <span class="l-caption">p.' + c.page + '</span>' : '') +
+        (c.related ? ' <span class="l-caption s-related">' + ES('related', 'relacionado') + '</span>' : '') + '</a>' +
+        /* D4 (#278 #279, 10-28): no quoted document text: no Pagefind excerpt and no server excerpt, on any row; N1 (#284):
+           an off-topic row (c.off) is listed lower, bare. The catalogue's own summary line stays. */
+        (c.summary ? '<p class="snippet s-sum">' + esc(scrubDose(c.summary)) + '</p>' : '') + '</div>';
+    }
+    var PART_NAME = { d: ES('development handbooks', 'los manuales de desarrollo'), h: ES('historical texts', 'los textos históricos') },
+        PART_MODERN = ES('modern shelves', 'los estantes modernos');
+    function partNote(wait, failed) {
+      var h = '', i, n = [];
+      /* #240 (round 8 b4 F3): a /semantic call that did not answer is said, not silent */
+      if (semFail) {
+        h += '<p class="l-caption" id="ft-semfail">' + ES('The search by meaning did not answer in time: these are word matches only. Search again in a moment for related pages.',
+          'La búsqueda por significado no respondió a tiempo: estos resultados son solo por palabras. Busque otra vez en un momento para ver páginas relacionadas.') + '</p>';
+      }
+      for (i = 0; i < wait.length; i++) { n.push(PART_NAME[wait[i]] || PART_MODERN); }
+      if (n.length) { h += '<p class="l-caption" id="ft-pending" role="status">' + ES('Still searching the ', 'Todavía buscando en ') + n.join(ES(' and ', ' y ')) + '…</p>'; }
+      for (n = [], i = 0; i < failed.length; i++) { n.push(PART_NAME[failed[i]] || PART_MODERN); }
+      if (n.length) {
+        h += '<p class="l-caption" id="ft-failed">' + ES('The ' + n.join(' and ') + ' did not answer for this search. Try fewer or more specific words.',
+          'No respondieron ' + n.join(' y ') + ' para esta búsqueda. Pruebe con menos palabras o más precisas.') + '</p>';
+      }
+      return h;
+    }
+    function render(fused, pfDocs, wait, failed) {
+      if (!fused.length) {
+        out.innerHTML = (pfDocs.length || semDocs.length
+          ? '<p class="l-caption">' + ES('Matches found, but your filters hide them.', 'Hay resultados, pero los filtros los ocultan.') + '</p>'
+          : wait.length ? '' : '<p class="l-caption">' + ES('Nothing inside the documents for “', 'Nada dentro de los documentos para «') + esc(q) + ES('”.', '».') + '</p>') + partNote(wait, failed);
+        return;
+      }
+      var noSnip = drugQuery(q) || (window.lanternRoute && routeOf(q).amount ? 'en' : false);   /* #272: an amount question too */
+      /* D2 (2026-10-09): the promise covers the library's own text, not the shelved medical books. Spanish
+         notice when the page is in Spanish or the query is (#146) */
+      var esNote = noSnip === 'es' || state.lang === 'spa' || /[áéíóúñ¿¡]/i.test(q);
+      var h = !noSnip ? '' : esNote
+        ? '<div class="l-notice-dosing" id="dose-notice" lang="es"><b>Las páginas, los resúmenes y la búsqueda propios de ' +
+          'esta biblioteca nunca indican dosis de medicamentos.</b> Los libros de medicina del estante sí las indican: ' +
+          'para cualquier dosis, use la guía impresa de medicamentos (Davis’s, Lippincott de bolsillo). La búsqueda ' +
+          'muestra solo los títulos; los enlaces de abajo abren los libros completos.</div>'
+        : '<div class="l-notice-dosing" id="dose-notice"><b>This library’s own pages, summaries and search never state ' +
+          'drug doses.</b> The medical books on the shelf do: use the printed drug guide (Davis’s, Lippincott pocket) ' +
+          'for any dose. Search shows titles only; the links below open the full books.</div>';
+      /* modern rows first (mirrors included, no penalty); historical shelves
+         always below, under a visible divider, never interleaved */
+      var modern = [], hist = [], dev = [], i;
+      for (i = 0; i < fused.length; i++) { (histPath(fused[i].rel) ? hist : devPath(fused[i].rel) ? dev : modern).push(fused[i]); }
+      for (i = 0; i < modern.length && i < 8; i++) { h += ftRow(modern[i]); }
+      if (dev.length) {
+        h += '<div class="s-histdiv">' + ES('Development handbooks and textbooks (CD3WD, Siyavula, Connexions)', 'Manuales de desarrollo y libros de texto (CD3WD, Siyavula, Connexions)') + '</div>';
+        for (i = 0; i < dev.length && i < 4; i++) { h += ftRow(dev[i]); }
+      }
+      if (hist.length) {
+        /* #193 (a7a W8): this section also holds superseded 1997-2011 editions (docs/HISTORICAL, CD3WD health) */
+        h += '<div class="s-histdiv">' + ES('Older and historical documents (outdated, unverified)', 'Documentos antiguos e históricos (desactualizados, sin verificar)') + '</div>';
+        for (i = 0; i < hist.length && i < 4; i++) { h += ftRow(hist[i]); }
+      }
+      out.innerHTML = h + partNote(wait, failed);
+    }
+  }
+
+  /* H37b: same-origin /semantic (nginx → lantern-mcp :8090). Degrades to [] on absence/timeout, with cb(list, true) so
+     the page says so (#240, b4 F3: a loaded Pi took up to 3.6 s, so the wait is 6 s, not 3). Dev server has no nginx: on
+     localhost only, fall back to the MCP port directly. */
+  var ftSeq = 0;
+  function semanticFetch(q, cb) {
+    semanticGet('/semantic?q=' + encodeURIComponent(q) + '&lang=' + state.lang + '&limit=20', cb);
+  }
+  function semanticGet(qs, cb) {
+    var local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+    function get(url, fail) {
+      var x = new XMLHttpRequest();
+      x.open('GET', url, true); x.timeout = 6000;
+      x.onreadystatechange = function () {
+        if (x.readyState !== 4) { return; }
+        if (x.status === 200) {
+          try { var l = JSON.parse(x.responseText); cb(l.length !== undefined ? l : []); return; } catch (e) {}
+        }
+        fail();
+      };
+      x.send();
+    }
+    if (direct) { cb([]); return; }
+    var devUrl = location.protocol + '//' + location.hostname + ':8090' + qs;
+    if (local) { get(devUrl, function () { get(qs, function () { cb([], true); }); }); }
+    else { get(qs, function () { cb([], true); }); }
+  }
+  /* #246 E27 age weight (fix plan "Age weight"): health content only, catalogue year from health_years.json, AGE_REF_YEAR 2026;
+     0 under 20 years or with no year, then slow growth to 0.15 at 100 years. Same formula as mcp_server.py.
+     ponytail: a path-prefix list, as on the server; a catalogue topic field is the upgrade */
+  var HEALTH_RE = /^(?:docs\/medical\/|docs\/HISTORICAL\/|docs\/cd3wd\/2012\/health\/|mirrors\/hesperian\/|docs\/survivor_library\/SurvivalLibrary\/library\/(?:Medical-|(?:First Aid|Dentistry|Herbalism|Veterinary)\/))/;
+  function ageW(p) {
+    var y = HY && HY[p], age = 2026 - y;
+    return !y || !HEALTH_RE.test(p) || age < 20 ? 0 : Math.round(Math.min(0.15, 0.15 * (age - 20) / 80) * 1000) / 1000;   /* w to 3 decimals, as age_w */
+  }
+  var HIST_PREFIX = ['docs/survivor_library/', 'docs/cd3wd/2012/health/', 'docs/HISTORICAL/'];
+  var HIST_EXEMPT = ["docs/cd3wd/2012/health/_mc_405_HEALTH_2_jf_en_136310_.pdf", "docs/cd3wd/2012/health/_mc_437_How_to_Look_After_a_Refrigerator27_717_jf_en_136560_.pdf", "docs/cd3wd/2012/health/_mc_Portable_Wheelchair_Ramp_Design_ap_en_lp_138160_.pdf", "docs/cd3wd/2012/health/_mc_S00017_bicycle_ambulance_e4c_en_138440_.pdf", "docs/cd3wd/2012/health/_mc_S00063_MIT_Public_Service_Center_presentation_6_10_10_e4c_en_138490_.pdf", "docs/cd3wd/2012/health/_mc_S00063_TIE_SE_Presentation_8_2_10_e4c_en_138520_.pdf", "docs/cd3wd/2012/health/_mc_S00063_The_Alpha_Prototype_Brochure_e4c_en_138500_.pdf", "docs/cd3wd/2012/health/_mc_S00063_The_Alpha_Prototype_Presentation_e4c_en_138510_.pdf", "docs/cd3wd/2012/health/_mc_S00063_USAID_Komera_Project_Factsheet_e4c_en_138530_.pdf", "docs/cd3wd/2012/health/_mc_S00064_Amos_Winter_LFC_2009_ASME_IDETC_e4c_en_138540_.pdf", "docs/cd3wd/2012/health/_mc_S00064_USAID_lfc_project_factsheet_e4c_en_138550_.pdf", "docs/cd3wd/2012/health/_mc_ms_medical_waste_incinerator_pa_en_137940_.pdf"];
+  var DEV_PREFIX = ['docs/cd3wd/2012/', 'docs/school_textbooks/'];
+  function devPath(p) {
+    if (histPath(p)) { return false; }
+    for (var i = 0; i < DEV_PREFIX.length; i++) { if (p.indexOf(DEV_PREFIX[i]) === 0) { return true; } }
+    return false;
+  }
+  function histPath(p) {
+    var s = shelfOf(p), i;
+    if (HIST_EXEMPT.indexOf(p) >= 0) { return false; }  /* r9 a7a W8: gen_index.HIST_EXEMPT, engineering papers in the CD3WD health folder */
+    for (i = 0; i < HIST_PREFIX.length; i++) { if (p.indexOf(HIST_PREFIX[i]) === 0) { return true; } }
+    for (i = 0; i < shelves.length; i++) { if (shelves[i].path === s) { return !!shelves[i].historical; } }
+    return false;
+  }
+
+  /* #87 (2026-10-06): question words and punctuation (EN + ES) left out of the encyclopedia pattern and of the
+     relaxed Pagefind variant; the whole query is used when nothing else is left. */
+  var QWORDS = ('a al algo alguien algun alguna alguno ante como cómo con cual cuál cuales cuáles cuando cuándo cuanto cuánto cuanta ' +
+    'cuánta cuantos cuántos cuantas cuántas de del desde donde dónde el ella en entre es esa ese eso esta este esto está están ' +
+    'hay la las le les lo los me mi mis muy nos o para pero por porque puede pueden puedo debo debe deben que qué quien quién se ' +
+    'ser si su sus te tengo tiene tienen tu tus un una uno unos unas y ya yo ' +
+    'the a an and or of to in on at for from by with is are was were be been do does did how what which who whom why ' +
+    'when where can could should would will i me my we our you your it its this that these those there their they them ' +
+    'he she his her if so as into about').split(' ');
+  /* #252 (b2 W15): doing-verbs a question carries and a page rarely does; dropped from the relaxed Pagefind variant only */
+  var FILLER = 'echo echar echarle echarlo echarla pongo poner ponerle agrego agregar añado añadir uso usar put add use'.split(' ');
+  function encWords(q) {
+    var w = q.toLowerCase().replace(/[¿?¡!.,;:"“”()]/g, ' ').split(/\s+/), keep = [], i;
+    for (i = 0; i < w.length; i++) { if (w[i] && QWORDS.indexOf(w[i]) === -1) { keep.push(w[i]); } }
+    return keep;
+  }
+  /* #92 (2026-10-06): for broad words ("Canning", "Fire", "Solar") Xapian's top rows were disambiguation, list,
+     category and surname pages. Fetch 24, show real articles first, those navigation pages after (never dropped). */
+  var ENC_NAV = /^(category:|_categories_partials_|portal:|index:|list of |lists of |index of |outline of |highest voted )|\((disambiguation|name|surname|given name)\)$/i;
+  var encSeq = 0;
+  function runEnc(q) {
+    var sec = el('s-enc'), out = el('r-enc');
+    if (direct || document.documentElement.getAttribute('data-cap-enc') !== '1') {
+      sec.className = 's-section s-offline';
+      out.innerHTML = '<p class="l-caption">' + (direct
+        ? '<span class="l-badge">' + ES('NEEDS THE SERVER', 'NECESITA EL SERVIDOR') + '</span> ' + ES('Encyclopedia search runs on the Lantern box.', 'La búsqueda en las enciclopedias funciona en la caja Lantern.')
+        : ES('Encyclopedia service not answering.', 'El servicio de enciclopedias no responde.')) + '</p>';
+      return;
+    }
+    sec.className = 's-section';
+    var base = window.lanternKiwixBase(), seq = ++encSeq, words = encWords(q);
+    function urlOf(pattern) {
+      return base + '/search?pattern=' + encodeURIComponent(pattern) + '&pageLength=24' +
+        '&books.filter.lang=' + state.lang + '&books.filter.notag=_category:ted'; // TED is multilingual: kiwix refuses mixed-language search
+    }
+    var url = urlOf(words.length ? words.join(' ') : q);
+    var linkOut = '<p class="l-caption"><a href="' + esc(url) + '">' + ES('Search the encyclopedias →', 'Buscar en las enciclopedias →') + '</a></p>';
+    /* rows [{href, t}] or null on error */
+    function get(u, cb) {
+      var x = new XMLHttpRequest();
+      x.open('GET', u, true); x.timeout = 4000;
+      x.onreadystatechange = function () {
+        if (x.readyState !== 4) { return; }
+        if (!x.status || x.status >= 400) { cb(null); return; }
+        try {
+          var links = new DOMParser().parseFromString(x.responseText, 'text/html').querySelectorAll('.results a, .result a, li a'), rows = [];
+          for (var i = 0; i < links.length; i++) {
+            var href = links[i].getAttribute('href') || '';
+            if (href.indexOf('viewer#') === -1 && !/^\/content\//.test(href)) { continue; }
+            /* /content/<book>/<path> is the bare article; /viewer#<book>/<path> keeps the Kiwix search bar */
+            rows.push({ href: href.replace(/^\/content\//, '/viewer#'), t: links[i].textContent.replace(/\s+/g, ' ').trim() });
+          }
+          cb(rows);
+        } catch (e) { cb(null); }
+      };
+      x.send();
+    }
+    function show(rows) {
+      if (seq !== encSeq) { return; }
+      var good = [], nav = [], seen = {};
+      for (var i = 0; rows && i < rows.length; i++) {
+        var r = rows[i];
+        if (seen[r.href]) { continue; }
+        seen[r.href] = 1;
+        (ENC_NAV.test(r.t) || /questions\/tagged\//.test(r.href) ? nav : good).push(
+          '<a class="l-doc-row" href="' + esc(base + r.href) + '">' +
+          /* #272 (a7b note 3): a title is scrubbed only when it names a medicine ("iPhone 3G" is not 3 grams) */
+          '<span><span class="l-src l-src--enc">' + ES('ENCYCLOPEDIA', 'ENCICLOPEDIA') + '</span> <b>' + esc(drugQuery(r.t, true) ? scrubDose(r.t) : r.t) + '</b></span>' +
+          '<span class="spacer">›</span></a>');
+      }
+      out.innerHTML = good.concat(nav).slice(0, 8).join('') || linkOut;
+    }
+    /* #240 (a7a note 3): «perro comió chocolate» found 15 articles but not «Teobromina», the word the encyclopedia
+       uses. The first synonym variant (search_synonyms.json, as for Pagefind) runs too; its rows join after the
+       reader's own first four, never above them */
+    function synRows(rows) {
+      var v = expandQuery(q, 1);
+      if (!rows || !v.length) { show(rows); return; }
+      var vw = encWords(v[0]);
+      get(urlOf(vw.length ? vw.join(' ') : v[0]), function (more) {
+        show(more && more.length ? rows.slice(0, 4).concat(more.slice(0, 4), rows.slice(4)) : rows);
+      });
+    }
+    get(url, function (rows) {
+      /* a question's first content word is usually its verb ("prepara", "abro", "make"); when every word together
+         finds under 8 articles, ask again without it and append those rows after the first answer's */
+      if (!rows || rows.length >= 8 || words.length < 3) { synRows(rows); return; }
+      get(urlOf(words.slice(1).join(' ')), function (more) { synRows(rows.concat(more || [])); });
+    });
+  }
+
+  /* ── orchestrate ── */
+  var timer = null, netTimer = null;
+  function run() {
+    var q = input.value.replace(/^\s+|\s+$/g, '');
+    if (!q) {
+      el('r-emerg').innerHTML = el('r-pin').innerHTML = el('r-titles').innerHTML = el('r-fulltext').innerHTML = el('r-enc').innerHTML = '';
+      return;
+    }
+    el('r-emerg').innerHTML = window.lanternEmergHTML(state.lang === 'spa');   /* #287: every answer, whatever the question */
+    try { history.replaceState(null, '', 'search.html?' + (state.lang !== 'eng' ? 'lang=' + state.lang + '&' : '') + (state.mode !== 'both' ? 'mode=' + state.mode + '&' : '') + 'q=' + encodeURIComponent(q)); } catch (e) {}
+    el('c-fulltext').textContent = {
+      precise: ES('Exact words on the page. Filters apply.', 'Las palabras exactas en la página. Los filtros se aplican.'),
+      feeling: ES('By meaning: pages about the idea even when the words differ. Filters apply.', 'Por significado: páginas sobre la idea aunque las palabras sean otras. Los filtros se aplican.'),
+      both: ES('Words on the page, plus related pages by meaning. Filters apply.', 'Las palabras en la página, más páginas relacionadas por significado. Los filtros se aplican.') }[state.mode];
+    runTitles(q, function (items) {
+      var seen = {}, i;
+      for (i = 0; i < items.length; i++) { seen[items[i].p] = 1; }
+      /* titles are instant; the network layers (pagefind, kiwix) wait for a
+         typing pause so mid-word keystrokes don't spam the Pi */
+      clearTimeout(netTimer);
+      netTimer = setTimeout(function () {
+        if (input.value.replace(/^\s+|\s+$/g, '') !== q) { return; }
+        /* ponytail: Pagefind on the 2.9 GB index pulls ~270 MB for a bare
+           stopword ('the'); require one 4+ char token, same bar as title rows.
+           #252 (b2 W10): or a 3-letter word that is not a question or function word («VIH», "flu"); the historical
+           index never sees it (contentWords keeps 4+ letters). A very common 3-letter word is the known ceiling. */
+        if (/\S{4,}/.test(q) || encWords(q).some(function (w) { return w.length === 3; })) { runFulltext(q, seen); }
+        runEnc(q);
+      }, 400);
+    });
+  }
+  input.addEventListener('input', function () {
+    clearTimeout(timer); timer = setTimeout(run, 120);
+  });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.keyCode === 13) { clearTimeout(timer); run(); }
+  });
+
+  /* boot: shelves for the filter rail (sidebar fills itself via app.js),
+     then initial ?q=. app.js is deferred — wait for its API. */
+  (function ready() {
+    if (!window.lanternShelves) { setTimeout(ready, 40); return; }
+    window.lanternShelves(function (list) {
+      shelves = list;
+      buildRail();
+      var m = location.search.match(/[?&]q=([^&]+)/);
+      if (m) { input.value = decodeURIComponent(m[1].replace(/\+/g, ' ')); }
+      /* the row languages first, so the first English answer already drops the Spanish rows */
+      loadRowLangs(function () { if (input.value) { run(); } });
+    });
+  })();
+})();
+</script>
+</body>
+</html>

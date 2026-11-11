@@ -1,0 +1,180 @@
+{
+  "_doc": "H37b gold set. expect = case-insensitive path substrings, any one satisfies ('|' separated). kind=mismatch: vocabulary differs from the page text (semantic should help). kind=exact: today's Pagefind already answers; its top-3 hit must survive fusion. kind=historical (H37c): expected doc lives on a historical shelf; hit@5 is scored inside the historical sublist (the rows under the divider), reported separately.",
+  "queries": [
+    {
+      "q": "stop bleeding from a deep cut",
+      "kind": "mismatch",
+      "expect": "bleeding|first_aid|wound|icrc_first_aid|damage_control|ranger_medic|tccc"
+    },
+    {
+      "q": "make water safe to drink",
+      "kind": "mismatch",
+      "expect": "sodis|disinfection|make_water_safe|drinking_water|water_supply|biosand"
+    },
+    {
+      "q": "how long can canned food last",
+      "kind": "mismatch",
+      "expect": "canning|nchfp|canned|storing"
+    },
+    {
+      "q": "signs of hypothermia",
+      "kind": "mismatch",
+      "expect": "hypothermia|cold|winter"
+    },
+    {
+      "q": "build a latrine",
+      "kind": "mismatch",
+      "expect": "latrine|excreta"
+    },
+    {
+      "q": "radio that works without internet",
+      "kind": "mismatch",
+      "expect": "comms/"
+    },
+    {
+      "q": "someone is choking and cannot breathe",
+      "kind": "mismatch",
+      "expect": "first_aid|choking|airway|cert_basic"
+    },
+    {
+      "q": "keep food cold without electricity",
+      "kind": "mismatch",
+      "expect": "root_cellars|storing_fresh_produce|power-outage|refrigerat"
+    },
+    {
+      "q": "grow vegetables from saved seeds",
+      "kind": "mismatch",
+      "expect": "seed_saving|vegetable_gardening|growing_vegetables"
+    },
+    {
+      "q": "toilet when the sewer is broken",
+      "kind": "mismatch",
+      "expect": "two_bucket|emergency_sanitation|excreta|latrine|humanure|toilet"
+    },
+    {
+      "q": "what to do after an earthquake",
+      "kind": "mismatch",
+      "expect": "earthquake"
+    },
+    {
+      "q": "shelter from fallout after a nuclear blast",
+      "kind": "mismatch",
+      "expect": "nuclear"
+    },
+    {
+      "q": "sew up a torn tent",
+      "kind": "mismatch",
+      "expect": "fabric_repair|sew|stitch|textiles"
+    },
+    {
+      "q": "protect the house from a wildfire",
+      "kind": "mismatch",
+      "expect": "wildfire|firewise|hiz|wildland"
+    },
+    {
+      "q": "find my way with a map and compass",
+      "kind": "mismatch",
+      "expect": "map_reading|navigation"
+    },
+    {
+      "q": "make electricity when the grid is down",
+      "kind": "mismatch",
+      "expect": "wood_gas|offgrid|power-outage|generator"
+    },
+    {
+      "q": "a dead body needs to be buried safely",
+      "kind": "mismatch",
+      "expect": "dead_bod|death_care"
+    },
+    {
+      "q": "collect rain for drinking",
+      "kind": "mismatch",
+      "expect": "rainwater"
+    },
+    {
+      "q": "bread without store bought yeast",
+      "kind": "mismatch",
+      "expect": "sourdough"
+    },
+    {
+      "q": "keep chickens for eggs",
+      "kind": "mismatch",
+      "expect": "poultry|chickens"
+    },
+    {
+      "q": "biosand filter",
+      "kind": "exact",
+      "expect": "biosand"
+    },
+    {
+      "q": "sodis",
+      "kind": "exact",
+      "expect": "sodis"
+    },
+    {
+      "q": "root cellar",
+      "kind": "exact",
+      "expect": "root_cellars"
+    },
+    {
+      "q": "tourniquet",
+      "kind": "exact",
+      "expect": "tccc|first_aid|nwtnd|ranger_medic|war_surgery"
+    },
+    {
+      "q": "compost toilet",
+      "kind": "exact",
+      "expect": "humanure|compost|sanitation"
+    },
+    {
+      "q": "morse code",
+      "kind": "exact",
+      "expect": "morse|comms/"
+    },
+    {
+      "q": "graywater",
+      "kind": "exact",
+      "expect": "graywater|greywater"
+    },
+    {
+      "q": "pressure canner",
+      "kind": "exact",
+      "expect": "canning|nchfp"
+    },
+    {
+      "q": "septic",
+      "kind": "exact",
+      "expect": "septic"
+    },
+    {
+      "q": "antenna",
+      "kind": "exact",
+      "expect": "antenna|neets|comms/"
+    },
+    {
+      "q": "blacksmith forge welding",
+      "kind": "historical",
+      "expect": "survivor_library/.*blacksmith|survivor_library/.*weld|survivor_library/.*forg"
+    },
+    {
+      "q": "sheep husbandry",
+      "kind": "historical",
+      "expect": "survivor_library/.*sheep"
+    },
+    {
+      "q": "slide rule instructions",
+      "kind": "historical",
+      "expect": "survivor_library/.*slide_rule|survivor_library/.*sliderule"
+    },
+    {
+      "q": "steam engine boiler",
+      "kind": "historical",
+      "expect": "survivor_library/.*boiler|survivor_library/.*steam"
+    },
+    {
+      "q": "bookbinding sewing",
+      "kind": "historical",
+      "expect": "survivor_library/.*bookbind"
+    }
+  ]
+}

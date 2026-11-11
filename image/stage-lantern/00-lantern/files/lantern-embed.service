@@ -1,0 +1,17 @@
+[Unit]
+Description=Lantern embedding service (llamafile, nomic-embed) for MCP semantic search
+RequiresMountsFor=/data
+After=network.target lantern-firstboot.service
+
+[Service]
+Type=simple
+ExecStart=/bin/sh /data/library/tools/llamafile/llamafile-0.10.6 --server --embedding -m /data/library/tools/models/nomic-embed-text-v1.5.f16.gguf --host 127.0.0.1 --port 8091 -c 2048 -b 2048 -ub 2048
+Restart=on-failure
+RestartSec=10
+User=www-data
+# llamafile (APE) extracts a loader under $HOME; www-data has none writable.
+StateDirectory=lantern-embed
+Environment=HOME=/var/lib/lantern-embed
+
+[Install]
+WantedBy=multi-user.target

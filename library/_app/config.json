@@ -1,0 +1,5 @@
+{
+  "kiwixPort": 8080,
+  "llmEndpoints": ["http://10.10.10.20:11434", "http://10.10.10.20:8081"],
+  "homeRegion": { "name": "Redwood City, California", "lat": 37.485, "lon": -122.236 }
+}

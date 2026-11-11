@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lantern — Offline Survival Library</title>
+<link rel="icon" href="_app/brand/lantern-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_app/fonts/fonts.css">
+<link rel="stylesheet" href="_app/app.26829533.css">
+<script src="_app/app.7858fbba.js" defer></script>
+</head>
+<body class="has-sidebar">
+
+<aside class="l-sidebar">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <!--SIDEPILL--><button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+  <a class="l-cta-triage l-cta-triage--side" href="triage.html">
+    <span class="cross">+</span><span><b>Hurt or sick</b></span>
+  </a>
+  <!--NAV-->
+  <nav class="l-nav" aria-label="Primary">
+    <a href="index.html" aria-current="page">Shelves</a>
+    <a href="search.html">Search</a>
+    <a href="audio.html">Listening</a>
+    <a href="chat.html" class="needs-chat">Ask</a>
+    <a href="map.html" class="needs-maps hide-direct">Map</a>
+    <a href="kids.html">Kids</a>
+  </nav>
+  <!--/NAV-->
+  <div class="l-shelflist" id="sidebar-shelves"><a href="_app/shelf/docs_medical.html">Medical</a><a href="plants.html">Plants, mushrooms &amp; the coast</a><a href="_app/shelf/docs_food_preservation.html">Food preservation</a><a href="_app/shelf/docs_water.html">Water</a><a href="_app/shelf/docs_sanitation.html">Sanitation</a><a href="_app/shelf/audio_librivox.html">Audiobooks</a><a href="_app/shelf/docs_textiles.html">Clothing &amp; textiles</a><a href="_app/shelf/docs_foraging_coastal.html">Coastal foraging</a><a href="_app/shelf/docs_comms.html">Communications</a><a href="_app/shelf/docs_security.html">Community security</a><a href="_app/shelf/datasets.html">Datasets</a><a href="_app/shelf/docs_death_care.html">Death care</a><a href="_app/shelf/docs_cd3wd.html">Development handbooks (CD3WD)</a><a href="_app/shelf/docs_emergency_mgmt.html">Emergency management</a><a href="_app/shelf/zim.html">Encyclopedias</a><a href="_app/shelf/docs_energy.html">Energy &amp; power</a><a href="_app/shelf/docs_fire_safety.html">Fire safety</a><a href="_app/shelf/docs_grain_processing.html">Grain &amp; bread</a><a href="_app/historical.html?f=_app%2Fshelf%2Fdocs_HISTORICAL.html">Historical medical</a><a href="_app/shelf/docs_homesteading_extension.html">Homestead &amp; garden</a><a href="_app/shelf/video_khan_academy.html">Khan Academy lessons</a><a href="_app/shelf/maps.html">Maps &amp; charts</a><a href="_app/shelf/docs_military_manuals.html">Military field manuals</a><a href="_app/shelf/docs_mit_ocw.html">MIT OpenCourseWare</a><a href="_app/shelf/docs_navigation.html">Navigation</a><a href="_app/shelf/docs_nuclear.html">Nuclear</a><a href="_app/shelf/video_preschool.html">Preschool videos</a><a href="_app/shelf/docs_school_textbooks.html">School textbooks</a><a href="_app/shelf/docs_shelter.html">Shelter</a><a href="_app/shelf/mirrors.html">Site mirrors</a><a href="_app/historical.html?f=_app%2Fshelf%2Fdocs_survivor_library.html">Survivor Library</a><a href="_app/shelf/tools.html">Tools</a><a href="_app/shelf/video_prelinger.html">Video</a></div>
+  <!--SIDEFOOT-->
+  <div class="l-foot"><p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div></div>
+  <!--/SIDEFOOT-->
+</aside>
+
+<main>
+<header class="l-header">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+</header>
+
+<div class="l-wrap">
+  <!-- FIXES #206 (E6, 10-17: "Spanish should NEVER compromise this English-first resource"): the Spanish block moved to es.html; this link is the only Spanish here -->
+  <p style="margin:12px 0 0;text-align:right;font-size:14px"><a href="es.html" lang="es" hreflang="es">Español</a></p>
+  <p style="font-family:var(--l-font-display);font-size:17px;line-height:1.35;color:var(--l-text2);margin:8px 0 16px;max-width:640px">
+    Everything this household needs to know, on this drive: medicine, food,
+    water, power, repair, maps, and something to read by lantern light.
+  </p>
+
+  <a class="l-cta-triage" href="triage.html">
+    <span class="cross">+</span>
+    <span><b>Someone is hurt or sick</b>
+    <span>Symptom triage: what to do now.</span></span><!-- FIXES #194: no card count here; it went stale when cards were added -->
+  </a>
+
+  <div class="l-search" style="margin:24px 0">
+    <label for="q" id="q-label">Search titles</label>
+    <input type="search" id="q" data-role="titlesearch" data-suggest="q-suggest"
+      placeholder="burns, canning, antenna, chainsaw…" autocomplete="off">
+    <ul class="l-suggest" id="q-suggest"></ul>
+  </div>
+
+  <h2>Shelves</h2>
+  <div class="l-grid" id="shelves">
+<a class="l-shelf-card" href="_app/shelf/docs_medical.html"><b>Medical</b><span>Current emergency and field medicine: TCCC trauma care, MSF and WHO guidelines, Hesperian guides, war surgery.</span><span class="l-caption">68 items</span></a>
+<a class="l-shelf-card" href="plants.html"><b>Plants, mushrooms &amp; the coast</b><span>Photo guide to wild plants, mushrooms and coastal species — which are edible and which kill.</span><span class="l-caption">662 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_food_preservation.html"><b>Food preservation</b><span>The USDA Complete Guide to Home Canning — tested times and methods for safe canning.</span><span class="l-caption">2 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_water.html"><b>Water</b><span>Making water safe: disinfection, filtration, storage and rainwater collection.</span><span class="l-caption">5 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_sanitation.html"><b>Sanitation</b><span>Latrines, septic after floods, composting waste and hygiene to stop disease spreading.</span><span class="l-caption">36 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/audio_librivox.html"><b>Audiobooks</b><span>Free public-domain audiobooks, sorted by listener age from young children to adults.</span><span class="l-caption">1,600 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_textiles.html"><b>Clothing &amp; textiles</b><span>Beginner sewing, fabric repair and spinning.</span><span class="l-caption">6 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_foraging_coastal.html"><b>Coastal foraging</b><span>Coastal foraging rules and hazards: California ocean sport fishing regulations (2025), CDPH marine biotoxins (PSP, domoic acid: cooking does not destroy them), Washington shellfish and seaweed identification and limits.</span><span class="l-caption">4 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_comms.html"><b>Communications</b><span>Amateur and emergency radio, mesh networks and antenna building.</span><span class="l-caption">18 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_security.html"><b>Community security</b><span>De-escalation, neighborhood watch, mutual aid and personal safety.</span><span class="l-caption">7 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/datasets.html"><b>Datasets</b><span>Raw data files the box&#x27;s tools read: NOAA climate normals, the JPL ephemeris behind the almanac, the FCC amateur radio callsign database, and the FDA DailyMed drug labels (kept out of search on purpose).</span><span class="l-caption">475 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_death_care.html"><b>Death care</b><span>Handling bodies, burial and supporting the bereaved after a disaster.</span><span class="l-caption">3 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_cd3wd.html"><b>Development handbooks (CD3WD)</b><span>About 6,400 practical how-to manuals from aid agencies, 1970–2012: farming, water, sanitation, building, workshops, small business, village health. Collected by cd3wd.com.</span><span class="l-caption">5,744 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_emergency_mgmt.html"><b>Emergency management</b><span>Planning and response for earthquakes, wildfire and floods, with Bay Area focus.</span><span class="l-caption">14 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/zim.html"><b>Encyclopedias</b><span>Offline copies of whole reference sites, served by the box&#x27;s Kiwix: full English Wikipedia, Simple English Wikipedia, Wiktionary, Wikibooks, Project Gutenberg, iFixit repair guides, Stack Exchange Q&amp;A sites, TED talks and small survival libraries. Each row says what the set covers, its size and date.</span><span class="l-caption">33 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_energy.html"><b>Energy &amp; power</b><span>Electronics training (NEETS), wood gas generators and off-grid solar power.</span><span class="l-caption">28 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_fire_safety.html"><b>Fire safety</b><span>Wildfire preparation checklists and how to create defensible space around a house.</span><span class="l-caption">2 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_grain_processing.html"><b>Grain &amp; bread</b><span>Milling, storing grain and baking sourdough bread from scratch.</span><span class="l-caption">9 items</span></a>
+<a class="l-shelf-card" href="_app/historical.html?f=_app%2Fshelf%2Fdocs_HISTORICAL.html"><b>Historical medical</b><span>Outdated pre-2010 medical texts kept for context only — never treat anyone from them.</span><span class="l-caption">3 items</span> <span class="l-badge l-badge--hist">HISTORICAL</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_homesteading_extension.html"><b>Homestead &amp; garden</b><span>Extension-service guides for canning, gardening, soils, seeds and small livestock.</span><span class="l-caption">37 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/video_khan_academy.html"><b>Khan Academy lessons</b><span>Khan Academy maths and science lessons from the 2012 discs: arithmetic, algebra, geometry, trigonometry, statistics, calculus, physics, chemistry, biology.</span><span class="l-caption">1,484 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/maps.html"><b>Maps &amp; charts</b><span>Offline maps: topo, satellite, nautical charts, and region files for phone map apps.</span><span class="l-caption">33,050 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_military_manuals.html"><b>Military field manuals</b><span>US Army field and technical manuals: FM 21-76 survival, the Ranger handbook, welding, automotive repair and fighting-position construction.</span><span class="l-caption">5 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_mit_ocw.html"><b>MIT OpenCourseWare</b><span>Full MIT college courses — lectures and notes in math, physics, chemistry, biology, computing, economics.</span><span class="l-caption">283 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_navigation.html"><b>Navigation</b><span>Map reading and land navigation without GPS.</span><span class="l-caption">1 item</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_nuclear.html"><b>Nuclear</b><span>Surviving nuclear war: fallout, shelters and protective measures.</span><span class="l-caption">1 item</span></a>
+<a class="l-shelf-card" href="_app/shelf/video_preschool.html"><b>Preschool videos</b><span>Short videos for small children: letters A to Z, one word at a time, counting and simple sums, telling the time, and stories read aloud (Alice in Wonderland, the Three Bears).</span><span class="l-caption">430 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_school_textbooks.html"><b>School textbooks</b><span>Open textbooks for grades 4 to 12 (Siyavula, South Africa) and college courses (Connexions): maths, science, languages, economics, technology.</span><span class="l-caption">945 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/docs_shelter.html"><b>Shelter</b><span>Building trades: plumbing, carpentry, concrete, wood. Emergency and cold-weather shelter is FM 21-76 chapter 5 on the Military field manuals shelf.</span><span class="l-caption">5 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/mirrors.html"><b>Site mirrors</b><span>Complete offline copies of useful websites — health guides, food preservation, disaster prep, radio, bicycles.</span><span class="l-caption">74,207 items</span></a>
+<a class="l-shelf-card" href="_app/historical.html?f=_app%2Fshelf%2Fdocs_survivor_library.html"><b>Survivor Library</b><span>Scanned pre-1950 books on how things were made and done before modern industry. Background only.</span><span class="l-caption">7,164 items</span> <span class="l-badge l-badge--hist">HISTORICAL</span></a>
+<a class="l-shelf-card" href="_app/shelf/tools.html"><b>Tools</b><span>Two kinds of tools: pages that run in this browser (sun &amp; moon, converters, Ask), and programs to install on your own phone or laptop (maps, Kiwix, VLC, charts, offline AI, speech, translation). Every folder starts with its own instructions page.</span><span class="l-caption">1,301 items</span></a>
+<a class="l-shelf-card" href="_app/shelf/video_prelinger.html"><b>Video</b><span>Old educational films (1920s–1970s) on first aid, farming and practical skills.</span><span class="l-caption">20 items</span></a>
+</div>
+
+  <!--ENC-->
+<section class="l-enc needs-enc" id="encyclopedias"><h2>Encyclopedias</h2><p class="l-caption">Offline Wikipedia (full English, 2026) and 32 more reference sets, served by the Lantern box. <span class="l-badge show-direct">NEEDS THE SERVER</span></p><div class="l-enc-list"><a class="l-chip" href="search.html" data-kiwix="/viewer#wikipedia_en_all_maxi_2026-08"><b>Wikipedia (full English)</b></a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#wikipedia_en-simple_all_maxi_2026-06">Simple English Wikipedia</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#wikipedia_en_medicine_maxi_2026-04">WikiMed (medical Wikipedia)</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#wiktionary_en_all_nopic_2026-08">Wiktionary</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#wikibooks_en_all_maxi_2026-04">Wikibooks</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#wikisource_en_all_maxi_2026-05">Wikisource</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#wikiversity_en_all_maxi_2026-05">Wikiversity</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#wikivoyage_en_all_maxi_2026-06">Wikivoyage</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#gutenberg_en_all_2025-11">Project Gutenberg</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#ifixit_en_all_2025-12">iFixit repair guides</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#appropedia_en_all_maxi_2026-02">Appropedia</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#energypedia_en_all_maxi_2026-06">Energypedia</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#trueprepper.com_en_all_2026-05">TruePrepper</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#phet_en_all_2026-08">PhET simulations</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#zimgit-medicine_en_2024-08">Medical Library</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#zimgit-water_en_2024-08">Water Treatment Library</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#zimgit-food-preparation_en_2025-04">Food Preparation Library</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#zimgit-knots_en_2024-08">Knots</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#zimgit-post-disaster_en_2024-05">Post-Disaster Library</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#ted_mul_biology_2026-04">TED talks: biology</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#ted_mul_chemistry_2026-04">TED talks: chemistry</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#ted_mul_health-care_2026-04">TED talks: health care</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#ted_mul_medicine_2026-04">TED talks: medicine</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#ted_mul_physics_2026-04">TED talks: physics</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#chemistry.stackexchange.com_en_all_2026-07">Chemistry.stackexchange</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#diy.stackexchange.com_en_all_2026-08">Diy.stackexchange</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#electronics.stackexchange.com_en_all_2026-08">Electronics.stackexchange</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#gardening.stackexchange.com_en_all_2026-08">Gardening.stackexchange</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#ham.stackexchange.com_en_all_2026-02">Ham.stackexchange</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#medicalsciences.stackexchange.com_en_all_2026-02">Medicalsciences.stackexchange</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#outdoors.stackexchange.com_en_all_2026-08">Outdoors.stackexchange</a>
+<a class="l-chip" href="search.html" data-kiwix="/viewer#physics.stackexchange.com_en_all_2026-08">Physics.stackexchange</a>
+<a class="l-chip" href="search.html" data-kiwix="/"><b>All encyclopedias →</b></a></div></section>
+<!--/ENC-->
+
+  <div class="l-hazard" style="margin:24px 0" id="historical-card">
+    <span class="l-badge l-badge--hist">HISTORICAL</span>
+    <b style="font-family:var(--l-font-display);font-size:18px;display:block;margin:8px 0 4px">
+      Old techniques, old medicine</b>
+    <p style="font-size:13px;color:var(--l-text2);margin:0">
+      Survivor Library (<!--count:survivor_pdfs-->7,164<!--/count--> pre-1950 scans) and pre-2010 medical texts —
+      background only, never for dosing or food preservation.
+      <a href="_app/historical.html?f=_app%2Fshelf%2Fdocs_survivor_library.html">Enter with care</a>.
+    </p>
+  </div>
+
+  <!-- FIXES #208 (a7a W6, a7b W3): the English "without the box" line (it used to exist only in Spanish) -->
+  <h2 id="without-the-box">Without the box</h2>
+  <p style="font-size:14px;color:var(--l-text2);max-width:640px">
+    If the Pi runs but there is no LIBRARY Wi-Fi: plug a laptop into the Pi's Ethernet port with a cable, set the wired connection to
+    address 10.10.10.20, netmask 255.255.255.0, and open http://10.10.10.10 (the name library.lan does not work this way).
+    Without the Pi: a laptop running Linux can read the backup SSD; open the library folder on it, then
+    <a href="index_v1.html">index_v1.html</a>, the plain version of this page. Mac and Windows laptops cannot read that SSD without
+    extra software. PDFs, plant photos and website copies open as files; the encyclopedias (.zim files) need the Kiwix program in
+    <a href="tools/kiwix_desktop/">tools/kiwix_desktop/</a>, or the Kiwix app from <a href="tools/android/">tools/android/</a> on an
+    Android phone. Full steps: <a href="_app/runbook.html#part-2-when-it-does-not-work">Operator runbook, Part 2, step 4</a>.
+  </p>
+
+  <div id="continue-reading"></div>
+
+  <footer style="margin:32px 0">
+    <div class="l-notice-dosing">
+      <b>This library's own pages, summaries and search never state drug doses.</b>
+      The medical books on the shelf do: use the printed drug guide (Davis's, Lippincott
+      pocket) for any dose. A wrong table kills; paper from a licensed publisher doesn't go stale silently.
+    </div>
+    <p class="l-caption" style="margin-top:16px">
+      <a id="buildver" href="VERSION.json">Library</a><span id="imgver"></span><span id="filecount"></span> · <a href="index_v1.html">plain version</a>
+    </p>
+  </footer>
+  <script>
+  (function(){ // versions from the seal (VERSION.json) and the image (/image-release.txt)
+    function get(u,cb){var x=new XMLHttpRequest();x.open('GET',u);x.onload=function(){if(x.status===200)cb(x.responseText)};x.send()}
+    get('VERSION.json',function(t){var v=JSON.parse(t);
+      document.getElementById('buildver').textContent='Library '+v.library;
+      document.getElementById('filecount').textContent=' · '+v.files.toLocaleString()+' files';
+      document.getElementById('buildver').title='manifest sha256 '+v.manifest_sha256;
+      document.getElementById('imgver').insertAdjacentHTML('afterend',' · manifest sha256 <code style="overflow-wrap:anywhere">'+v.manifest_sha256+'</code>')});
+    get('image-release.txt',function(t){var m=/IMAGE=(\S+)/.exec(t);
+      if(m)document.getElementById('imgver').textContent=' · Image '+m[1]});
+  })();
+  </script>
+</div>
+</main>
+
+<!--TABBAR-->
+<nav class="l-tabbar" aria-label="Tabs">
+  <a href="index.html" class="l-tab l-tab-home" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path><path d="M10 20v-5.5h4V20"></path></svg><span class="l-tab-label">Home</span></a>
+  <a href="search.html" class="l-tab l-tab-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.75" cy="10.75" r="6.75"></circle><path d="M15.75 15.75 20.5 20.5"></path></svg><span class="l-tab-label">Search</span></a>
+  <a href="triage.html" class="l-tab l-tab-triage"><span class="cross"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></span><span class="l-tab-label">Hurt or sick</span></a>
+  <a href="audio.html" class="l-tab l-tab-listening"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"></path><path d="M4 14.5h2.5A1.5 1.5 0 0 1 8 16v3a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 4 19z"></path><path d="M20 14.5h-2.5A1.5 1.5 0 0 0 16 16v3a1.5 1.5 0 0 0 1.5 1.5h1A1.5 1.5 0 0 0 20 19z"></path></svg><span class="l-tab-label">Listening</span></a>
+  <details class="l-more"><summary class="l-tab l-tab-more"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect></svg><span class="l-tab-label">More</span></summary>
+    <div class="l-msheet">
+      <div class="l-msheet-head"><h2 class="l-msheet-title">More</h2></div>
+      <div class="l-msheet-body">
+        <div class="l-msheet-links">
+          <a href="chat.html" class="needs-chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17H6.5A2.5 2.5 0 0 1 4 14.5z"></path></svg>Ask</a>
+          <a href="map.html" class="needs-maps hide-direct"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5 6-2.5v13.5L15 20l-6-2.5L3 20z"></path><path d="M9 4v13.5M15 6.5V20"></path></svg>Map</a>
+          <a href="kids.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8z"></path></svg>Kids</a>
+          <a href="video.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="m10 9 5 3-5 3z"></path></svg>Video</a>
+          <a href="plants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"></path><path d="M5 19c3-4 6-7 9-9"></path></svg>Plants</a>
+          <a href="tools/suncalc.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg>Sun &amp; moon</a>
+          <a href="tools/convert.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"></path></svg>Converters</a>
+        </div>
+        <p class="l-caption">Shelves</p>
+        <div class="l-shelflist" data-fill="shelves"></div>
+        <p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div>
+      </div>
+      <div class="l-msheet-foot"><button class="l-pill" type="button" data-role="status" onclick="lanternToggleTheme()" aria-label="Server status. Switch theme"><span class="dot"></span>checking…</button></div>
+    </div>
+  </details>
+</nav>
+<!--/TABBAR-->
+
+<script>
+(function () {
+  'use strict';
+  /* Shelf grid + sidebar are STATIC HTML, generated by gen_shelves.py
+     (acceptance 2: landing usable with JS off). JS only enhances below. */
+  // continue reading (desktop)
+  try {
+    var pos = JSON.parse(localStorage.getItem('lantern.positions') || '{}');
+    var keys = Object.keys(pos).sort(function (a, b) { return pos[b].at - pos[a].at; }).slice(0, 3);
+    if (keys.length) {
+      var c = '<h2>Continue</h2>';
+      for (var j = 0; j < keys.length; j++) {
+        var e = pos[keys[j]], k = keys[j];
+        /* writers: reader {kind:'pdf', page}, audio {kind:'audio', time}
+           keyed by album, video {kind:'video', time} (H33: was reading a
+           nonexistent e.pos -> "NaN min in", and linked everything to reader) */
+        var href = e.kind === 'audio' ? 'audio.html#' + encodeURIComponent(k)
+          : e.kind === 'video' ? 'video.html' : 'reader.html?f=' + encodeURIComponent(k);
+        var meta = e.kind === 'pdf' ? (e.page ? 'page ' + e.page : '')
+          : (isFinite(e.time) && e.time >= 60 ? Math.floor(e.time / 60) + ' min in' : 'just started');
+        var t = String(e.title || k.split('/').pop()).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+        c += '<div class="l-continue"><a class="l-doc-row" href="' + href + '">' +
+          '<span><b>' + t + '</b>' +
+          '<div class="meta">' + meta + '</div></span>' +
+          '<span class="spacer">›</span></a>' +
+          '<button type="button" class="l-continue-x" data-key="' + k.replace(/&/g, '&amp;').replace(/"/g, '&quot;') +
+          '" aria-label="Remove ' + t + ' from Continue">×</button></div>';
+      }
+      var box = document.getElementById('continue-reading');
+      box.innerHTML = c;
+      box.addEventListener('click', function (ev) {
+        var b = ev.target.closest('.l-continue-x');
+        if (!b) { return; }
+        window.lanternPositions.forget(b.getAttribute('data-key'));
+        b.parentNode.parentNode.removeChild(b.parentNode);
+        if (!box.querySelector('.l-continue')) { box.innerHTML = ''; }
+      });
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>

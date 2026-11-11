@@ -1,0 +1,580 @@
+/* Lantern — Offline Survival Library. One stylesheet, two themes, three shells.
+   Spec: the private design notes */
+
+/* ── tokens ─────────────────────────────────────────────────────────────── */
+:root {
+  --l-ground: #17130E; --l-surface: #221C14; --l-surface2: #2C251B;
+  --l-line: #3D3426; --l-ctl: #5A4C36;
+  --l-text: #F3EADB; --l-text2: #DACDB6; --l-muted: #B8AB95;
+  --l-primary: #F3EADB; --l-on-primary: #17130E;
+  --l-accent: #E8A33D; --l-link: #E8A33D; --l-link-hover: #F3C06A;
+  --l-alive: #7BC47F; --l-brand: #F0AC36;
+  --l-danger: #B3261E; --l-safe: #2E7D3C;
+  --l-on-danger: #FFFFFF; --l-tab-pill: #3E2F17; --l-scrim: rgba(23,19,14,.62);
+  --l-tab-h: 64px; --l-tab-lift: 20px; --l-sheet-h: min(76vh, 720px);
+  --l-src-docs: #E8A33D; --l-src-enc: #9DC7E8; --l-src-mirror: #B4D9A5; --l-src-title: #DACDB6;
+  --l-font-display: 'Newsreader', Georgia, serif;
+  --l-font-ui: 'Atkinson Hyperlegible', system-ui, sans-serif;
+}
+[data-theme="light"] {
+  --l-ground: #F6F0E4; --l-surface: #FFFDF8; --l-surface2: #EFE7D7;
+  --l-line: #D9CDB8; --l-ctl: #B9A98C;
+  --l-text: #1E1810; --l-text2: #3F362A; --l-muted: #5C5040;
+  --l-primary: #1E1810; --l-on-primary: #F6F0E4;
+  --l-accent: #C7801C; --l-link: #8A4F0B; --l-link-hover: #C7801C;
+  --l-alive: #2E7D3C; --l-brand: #995B17;
+  --l-tab-pill: #F3E1BE; --l-scrim: rgba(30,24,16,.42);
+}
+
+/* ── base ───────────────────────────────────────────────────────────────── */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--l-ground); color: var(--l-text);
+  font-family: var(--l-font-ui); font-size: 16px; line-height: 1.4;
+}
+h1, h2, h3 { font-family: var(--l-font-display); font-weight: 500; line-height: 1.1; margin: 0 0 12px; }
+h1 { font-size: 30px; } h2 { font-size: 22px; } h3 { font-size: 18px; }
+@media (min-width: 1024px) { h1 { font-size: 40px; } }
+p { margin: 0 0 12px; max-width: 720px; }
+a { color: var(--l-link); }
+a:hover { color: var(--l-link-hover); }
+:focus-visible, .js-focus { outline: 3px solid var(--l-accent); outline-offset: 2px; }
+small, .l-caption { font-size: 13px; color: var(--l-muted); }
+img { max-width: 100%; height: auto; }
+.l-wrap { max-width: 1020px; margin: 0 auto; padding: 0 16px; }
+@media (min-width: 600px)  { .l-wrap { padding: 0 24px; } }
+@media (min-width: 1024px) { .l-wrap { padding: 0 40px; } }
+.l-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ── header / nav shells ────────────────────────────────────────────────── */
+.l-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-bottom: 1px solid var(--l-line);
+}
+/* brand lockup: icon 1.5em tall, wordmark in Libre Baskerville Bold
+   (spec: the private design notes) */
+.l-wordmark {
+  display: inline-flex; align-items: center; gap: .3em;
+  font-family: 'Libre Baskerville', Georgia, serif; font-weight: 700; font-size: 19px;
+  letter-spacing: -.015em; font-kerning: none; line-height: 1;
+  color: var(--l-text); text-decoration: none;
+}
+.l-wordmark .l-mark { height: 1.5em; width: auto; flex: none; color: var(--l-brand); }
+.l-header .l-wordmark { margin-right: auto; }        /* 28px mark */
+.l-sidebar .l-wordmark { font-size: 27px; }          /* 40px mark */
+@media (min-width: 1024px) {                          /* sidebar carries the mark; header keeps the name */
+  body.has-sidebar .l-header .l-wordmark { font-size: 22px; }
+  body.has-sidebar .l-header .l-mark { display: none; }
+}
+.l-nav { display: none; gap: 4px; }
+.l-nav a { color: var(--l-text2); text-decoration: none; padding: 10px 12px; border-radius: 8px; }
+.l-nav a:hover { color: var(--l-text); background: var(--l-surface); }
+.l-nav a[aria-current="page"] { color: var(--l-text); font-weight: 700; }
+@media (min-width: 600px) { .l-nav { display: flex; } }
+
+.l-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--l-muted); background: var(--l-surface);
+  border: 1px solid var(--l-line); border-radius: 999px; padding: 6px 12px;
+  min-height: 32px; cursor: pointer;
+}
+.l-pill .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--l-muted); flex: none; }
+.l-pill.is-alive .dot { background: var(--l-alive); }
+
+/* phone/tablet bottom bar + More sheet (Claude Design handback 2026-09-29, the private design notes) */
+.l-tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  display: flex; align-items: stretch;
+  height: calc(var(--l-tab-h) + env(safe-area-inset-bottom, 0px));
+  padding: 0 4px env(safe-area-inset-bottom, 0px);
+  background: var(--l-surface); border-top: 1px solid var(--l-line);
+  font-family: var(--l-font-ui);
+}
+/* one vertical rhythm for all five tabs: pad 8 · icon pill 32 · gap 4 · label 12 · pad 8 = 64 */
+.l-tab {
+  position: relative; flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  gap: 4px; padding: 8px 2px 0; min-height: 44px;
+  color: var(--l-muted); text-decoration: none; -webkit-tap-highlight-color: transparent;
+}
+/* the svg is the pill: 24 px glyph + 4/12 padding = 48 × 32, radius 16 */
+.l-tab svg {
+  flex: none; width: 24px; height: 24px; box-sizing: content-box; padding: 4px 12px; border-radius: 16px;
+  fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.l-tab .l-tab-label { font-size: 12px; line-height: 12px; font-weight: 400; white-space: nowrap; }
+/* current: pill fill + text colour + bold; no extra pseudo-element (summary::before/::after are taken) */
+.l-tab[aria-current="page"], .l-more[open] > .l-tab { color: var(--l-text); }
+.l-tab[aria-current="page"] svg, .l-more[open] > .l-tab svg { background: var(--l-tab-pill); }
+/* no bold on the current label: bold re-centres the text and reads as a jiggle on tap */
+/* press + keyboard focus (no hover-only states) */
+.l-tab:active { color: var(--l-text); }
+.l-tab:active svg { background: var(--l-surface2); }
+.l-tab:focus-visible { outline: 2px solid var(--l-accent); outline-offset: -2px; border-radius: 10px; }
+/* Hurt or sick: 56 px disc; top edge 16 px above the bar + 4 px surface ring = 20 px (--l-tab-lift); label shares the y-44 baseline */
+.l-tab-triage { flex: 1.5 1 0; color: var(--l-text); }
+/* geometry per the handback: 56 disc lifted 24 (16 above the bar + 4 surface ring); label baseline y-44, 8 px clear of the bar bottom */
+.l-tab-triage .cross {
+  width: 56px; height: 56px; margin-top: -24px; border-radius: 999px;
+  background: var(--l-danger); color: var(--l-on-danger);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 0 4px var(--l-surface), 0 4px 12px rgba(0,0,0,.28);
+}
+.l-tab-triage .l-tab-label { font-weight: 700; }
+.l-tab-triage .cross svg, .l-tab-triage[aria-current="page"] .cross svg, .l-tab-triage:active .cross svg { width: 28px; height: 28px; padding: 0; background: none; fill: none; stroke-width: 3.5; }
+/* current page: same disc, no outer red ring (2026-09-29) */
+/* More = <details>, so it opens with JS off */
+.l-more { flex: 1 1 0; min-width: 0; display: flex; }
+.l-more > summary { flex: 1 1 0; list-style: none; cursor: pointer; }
+.l-more > summary::-webkit-details-marker { display: none; }
+/* scrim: the summary's own ::before, so a tap anywhere outside the sheet toggles it closed with JS off */
+.l-more > summary::before {
+  content: ""; position: fixed; left: 0; right: 0; top: 0;
+  bottom: calc(var(--l-tab-h) + env(safe-area-inset-bottom, 0px)); z-index: 28;
+  background: var(--l-scrim); opacity: 0; pointer-events: none; transition: opacity 160ms ease-out;
+}
+.l-more[open] > summary::before { opacity: 1; pointer-events: auto; }
+/* close X: the summary's ::after, drawn with two gradients (no icon font, no extra element) */
+.l-more[open] > summary::after {
+  content: ""; position: fixed; z-index: 31; right: 8px;
+  bottom: calc(var(--l-tab-h) + env(safe-area-inset-bottom, 0px) + var(--l-sheet-h) - 54px);
+  width: 44px; height: 44px; border-radius: 999px;
+  background:
+    linear-gradient(45deg, transparent calc(50% - 1px), var(--l-text2) calc(50% - 1px), var(--l-text2) calc(50% + 1px), transparent calc(50% + 1px)) center / 18px 18px no-repeat,
+    linear-gradient(-45deg, transparent calc(50% - 1px), var(--l-text2) calc(50% - 1px), var(--l-text2) calc(50% + 1px), transparent calc(50% + 1px)) center / 18px 18px no-repeat;
+}
+/* sheet */
+.l-more .l-msheet {
+  position: fixed; left: 0; right: 0; z-index: 29;
+  bottom: calc(var(--l-tab-h) + env(safe-area-inset-bottom, 0px));
+  height: var(--l-sheet-h);
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--l-surface); border-top: 1px solid var(--l-line); border-radius: 20px 20px 0 0;
+  box-shadow: 0 -12px 32px rgba(0,0,0,.28);
+  font-family: var(--l-font-ui); font-size: 15px; line-height: 1.25; color: var(--l-text);
+}
+.l-more[open] .l-msheet { animation: l-msheet-up 240ms cubic-bezier(.2,.8,.2,1); }
+@keyframes l-msheet-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .l-more[open] .l-msheet { animation: none; }
+  .l-more > summary::before { transition: none; }
+}
+.l-msheet-head {
+  position: relative; flex: none; display: flex; align-items: center; min-height: 56px;
+  padding: 14px 64px 8px 20px; border-bottom: 1px solid var(--l-line);
+}
+.l-msheet-head::before { /* grabber */
+  content: ""; position: absolute; top: 6px; left: 50%; width: 36px; height: 4px; margin-left: -18px;
+  border-radius: 2px; background: var(--l-ctl);
+}
+.l-msheet-title { margin: 0; font-family: var(--l-font-display); font-size: 24px; font-weight: 500; line-height: 1.1; }
+.l-msheet-body { flex: 1 1 auto; overflow: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 16px 16px 8px; }
+.l-msheet-links { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.l-msheet-links a {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  min-height: 72px; padding: 12px; border-radius: 12px;
+  background: var(--l-surface2); color: var(--l-text); text-decoration: none; font-weight: 700; font-size: 15px;
+}
+.l-msheet-links a svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; color: var(--l-link); }
+.l-msheet-links a[aria-current="page"] { box-shadow: inset 0 0 0 2px var(--l-accent); }
+.l-msheet-links a:active { background: var(--l-line); }
+/* Ask/Map dim only when the box lacks them: the [data-cap-*="0"] rules below, not here */
+.l-msheet .l-caption { margin: 20px 4px 4px; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--l-muted); }
+.l-msheet .l-shelflist { display: grid; grid-template-columns: minmax(0, 1fr); }
+.l-msheet .l-shelflist a {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 44px; padding: 10px 4px; border-bottom: 1px solid var(--l-line);
+  color: var(--l-text2); text-decoration: none; font-size: 15px;
+}
+.l-msheet .l-shelflist a::after { /* chevron */
+  content: ""; flex: none; width: 8px; height: 8px; margin-right: 4px;
+  border-right: 1.75px solid var(--l-ctl); border-bottom: 1.75px solid var(--l-ctl); transform: rotate(-45deg);
+}
+.l-msheet .l-shelflist a[aria-current="page"] { color: var(--l-text); font-weight: 700; }
+.l-msheet .l-shelflist a:active { background: var(--l-surface2); }
+.l-msheet-foot { flex: none; display: flex; align-items: center; padding: 10px 16px; border-top: 1px solid var(--l-line); background: var(--l-surface); }
+.l-msheet-foot .l-pill {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px 0 14px;
+  border: 1px solid var(--l-line); border-radius: 999px; background: var(--l-surface);
+  color: var(--l-text2); font: 700 14px/1 var(--l-font-ui); cursor: pointer;
+}
+.l-msheet-foot .l-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--l-alive); }
+.l-msheet-foot .l-pill .l-pill-sep { width: 1px; height: 18px; margin: 0 2px 0 4px; background: var(--l-line); }
+.l-msheet-foot .l-pill svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; color: var(--l-muted); }
+/* 320: the two outer tabs go icon-only (label stays in the accessible name); Hurt or sick keeps its label */
+@media (max-width: 359px) {
+  .l-tab-home, .l-tab-more { flex: .75 1 0; }
+  .l-tab-home svg, .l-tab-more svg { padding: 4px 10px; }
+  .l-tab-home .l-tab-label, .l-tab-more .l-tab-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+/* ≥600: six tiles in one row, shelves in two columns */
+@media (min-width: 600px) {
+  .l-msheet-links { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .l-msheet .l-shelflist { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+  .l-msheet-body { padding: 16px 24px 8px; }
+}
+body { padding-bottom: 88px; } /* was 72: 64 bar + 20 disc lift + 4 */
+@media (min-width: 1024px) { .l-tabbar { display: none; } body { padding-bottom: 0; } }
+
+/* desktop sidebar */
+.l-sidebar { display: none; }
+@media (min-width: 1024px) {
+  body.has-sidebar { display: flex; min-height: 100vh; }
+  .l-sidebar {
+    display: flex; flex-direction: column; gap: 16px; flex: none;
+    width: 260px; padding: 24px 20px; border-right: 1px solid var(--l-line);
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  body.has-sidebar > main { flex: 1; min-width: 0; }
+  .l-sidebar .l-nav { display: flex; flex-direction: column; }
+  .l-sidebar .l-shelflist { display: flex; flex-direction: column; gap: 2px; font-size: 13px; }
+  .l-sidebar .l-shelflist a { color: var(--l-muted); text-decoration: none; padding: 6px 8px; border-radius: 6px; }
+  .l-sidebar .l-shelflist a:hover { color: var(--l-text); background: var(--l-surface); }
+  .l-sidebar .l-foot { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--l-line); }
+  body.has-sidebar .l-header .l-pill[data-role="status"] { display: none; } /* sidebar carries it */
+  .l-sidebar .l-foot .l-caption { margin: 0 8px 6px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+}
+
+/* ── triage CTA ─────────────────────────────────────────────────────────── */
+.l-cta-triage {
+  display: flex; align-items: center; gap: 16px; text-decoration: none;
+  background: var(--l-surface); border: 1px solid var(--l-ctl); border-radius: 14px;
+  padding: 16px; min-height: 104px; color: var(--l-text);
+}
+.l-cta-triage:hover { border-color: var(--l-accent); color: var(--l-text); }
+.l-cta-triage .cross {
+  width: 52px; height: 52px; flex: none; border-radius: 999px; background: var(--l-danger);
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700;
+}
+.l-cta-triage b { font-family: var(--l-font-display); font-weight: 500; font-size: 22px; display: block; }
+.l-cta-triage span { color: var(--l-text2); font-size: 13px; }
+.l-cta-triage--side { min-height: 56px; padding: 8px 12px; border-radius: 10px; }
+.l-cta-triage--side .cross { width: 32px; height: 32px; font-size: 18px; }
+.l-cta-triage--side b { font-size: 16px; font-family: var(--l-font-ui); font-weight: 700; }
+.l-cta-triage--side span { color: inherit; }
+/* reader has no sidebar, so its CTA sits in the header; the tab bar already has Hurt or sick under 1024 */
+.l-header > .l-cta-triage { display: none; }
+@media (min-width: 1024px) { .l-header > .l-cta-triage { display: flex; } }
+
+/* ── search ─────────────────────────────────────────────────────────────── */
+.l-search label { display: block; font-size: 13px; color: var(--l-muted); margin-bottom: 6px; }
+.l-search input[type="search"] {
+  width: 100%; min-height: 56px; padding: 0 16px; font-size: 18px;
+  color: var(--l-text); background: var(--l-surface);
+  border: 1px solid var(--l-ctl); border-radius: 10px;
+}
+.l-search input[type="search"]:focus { border-color: var(--l-accent); outline: none; }
+.l-suggest {
+  margin: 4px 0 0; padding: 0; list-style: none; background: var(--l-surface);
+  border: 1px solid var(--l-line); border-radius: 10px; overflow: hidden;
+}
+.l-suggest:empty { display: none; }  /* empty dropdown was a stray 1px rule */
+/* FIXES #287: the fixed emergency line above every card list (Ask, Search, front page); one line on a phone, wraps */
+.l-emerg { margin: 8px 0; font-size: 14px; line-height: 1.7; color: var(--l-text2); }
+.l-emerg b { color: var(--l-text); margin-right: 2px; }
+.l-emerg a { white-space: nowrap; font-weight: 600; }
+.l-suggest a {
+  display: flex; align-items: center; gap: 8px; min-height: 48px; padding: 4px 12px;
+  color: var(--l-text); text-decoration: none;
+}
+.l-suggest a:hover, .l-suggest a.is-active { background: var(--l-surface2); }
+
+/* ── badges & chips ─────────────────────────────────────────────────────── */
+.l-badge {
+  display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .04em;
+  padding: 2px 8px; border-radius: 4px; background: var(--l-surface2); color: var(--l-text2);
+}
+/* doubled class: outranks container span-colour rules (.l-plant-card span, .l-shelf-card span) that muted the text */
+.l-badge.l-badge--danger { background: var(--l-danger); color: #fff; font-size: 12px; }
+.l-badge.l-badge--safe   { background: var(--l-safe); color: #fff; font-size: 12px; }
+/* doubled class outranks container span-color rules (.l-shelf-card span etc.)
+   that painted badge text muted-on-orange (H5) */
+.l-badge.l-badge--hist { background: var(--l-accent); color: #17130E; display: inline-block; width: auto; }
+.l-badge--server { border: 1px dashed var(--l-ctl); background: transparent; color: var(--l-muted); }
+.l-result .snippet.s-sum { color: var(--l-muted); font-style: italic; }  /* E1c: "what this answers" under the quote */
+/* E3/E4: year, language and currency badges on shelf rows */
+.l-badge.l-badge--year, .l-badge.l-badge--lang { border: 1px solid var(--l-ctl); background: transparent; color: var(--l-muted); font-size: 12px; display: inline-block; width: auto; }
+.l-badge.l-badge--stale { background: var(--l-danger); color: #fff; font-size: 12px; display: inline-block; width: auto; }
+.l-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+.l-table th, .l-table td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--l-ctl); vertical-align: top; overflow-wrap: anywhere; }
+.l-src { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 4px; color: #17130E; }
+.l-src--docs { background: var(--l-src-docs); } .l-src--enc { background: var(--l-src-enc); }
+.l-src--mirror { background: var(--l-src-mirror); } .l-src--title { background: var(--l-src-title); }
+.l-src--triage { background: var(--l-danger, #C0392B); color: #fff; }
+.l-src--hist { background: var(--l-hist, #8A7B63); color: #fff; }
+.l-chip {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px;
+  font-size: 16px; color: var(--l-text2); background: var(--l-surface);
+  border: 1px solid var(--l-ctl); border-radius: 999px; cursor: pointer;
+}
+.l-chip[aria-pressed="true"] { background: var(--l-primary); color: var(--l-on-primary); border-color: var(--l-primary); }
+
+/* ── buttons ────────────────────────────────────────────────────────────── */
+.l-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 0 20px; font-size: 16px; font-weight: 700;
+  font-family: var(--l-font-ui); border-radius: 8px; cursor: pointer; text-decoration: none;
+  background: var(--l-surface); color: var(--l-text); border: 1px solid var(--l-ctl);
+}
+.l-btn--primary { background: var(--l-primary); color: var(--l-on-primary); border-color: var(--l-primary); }
+.l-btn--accent { border-color: var(--l-accent); color: var(--l-accent); background: transparent; }
+.l-btn--danger-outline { border-color: var(--l-danger); color: var(--l-danger); background: transparent; }
+.l-btn--disabled, .l-btn[disabled] { border-style: dashed; color: var(--l-muted); cursor: not-allowed; background: transparent; }
+
+/* ── cards, rows, grids ─────────────────────────────────────────────────── */
+.l-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+.l-grid > * { flex: 1 1 calc(50% - 12px); min-width: calc(50% - 12px); }
+@media (min-width: 600px)  { .l-grid > * { flex-basis: calc(33.33% - 12px); min-width: calc(33.33% - 12px); } }
+@media (min-width: 1024px) { .l-grid > * { flex-basis: calc(25% - 12px); min-width: calc(25% - 12px); } }
+@media (min-width: 1440px) { .l-grid > * { flex-basis: calc(20% - 12px); min-width: calc(20% - 12px); } }
+
+.l-shelf-card {
+  display: block; background: var(--l-surface); border: 1px solid var(--l-line);
+  border-radius: 10px; padding: 16px; color: var(--l-text); text-decoration: none;
+}
+.l-shelf-card:hover { border-color: var(--l-accent); color: var(--l-text); }
+.l-shelf-card b { font-family: var(--l-font-display); font-weight: 500; font-size: 18px; display: block; margin-bottom: 4px; }
+.l-shelf-card span { font-size: 13px; color: var(--l-muted); display: block; }
+.l-shelf-card.needs-server { opacity: .5; }
+
+.l-doc-row {
+  display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 12px;
+  background: var(--l-surface); border: 1px solid var(--l-line); border-radius: 8px;
+  color: var(--l-text); text-decoration: none; margin-bottom: 8px;
+}
+.l-doc-row:hover { border-color: var(--l-accent); color: var(--l-text); }
+.l-continue { position: relative; }
+.l-continue .l-doc-row { padding-right: 48px; }
+.l-continue-x {
+  position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+  width: 32px; height: 32px; border-radius: 999px; border: 1px solid var(--l-line);
+  background: var(--l-surface); color: var(--l-muted); font-size: 20px; line-height: 1; cursor: pointer;
+}
+.l-continue-x:hover { color: var(--l-text); border-color: var(--l-accent); }
+.l-doc-row img.cover { width: 64px; height: 84px; object-fit: cover; border-radius: 4px; flex: none; background: var(--l-surface2); }
+.l-doc-row .meta { font-size: 13px; color: var(--l-muted); overflow-wrap: anywhere; }
+.l-doc-row > span { min-width: 0; }
+.l-doc-row .spacer { margin-left: auto; color: var(--l-muted); }
+
+/* no rule line under result titles — the section headers separate (H17);
+   overflow-wrap keeps long paths from forcing a horizontal scroll (H16) */
+.l-result { padding: 10px 12px 14px; min-width: 0; overflow-wrap: anywhere; }
+.l-result a.title { font-size: 18px; }
+.l-result .snippet { font-size: 16px; color: var(--l-text2); margin: 4px 0; }
+.l-result mark { background: var(--l-accent); color: #17130E; border-radius: 2px; padding: 0 2px; }
+
+/* ── hazard / notices ───────────────────────────────────────────────────── */
+.l-hazard {
+  border: 1px solid var(--l-line); border-left: 6px solid transparent; border-radius: 10px;
+  border-image: repeating-linear-gradient(45deg, var(--l-accent) 0 8px, var(--l-ground) 8px 16px) 1;
+  border-image-width: 0 0 0 6px; padding: 16px; background: var(--l-surface);
+}
+.l-notice-dosing {
+  border: 1px solid var(--l-accent); border-radius: 8px; padding: 12px 16px;
+  font-size: 13px; color: var(--l-text2); background: var(--l-surface);
+}
+
+/* ── triage page ────────────────────────────────────────────────────────── */
+.l-symptoms { display: flex; flex-wrap: wrap; gap: 8px; }
+.l-symptoms a {
+  flex: 1 1 calc(50% - 8px); min-width: calc(50% - 8px); min-height: 64px;
+  display: flex; align-items: center; padding: 8px 14px;
+  font-size: 17px; font-weight: 700; color: var(--l-text); text-decoration: none;
+  background: var(--l-surface); border: 1px solid var(--l-ctl); border-radius: 8px;
+}
+@media (min-width: 600px) { .l-symptoms a { flex-basis: calc(33.33% - 8px); min-width: calc(33.33% - 8px); } }
+.l-symptoms a:hover, .l-symptoms a.is-current { background: var(--l-primary); color: var(--l-on-primary); border-color: var(--l-primary); }
+.l-triage-section {
+  background: var(--l-surface); border: 1px solid var(--l-line); border-radius: 12px;
+  padding: 16px; margin: 16px 0;
+}
+.l-triage-section ol { font-size: 18px; padding-left: 24px; }
+.l-triage-section .l-doc-row { min-height: 48px; }
+
+/* ── plants ─────────────────────────────────────────────────────────────── */
+.l-plant-card {
+  display: block; background: var(--l-surface); border: 1px solid var(--l-line);
+  border-radius: 10px; overflow: hidden; color: var(--l-text); text-decoration: none; position: relative;
+}
+.l-plant-card:hover { border-color: var(--l-accent); }
+/* .ph must be block: it's a <span>, and padding-top:100% on an inline box
+   creates no height — images collapsed to 0 and the badge sat on the title */
+.l-plant-card .ph { display: block; position: relative; padding-top: 100%; background: var(--l-surface2); }
+.l-plant-card .ph img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+.l-plant-card .l-badge { position: absolute; top: 8px; left: 8px; z-index: 2; }
+.l-plant-card .body { display: block; padding: 10px 14px 12px; }  /* a <span>: inline padding is ignored vertically and only drawn at line starts */
+.l-plant-card b { display: block; }
+.l-plant-card span { font-size: 13px; color: var(--l-muted); }
+/* ── lightbox (unified image viewer — lanternLightbox in app.js) ────────── */
+body.l-lb-open { overflow: hidden; }
+.l-lb {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 300;
+  display: flex; align-items: center; justify-content: center; padding: 12px;
+  background: rgba(15, 12, 8, .82);
+}
+.l-lb-frame {
+  display: flex; flex-direction: column; width: 100%; max-width: 760px; max-height: 96vh;
+  background: var(--l-surface); border: 1px solid var(--l-line); border-radius: 14px; overflow: hidden;
+}
+.l-lb-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px 10px 16px; border-bottom: 1px solid var(--l-line); }
+.l-lb-head .ttl { font-family: var(--l-font-display); font-size: 20px; font-weight: 500; margin-right: auto; min-width: 0; }
+.l-lb-close {
+  min-width: 44px; min-height: 44px; border: 1px solid var(--l-ctl); border-radius: 8px;
+  background: transparent; color: var(--l-text); font-size: 15px; cursor: pointer; flex: none;
+}
+.l-lb-close:hover { border-color: var(--l-accent); }
+.l-lb-stage { position: relative; background: var(--l-ground); text-align: center; }
+.l-lb-stage img { display: block; margin: 0 auto; max-width: 100%; max-height: 56vh; }
+.l-lb-arrow {
+  position: absolute; top: 50%; margin-top: -24px; width: 48px; height: 48px;
+  border-radius: 999px; border: 1px solid var(--l-ctl); cursor: pointer;
+  background: var(--l-surface); color: var(--l-text); font-size: 22px; line-height: 1;
+}
+.l-lb-arrow:hover { border-color: var(--l-accent); }
+.l-lb-arrow.prev { left: 8px; } .l-lb-arrow.next { right: 8px; }
+.l-lb-bar { display: flex; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--l-line); font-size: 13px; color: var(--l-muted); }
+.l-lb-bar .count { margin-right: auto; }
+.l-lb-bar a { color: var(--l-link); }
+.l-lb-body { padding: 12px 16px 16px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.l-lb-body:empty { display: none; }
+@media (max-width: 480px) {
+  .l-lb { padding: 0; }
+  .l-lb-frame { max-width: none; max-height: none; height: 100%; border-radius: 0; border: 0; }
+  .l-lb-stage img { max-height: 48vh; }
+}
+
+/* ── player ─────────────────────────────────────────────────────────────── */
+.l-player {
+  background: var(--l-surface); border: 1px solid var(--l-line); border-radius: 12px; padding: 16px;
+}
+.l-player .controls { display: flex; align-items: center; justify-content: center; gap: 24px; margin: 12px 0; }
+.l-player .controls .play {
+  width: 76px; height: 76px; border-radius: 999px; background: var(--l-primary); color: var(--l-on-primary);
+  border: 0; font-size: 30px; cursor: pointer;
+}
+.l-player .controls .skip { min-width: 44px; min-height: 44px; }
+.l-player input[type="range"] { width: 100%; }
+.l-track-row { display: flex; align-items: center; gap: 8px; min-height: 52px; padding: 4px 8px; border-bottom: 1px solid var(--l-line); }
+
+/* ── reader ─────────────────────────────────────────────────────────────── */
+.l-reader-toolbar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 12px; background: var(--l-surface); border-bottom: 1px solid var(--l-line);
+  position: sticky; top: 0; z-index: 20;
+}
+.l-reader-toolbar .l-btn { min-height: 44px; padding: 0 12px; }
+.l-reader-page { display: flex; justify-content: center; padding: 16px; }
+.l-reader-page canvas { max-width: 100%; box-shadow: 0 2px 12px rgba(0,0,0,.4); }
+
+/* ── sheet / interstitial ───────────────────────────────────────────────── */
+.l-sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 40; }
+.l-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 41;
+  background: var(--l-ground); border: 1px solid var(--l-line);
+  border-radius: 14px 14px 0 0; padding: 24px 16px; max-height: 85vh; overflow-y: auto;
+}
+@media (min-width: 600px) {
+  .l-sheet { left: 50%; right: auto; top: 50%; bottom: auto;
+    transform: translate(-50%, -50%); width: 520px; border-radius: 14px; }
+}
+
+/* ── skeleton ───────────────────────────────────────────────────────────── */
+.l-skeleton { background: var(--l-surface2); border-radius: 8px; min-height: 16px; }
+
+/* ── chrome injected by app.js (H1/H2/H3/H8) ───────────────────────────── */
+/* breadcrumb trail: first child of .l-wrap (shell() in gen_shelves, or injected by app.js); links get a 44px tap target */
+.l-wrap > .l-caption:first-child { font-size: 15px; }
+.l-wrap > .l-caption:first-child a { display: inline-block; padding: 12px 12px 12px 0; }
+.l-hsearch { flex: 1 1 120px; max-width: 340px; min-width: 0; }
+.l-hsearch input {
+  width: 100%; min-height: 36px; padding: 0 12px; font-size: 15px;
+  color: var(--l-text); background: var(--l-surface);
+  border: 1px solid var(--l-ctl); border-radius: 999px;
+}
+.l-hsearch input:focus { border-color: var(--l-accent); outline: none; }
+.l-filter { margin: 12px 0; }
+.l-filter input {
+  width: 100%; min-height: 44px; padding: 0 14px; font-size: 16px;
+  color: var(--l-text); background: var(--l-surface);
+  border: 1px solid var(--l-ctl); border-radius: 10px;
+}
+.l-filter input:focus { border-color: var(--l-accent); outline: none; }
+.l-filter .count { font-size: 13px; color: var(--l-muted); margin-top: 4px; }
+/* section-header row with a quiet inline filter (H15): [Shelves .... filter] */
+.l-sechead { display: flex; align-items: baseline; gap: 16px; margin: 24px 0 12px; }
+.l-sechead h2, .l-sechead h3 { margin: 0; flex: 1; }
+.l-sechead .l-filter { margin: 0; flex: none; display: flex; align-items: baseline; gap: 8px; }
+.l-sechead .l-filter input {
+  min-height: 32px; width: 170px; font-size: 14px; padding: 0 10px;
+  background: transparent; border: 0; border-bottom: 1px solid var(--l-ctl);
+  border-radius: 0;
+}
+.l-sechead .l-filter input:focus { border-bottom-color: var(--l-accent); }
+.l-sechead .l-filter .count { margin: 0; white-space: nowrap; }
+
+/* file-type tag: JS sets data-ft on direct file links; nav links get none.
+   Muted outline chip — visible, not shouting (H3/H9). */
+a[data-ft]::after {
+  content: attr(data-ft);
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .05em;
+  padding: 1px 6px; margin-left: 8px; border-radius: 4px; vertical-align: 1px;
+  border: 1px solid var(--l-ctl); color: var(--l-muted); background: transparent;
+  white-space: nowrap;
+}
+.l-doc-row[data-ft]::after { order: 98; margin-left: auto; }
+.l-doc-row[data-ft] .spacer { order: 99; margin-left: 8px; }
+.l-group { margin: 24px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--l-line); }
+
+/* historical warning modal shell (H6): iframe of historical.html?embed=1.
+   NO outside-tap dismiss — the only exits are the buttons inside. */
+.l-histmodal { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.65); }
+.l-histmodal iframe {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(720px, 94vw); height: min(800px, 92vh);
+  border: 1px solid var(--l-ctl); border-radius: 14px; background: var(--l-ground);
+}
+/* embedded interstitial: hide duplicate chrome, tighten */
+html.embed .h-box { margin: 12px auto; }
+
+/* continue CTA on the interstitial (H11): the affirmative action is solid
+   accent — highest-contrast element on the page */
+.l-btn--continue {
+  background: var(--l-accent); color: #17130E; border-color: var(--l-accent);
+  width: 100%; min-height: 52px; font-size: 17px;
+}
+.l-btn--continue:hover { background: var(--l-link-hover); color: #17130E; }
+
+/* ── capability gating (set by app.js on <html>) ────────────────────────── */
+[data-cap-enc="0"] .needs-enc, [data-cap-maps="0"] .needs-maps,
+[data-cap-fulltext="0"] .needs-fulltext, [data-cap-chat="0"] .needs-chat { opacity: .5; }
+[data-mode="direct"] .hide-direct { display: none; }
+.show-direct { display: none; }
+[data-mode="direct"] .show-direct { display: inline-block; }
+/* landing Encyclopedias (H25): chip list of kiwix-served ZIMs */
+.l-enc { margin-top: 32px; }
+.l-enc-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.l-enc-list .l-chip { min-height: 40px; font-size: 15px; text-decoration: none; }
+
+/* ── print ──────────────────────────────────────────────────────────────── */
+@media print {
+  body { background: #fff; color: #000; font-size: 12pt; padding: 0; }
+  .l-header, .l-tabbar, .l-sidebar, .l-pill, .l-search, .l-btn, nav,
+  .l-filter, .l-hsearch, .l-histmodal { display: none !important; }
+  a { color: #000; text-decoration: none; }
+  .l-triage-section { break-inside: avoid; page-break-inside: avoid; border: 1px solid #000; }
+  .l-triage-section h2 { break-before: page; page-break-before: always; } /* one situation per sheet; md pages flow */
+  .l-triage-section .l-doc-row::after { content: " (" attr(href) ")"; font-size: 10pt; }
+}
+
+/* markdown tables on generated doc pages (runbook, purchases — H29) */
+.l-md-table { border-collapse: collapse; font-size: 14px; line-height: 1.4; margin: 12px 0; min-width: 100%; }
+.l-md-table th, .l-md-table td { border: 1px solid var(--l-line); padding: 6px 8px; text-align: left; vertical-align: top; }
+.l-md-table th { background: var(--l-surface); font-weight: 700; }
+.l-md code { overflow-wrap: anywhere; }
+.l-md pre { overflow-x: auto; background: var(--l-surface); border: 1px solid var(--l-line); border-radius: 8px; padding: 10px 12px; font-size: 14px; line-height: 1.4; margin: 12px 0; }
+/* one-line "what is this" under a shelf-page group title (H30) */
+.l-h2 { font-size: 20px; margin: 22px 0 8px; }
+.l-sum { display: block; font-family: var(--l-font-ui); font-size: 13px; color: var(--l-text2); margin-top: 2px; }
+\n

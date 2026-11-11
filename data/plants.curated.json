@@ -1,0 +1,582 @@
+{
+ "_comment": "Safety-critical curation for plants.html. kind: 'edible' | 'danger' (drives the Edible/Deadly filters). label: badge text (EDIBLE, EDIBLE COOKED on safe green; DEADLY, POISONOUS, BURNS SKIN on danger red). lookalike: slug shown side-by-side on the detail page. Badges are never inferred anywhere else — this file is the only source. Curated 2026-09-17; verify against Peterson regional guide before field use. category: 'plant' | 'mushroom' (coastal file entries are all 'coastal'); drives the Plants/Mushrooms/Coastal filter. Curated 2026-09-22.",
+ "acorn_red_oak": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Shell, then leach tannins in several changes of water before eating. No acorn photo here: know the tree by pointed, bristle-tipped leaf lobes; its acorns are round with a shallow cap.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "acorn_white_oak": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Lower tannin than red oak; still leach before eating.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "amanita_death_cap": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Liver failure. Feeling better 12–24 h after eating means nothing — damage continues. Greenish cap, white gills, sac at base — but the cap is NOT always green: it can be pale green, yellowish, olive, bronze or white. Mirrored Wikipedia (Amanita phalloides): \"Californian specimens of A. phalloides frequently display yellowish to mustard-yellow caps, a coloration that can closely resemble the edible species Amanita velosa and Amanita calyptroderma, both of which are commonly foraged and consumed in California.\" Also mistaken for the edible paddy-straw mushroom (Volvariella) and Caesar's mushroom. It may also be mistaken for edible Agaricus (button and field mushrooms), especially young ones whose unopened caps hide the white gills; all mature Agaricus have dark gills (mirrored Wikipedia, Amanita phalloides). Any mushroom with white gills and a sac (volva) at the base of the stem: leave it, whatever the cap colour. Español — oronja verde, cicuta verde (Amanita phalloides): MORTAL, NO COMER. Destruye el hígado. Sentirse mejor 12 a 24 horas después de comerla NO significa estar a salvo: el daño sigue avanzando. Se confunde con la oronja o amanita de los Césares (Amanita caesarea), un hongo comestible que se recolecta, y con el hongo de paja (Volvariella), también comestible; en California, con Amanita velosa y Amanita calyptroderma, que allí se recolectan y se comen. También se confunde con el champiñón (Agaricus) joven, cuyo sombrero cerrado oculta las láminas blancas; el champiñón maduro tiene láminas oscuras. Láminas blancas y una bolsa (volva) en la base del pie; el sombrero NO siempre es verde: puede ser verde pálido, amarillento, oliva, bronce o blanco. Cualquier hongo con láminas blancas y bolsa en la base: déjelo, sea del color que sea.",
+  "lookalike": "puffball_giant",
+  "category": "mushroom",
+  "es": [
+   "oronja verde",
+   "cicuta verde",
+   "oronja mortal",
+   "hongo de la muerte",
+   "hongos",
+   "setas"
+  ]
+ },
+ "amanita_destroying_angel": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "All-white amanita. Same delayed liver failure as death cap. Mistaken for the edible button mushroom, meadow mushroom and horse mushroom; young ones still inside their veil look like puffballs (mirrored Wikipedia, Destroying angel) — slice every puffball top to bottom. It has also been taken for the edible paddy-straw mushroom (Volvariella volvacea): in 2006 seven people in Minnesota were poisoned that way (mirrored Wikipedia, Amanita bisporigera, the species in the photos). Never eat any all-white gilled mushroom, or any gilled mushroom with a sac (volva) at the base of the stem. Español — amanita blanca (en las fotos, Amanita bisporigera; en Europa, Amanita virosa y Amanita verna): MORTAL, NO COMER. El mismo daño tardío al hígado que la oronja verde. Se confunde con el champiñón, el champiñón silvestre y la bola de nieve; de joven, todavía cerrada, parece un bejín (hongo bola): corte cada uno de arriba abajo. También se ha confundido con el hongo de paja (Volvariella volvacea), comestible: en 2006, siete personas en Minnesota se intoxicaron así. Nunca coma un hongo de láminas todo blanco, ni ningún hongo de láminas con una bolsa (volva) en la base del pie.",
+  "lookalike": "puffball_giant",
+  "category": "mushroom",
+  "es": [
+   "amanita blanca",
+   "cicuta blanca",
+   "amanita maloliente",
+   "hongos",
+   "setas"
+  ]
+ },
+ "angels_trumpet": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "All parts. Delirium, seizures, death. Hanging trumpet flowers.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "bittersweet_nightshade": {
+  "kind": "danger",
+  "label": "POISONOUS",
+  "note": "Red berries on purple-flowered vine. Rarely fatal but seriously toxic — a child-attractive berry. None of the photos here shows the berries: the fruit is an oval red berry about 1 cm long, like a tiny tomato (mirrored Wikipedia, Solanum dulcamara).",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "black_elderberry_flowers": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Flat white flower heads; fine for tea and fritters. NEVER confuse with hemlock umbels — elder is a woody shrub, hemlocks are hollow green stems. Español — flor de saúco (Sambucus): COMESTIBLE. Flores blancas en ramilletes planos; sirven para té y buñuelos. NUNCA las confunda con las umbelas de la cicuta: el saúco es un arbusto leñoso; las cicutas tienen tallos verdes y huecos.",
+  "lookalike": "poison_hemlock",
+  "category": "plant",
+  "es": [
+   "flor de saúco",
+   "saúco"
+  ]
+ },
+ "black_walnut": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Thick green husk stains hands; nut inside is rich food.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "blackberry": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Thorny canes, compound leaves. No dangerous lookalike when ripe and black.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "cattail": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Shoots, rhizomes, green flower spikes. Harvest only plants with the unmistakable seed head present — young blades resemble toxic iris. Clean water only: plants growing in polluted water can accumulate lead and pesticide residues in their rhizomes and should not be eaten (mirrored Wikipedia, Typha). Español — tule, espadaña, enea (Typha): COMESTIBLE. Brotes, rizomas y espigas verdes de la flor. Recoja solo plantas que tengan la espiga de semillas, inconfundible: las hojas jóvenes se parecen al lirio (Iris), que es tóxico. Solo de agua limpia: en agua contaminada acumula plomo y pesticidas en los rizomas y no se debe comer.",
+  "lookalike": null,
+  "category": "plant",
+  "es": [
+   "tule",
+   "espadaña",
+   "enea"
+  ]
+ },
+ "cattail_pollen": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Shake yellow pollen from summer spikes into a bag; protein-rich flour extender. Clean water only: cattails in polluted water take up lead and pesticides.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "chanterelle": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Golden, false ridged 'gills' running down the stem, fruity smell, grows from soil — never in shelf-like clusters on wood. Lookalikes: jack-o'-lantern (poisonous, clustered on wood, true gills) and false chanterelle (true thin forking gills, on rotten wood) — if the gills are true blades, leave it. Español — rebozuelo, cantarela (Cantharellus): COMESTIBLE COCIDO. Dorado, con falsas láminas (pliegues) que bajan por el pie, olor afrutado, crece en el suelo, nunca en racimos sobre madera. Parecidos: la seta de olivo (venenosa, en racimos sobre madera, láminas verdaderas) y el falso rebozuelo (láminas verdaderas finas que se bifurcan, sobre madera podrida). Si las láminas son hojas verdaderas, déjelo.",
+  "lookalike": "jack_o_lantern",
+  "category": "mushroom",
+  "es": [
+   "rebozuelo",
+   "cantarela",
+   "hongos",
+   "setas"
+  ]
+ },
+ "chicken_of_the_woods": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Orange to sulphur-yellow shelf on wood, with small pores (no gills) underneath. Lookalike: the poisonous jack-o'-lantern is mistaken for it because of its similar colour (mirrored Wikipedia, Omphalotus olearius); jack-o'-lantern has true gills — if it has gills, leave it. Cook well; some people react. Avoid specimens on conifers, eucalyptus, or locust. Español — pollo del bosque (Laetiporus): COMESTIBLE COCIDO. Repisa anaranjada o amarillo azufre sobre madera, con poros pequeños (sin láminas) por debajo. Se confunde con la seta de olivo (venenosa), que tiene láminas verdaderas: si tiene láminas, déjelo. Cocínelo bien; a algunas personas les sienta mal. Evite los que crecen sobre coníferas, eucalipto o falsa acacia (robinia).",
+  "lookalike": "jack_o_lantern",
+  "category": "mushroom",
+  "es": [
+   "hongo pollo",
+   "pollo del bosque",
+   "hongos",
+   "setas"
+  ]
+ },
+ "chickweed": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Single line of hairs on the stem, white starry flowers. Mild salad green.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "cleavers": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Velcro-sticky whorled leaves. Cook young shoots; seeds roast into a coffee substitute.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "common_purslane": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Succulent mat, clear sap. Toxic spurge look-similar has MILKY sap — check every stem. Español — verdolaga (Portulaca oleracea): COMESTIBLE. Planta rastrera carnosa, de savia transparente. La euforbia tóxica (lechetrezna, golondrina) se le parece, pero su savia es BLANCA como leche: revise cada tallo.",
+  "lookalike": null,
+  "category": "plant",
+  "es": [
+   "verdolaga"
+  ]
+ },
+ "cow_parsnip": {
+  "kind": "danger",
+  "label": "BURNS SKIN",
+  "note": "Sap + sunlight = blistering burns. Milder than giant hogweed but treat the same. Big umbel, fuzzy stem. The flowers also look like water hemlock (deadly) and poison hemlock — never eat any big white umbel you cannot name. Español — Heracleum maximum: QUEMA LA PIEL, NO COMER. Savia + sol = quemaduras con ampollas. Más suave que el perejil gigante, pero trátela igual. Umbela grande, tallo velloso. Sus flores también se parecen a la cicuta acuática (mortal) y a la cicuta: nunca coma una umbela blanca grande que no sepa nombrar.",
+  "lookalike": "giant_hogweed",
+  "category": "plant"
+ },
+ "dandelion": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Entire plant. Hollow unbranched stem, single flower, milky sap — the safe 'weed' to learn first.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "deadly_nightshade": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Sweet-tasting shiny black berries — the classic child killer. Bell-shaped purple-brown flowers. It is confused with the much less poisonous black nightshade, and its berries have been mistaken for blueberries (mirrored Wikipedia, Atropa bella-donna). Deadly nightshade berries are glossy, about twice as large, somewhat flattened, borne singly, with a large star-shaped calyx; black nightshade berries are dull, round and in clusters. Español — belladona (Atropa belladonna): MORTAL, NO COMER. Bayas negras brillantes de sabor dulce: el clásico veneno de niños. Flores en campana de color morado pardo. Se confunde con la hierba mora, mucho menos venenosa, y sus bayas se han confundido con arándanos. Las bayas de belladona son brillantes, casi el doble de grandes, algo aplastadas, sueltas de una en una y con un cáliz grande en forma de estrella; las de hierba mora son opacas, redondas y en racimos.",
+  "lookalike": null,
+  "category": "plant",
+  "es": [
+   "belladona"
+  ]
+ },
+ "death_camas": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Grass-like bulb plant that looks like wild onion but has NO onion smell. If a bulb doesn't smell of onion, drop it. The leaves are sharply folded into a 'V' along their length, quite unlike wild onion leaves. Meadow death camas has been mistaken for edible bulbs including blue camas, wild onions and mariposa lily, and once the leaves and flower stems have faded it is easily mistaken for camas lily bulbs in the Pacific Northwest (mirrored Wikipedia, Toxicoscordion venenosum). Never dig a bulb you did not see and identify in flower. All 4 photos here show mountain death camas (Anticlea elegans), a close relative that may also be toxic (mirrored Wikipedia, Anticlea elegans), not the meadow death camas this text describes; no photo of meadow death camas is in the library. Español — camas mortal (Toxicoscordion venenosum): MORTAL, NO COMER. Planta de bulbo con hojas como de pasto, parecida a la cebolla silvestre pero SIN olor a cebolla. Si un bulbo no huele a cebolla, tírelo. Las hojas están dobladas en «V» a lo largo, muy distintas de las de la cebolla silvestre. Se ha confundido con bulbos comestibles como el camas azul, la cebolla silvestre y el lirio mariposa, y cuando las hojas y los tallos de la flor ya se secaron, se confunde fácilmente con el bulbo del camas en el noroeste del Pacífico. Nunca saque un bulbo que no haya visto e identificado en flor. Las 4 fotos muestran Anticlea elegans, una pariente que también puede ser tóxica, no la especie que describe este texto.",
+  "lookalike": "field_garlic",
+  "es": [
+   "camas mortal"
+  ],
+  "category": "plant"
+ },
+ "elderberry": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Ripe BLACK berries in flat-topped drooping clusters, cooked only — raw berries, stems, leaves are cyanogenic. Photos here show the flat white flower heads and unripe green berries, not ripe fruit. See red elderberry warning. Español — saúco de bayas negras (Sambucus): COMESTIBLE COCIDO. Solo las bayas NEGRAS maduras, en racimos planos que cuelgan, y solo cocidas: las bayas crudas, los tallos y las hojas tienen cianuro. Las fotos muestran las flores blancas y bayas verdes, no fruta madura. Vea el aviso del saúco rojo. Compare con la hierba carmín (mortal), de racimos de bayas morado-negras sobre tallos color magenta.",
+  "lookalike": "pokeweed",
+  "category": "plant",
+  "es": [
+   "saúco"
+  ]
+ },
+ "false_hellebore": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Pleated broad leaves, appears in spring exactly where and when ramps do. The classic ramp-hunter's fatal mistake — no onion smell. Español — eléboro falso (Veratrum): MORTAL, NO COMER. Hojas anchas y plisadas; sale en primavera justo donde y cuando sale el ajo silvestre americano (ramps). El error mortal clásico de quien busca ramps: NO huele a cebolla.",
+  "lookalike": "ramps",
+  "category": "plant",
+  "es": [
+   "eléboro falso"
+  ]
+ },
+ "false_morel": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Brain-like wrinkled lobed cap, cottony chambered interior. True morels are pitted and completely hollow. Español — falsa colmenilla, hongo bonete (Gyromitra): MORTAL, NO COMER. Sombrero arrugado como un cerebro, en lóbulos, por dentro con cámaras algodonosas. Algunos textos dicen que cocida es inofensiva: no se fíe, cocinarla no elimina todas las toxinas. La colmenilla verdadera tiene hoyos y está completamente hueca.",
+  "lookalike": "morel",
+  "category": "mushroom",
+  "es": [
+   "falsa colmenilla",
+   "hongo bonete",
+   "hongos",
+   "setas"
+  ]
+ },
+ "field_garlic": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Must smell strongly of onion/garlic when crushed — no smell means it may be death camas or star-of-Bethlehem. Español — ajo de campo (Allium vineale): COMESTIBLE. Al aplastarlo DEBE oler fuerte a cebolla o ajo; si no huele, puede ser camas mortal o leche de gallina (estrella de Belén).",
+  "lookalike": "death_camas",
+  "category": "plant",
+  "es": [
+   "ajo de campo"
+  ]
+ },
+ "fly_agaric": {
+  "kind": "danger",
+  "label": "POISONOUS",
+  "note": "Red cap, white warts. Delirium and severe illness; occasionally fatal. The fairytale mushroom is not food. In the Americas it has been mistaken for other yellow to red mushrooms: honey mushroom (Armillaria) and the edible Amanita basii, a Mexican species like Caesar's mushroom (Amanita caesarea); in Mexico the edible one is called amarillo, and poison centres in the US and Canada see this mix-up. Caesar's mushroom has a wholly orange to red cap without white warts, but heavy rain can wash the warts off a fly agaric, so the warts are no test. Young closed buttons look like puffballs: slice every puffball top to bottom (mirrored Wikipedia, Amanita muscaria). Español — matamoscas, falsa oronja (Amanita muscaria): VENENOSA, NO COMER. Sombrero rojo con verrugas blancas. Delirio y enfermedad grave; a veces mortal. El hongo de los cuentos no es comida. En América se ha confundido con hongos amarillos a rojos comestibles: la oronja o amanita de los Césares (Amanita caesarea) y Amanita basii, que en México llaman amarillo, y también la armilaria (Armillaria). La oronja tiene el sombrero todo anaranjado a rojo, sin verrugas blancas, pero la lluvia fuerte puede lavar las verrugas de la matamoscas: las verrugas no sirven de prueba. De joven, cerrada, parece un bejín (hongo bola): corte cada uno de arriba abajo.",
+  "lookalike": null,
+  "category": "mushroom",
+  "es": [
+   "matamoscas",
+   "falsa oronja",
+   "hongos",
+   "setas"
+  ]
+ },
+ "foxglove": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Cardiac glycosides; first-year rosettes get mistaken for comfrey or borage. Fuzzy leaves, no smell when crushed. Español — dedalera (Digitalis purpurea): MORTAL, NO COMER. Glucósidos que dañan el corazón; las rosetas del primer año se confunden con la consuelda o la borraja. Hojas aterciopeladas, sin olor al aplastarlas.",
+  "lookalike": null,
+  "category": "plant",
+  "es": [
+   "dedalera"
+  ]
+ },
+ "garlic_mustard": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Garlic smell when crushed, invasive — harvest freely. First-year plants hold cyanide: chop and let it stand a few minutes, or cook, before eating much.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "giant_hogweed": {
+  "kind": "danger",
+  "label": "BURNS SKIN",
+  "note": "Sap + sunlight = severe blistering burns and lasting scars. Huge umbels, purple-blotched bristly stem. Do not touch, do not weed-whack. Español — perejil gigante (Heracleum mantegazzianum): QUEMA LA PIEL, NO COMER. Savia + sol = quemaduras graves con ampollas y cicatrices que duran. Umbelas enormes, tallo con manchas moradas y cerdas. No la toque, no la corte con desbrozadora. Se parece a Heracleum maximum, que también quema.",
+  "lookalike": "cow_parsnip",
+  "category": "plant",
+  "es": [
+   "perejil gigante"
+  ]
+ },
+ "ground_elder": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Carrot-family ground cover. Its flowers may be confused with two extremely toxic species, poison hemlock and hemlock water dropwort (mirrored Wikipedia, Aegopodium podagraria): attention to the leaves is required for a conclusive ID. Ground elder's upper leaves are in threes (ternate), broad and toothed; the stems are erect, hollow and grooved; it spreads as ground cover from underground rhizomes. Never pick it by the flowers. Because deadly umbellifers exist, require 100% ID on every carrot-family plant. Español — podagraria (Aegopodium podagraria): COMESTIBLE COCIDO. Planta de la familia de la zanahoria que cubre el suelo. Sus flores se pueden confundir con dos plantas muy tóxicas, la cicuta y el nabo del diablo (Oenanthe crocata): para identificarla hay que mirar las hojas. Las hojas de arriba van de tres en tres, anchas y dentadas; los tallos son rectos, huecos y con surcos; se extiende por raíces bajo tierra. Nunca la recoja por las flores. Toda planta de la familia de la zanahoria exige identificación al 100 %.",
+  "lookalike": "poison_hemlock",
+  "category": "plant",
+  "es": [
+   "podagraria"
+  ]
+ },
+ "hawthorn": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Berries edible; do NOT crush or eat the seeds (cyanogenic, like apple seeds). Thorned shrub.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "hen_of_the_woods": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Grey-brown overlapping fronds at oak bases (maitake). No dangerous twin; confirm pore surface, no gills. Español — maitake (Grifola frondosa): COMESTIBLE COCIDO. Frondas gris-marrón superpuestas al pie de los robles. No tiene un gemelo peligroso; confirme que por debajo tiene poros, no láminas.",
+  "lookalike": null,
+  "category": "mushroom",
+  "es": [
+   "maitake",
+   "hongos",
+   "setas"
+  ]
+ },
+ "hickory_nut": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Husk splits into 4 sections. Don't confuse with buckeye — buckeye husk doesn't split cleanly and nut lacks the pointed cap. Español — nuez de nogal americano (Carya): COMESTIBLE. La cáscara verde se abre en 4 partes. No la confunda con el castaño de Indias (venenoso): su cáscara no se abre limpia y la nuez no tiene la punta.",
+  "lookalike": null,
+  "category": "plant",
+  "es": [
+   "nogal americano"
+  ]
+ },
+ "jack_o_lantern": {
+  "kind": "danger",
+  "label": "POISONOUS",
+  "note": "Orange, true decurrent gills, grows in clusters ON WOOD, faint green glow in dark when fresh. Severe vomiting, not usually lethal. Also mistaken for the edible chicken of the woods (Laetiporus) because of its colour (mirrored Wikipedia, Omphalotus olearius); chicken of the woods has pores, not gills. Español — seta de olivo (Omphalotus): VENENOSA, NO COMER. Anaranjada, con láminas verdaderas que bajan por el pie, crece en racimos SOBRE MADERA; fresca, brilla un poco verde en la oscuridad. Vómitos fuertes; normalmente no mata. También se confunde con el pollo del bosque (Laetiporus), que tiene poros, no láminas.",
+  "lookalike": "chanterelle",
+  "category": "mushroom",
+  "es": [
+   "seta de olivo",
+   "hongos",
+   "setas"
+  ]
+ },
+ "jerusalem_artichoke": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Sunflower relative; knobby tubers. Cook — raw causes serious gas (inulin). Deadly pokeweed roots have been mistaken for Jerusalem artichoke (mirrored Wikipedia, Phytolacca americana): dig only under a plant you have identified above ground. Español — tupinambo, pataca (Helianthus tuberosus): COMESTIBLE COCIDO. Pariente del girasol; tubérculos nudosos. Cocínelo: crudo da muchos gases (inulina). Las raíces de la hierba carmín, mortal, se han confundido con el tupinambo: saque tubérculos solo bajo una planta que haya identificado por encima de la tierra.",
+  "lookalike": "pokeweed",
+  "category": "plant",
+  "es": [
+   "tupinambo",
+   "pataca"
+  ]
+ },
+ "jimsonweed": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Spiky seed pods, trumpet flowers, foul smell. Delirium, hyperthermia, death. Even seeds are dangerous.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "lambsquarters": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "White mealy coating on young leaves. Cook like spinach (oxalates). Young plants look like poisonous black nightshade — nightshade has no mealy white coating. Español — quelite cenizo (Chenopodium album): COMESTIBLE COCIDO. Polvillo blanco harinoso en las hojas jóvenes. Cocínelo como espinaca (oxalatos). De joven se parece a la hierba mora, venenosa: la hierba mora no tiene ese polvillo blanco.",
+  "lookalike": null,
+  "category": "plant",
+  "es": [
+   "quelite cenizo",
+   "cenizo"
+  ]
+ },
+ "lily_of_the_valley": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Cardiac glycosides. Paired broad leaves emerge exactly like ramps — but NO onion smell, and red berries later. Español — lirio de los valles, muguete (Convallaria majalis): MORTAL, NO COMER. Glucósidos que dañan el corazón. Sus dos hojas anchas salen igual que las del ajo silvestre americano (ramps), pero NO huele a cebolla, y más tarde da bayas rojas.",
+  "lookalike": "ramps",
+  "category": "plant",
+  "es": [
+   "lirio de los valles",
+   "muguete"
+  ]
+ },
+ "mayapple": {
+  "kind": "danger",
+  "label": "POISONOUS",
+  "note": "Only the fully ripe, soft, yellow fruit is edible, and only in small amounts: even ripe fruit may be poisonous eaten in excess (mirrored Wikipedia, Podophyllum peltatum). Leaves, roots, seeds, and unripe fruit are seriously toxic. Treat the plant as poison. Español — podófilo, manzana de mayo (Podophyllum peltatum): VENENOSA. Solo el fruto bien maduro, blando y amarillo es comestible, y solo en pequeñas cantidades: aun maduro, puede ser tóxico si se come en exceso. Las hojas, las raíces, las semillas y el fruto verde son muy tóxicos. Trate la planta como veneno.",
+  "lookalike": null,
+  "category": "plant",
+  "es": [
+   "podófilo",
+   "manzana de mayo"
+  ]
+ },
+ "miners_lettuce": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Round leaf pierced by the stem — unmistakable. Excellent salad green, common in coastal CA.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "monkshood": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Aconitine absorbs through broken skin — don't even handle barehanded. Hooded blue-purple flowers.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "morel": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Pitted (not wrinkled) cap, ONE hollow chamber top to bottom when sliced. Slice every single one. Never eat raw. Español — colmenilla, morilla (Morchella): COMESTIBLE COCIDA. Sombrero con hoyos (no arrugado); cortada de arriba abajo, UNA sola cámara hueca de punta a punta. Corte cada una. Nunca cruda.",
+  "lookalike": "false_morel",
+  "category": "mushroom",
+  "es": [
+   "colmenilla",
+   "morilla",
+   "hongos",
+   "setas"
+  ]
+ },
+ "mulberry": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Eat fully ripe (dark) berries; unripe fruit and milky sap are mildly toxic.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "pawpaw": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Custard-like ripe fruit only; skin and seeds are not food.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "persimmon": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Wait for fully soft ripe fruit (often after frost) — unripe is mouth-puckeringly astringent but not dangerous.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "plantain_broadleaf": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Ribbed leaves in a rosette, everywhere underfoot. Edible greens; classic poultice leaf.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "poison_hemlock": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Killed Socrates. Purple-blotched SMOOTH hollow stem, no hairs, musty smell, fern-like leaves. Edible plants confused with it: cultivated carrot, wild carrot, parsnip, fennel and parsley (mirrored Wikipedia, Conium maculatum). It is also confused with water hemlock (Cicuta), which is just as deadly; water hemlock lacks the purple spots and the mousy smell (mirrored Wikipedia, Conium maculatum). The reason every carrot-family plant needs 100% ID. First photo: the blotched stem close up (wild carrot's stem is hairy with no purple marks). The other photos are seeds, a distant plant and a book plate. Español — cicuta (Conium maculatum): MORTAL, NO COMER. Mató a Sócrates. Tallo LISO y hueco con manchas moradas, sin pelos, olor a ratón, hojas como de helecho. Plantas comestibles que se confunden con ella: la zanahoria, la zanahoria silvestre, la chirivía, el hinojo y el perejil. También se confunde con la cicuta acuática (Cicuta), igual de mortal, que no tiene las manchas moradas ni el olor a ratón. Por eso toda planta de la familia de la zanahoria exige identificación al 100 %. La primera foto es el tallo con manchas, de cerca (el de la zanahoria silvestre es velloso y sin manchas moradas).",
+  "lookalike": "wild_carrot",
+  "category": "plant",
+  "es": [
+   "cicuta"
+  ]
+ },
+ "pokeweed": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Purple-black berry clusters on magenta stems. Root is the worst: pokeweed roots have been mistaken for parsnip, Jerusalem artichoke or horseradish (mirrored Wikipedia, Phytolacca americana). Berries have killed children. Traditional triple-boiled greens are not worth the risk. Español — hierba carmín, fitolaca (Phytolacca americana): MORTAL, NO COMER. Racimos de bayas morado-negras sobre tallos color magenta. La raíz es lo peor: se ha confundido con la chirivía, el tupinambo y el rábano picante. Las bayas han matado a niños. Las hojas hervidas tres veces de la tradición no valen el riesgo.",
+  "lookalike": "jerusalem_artichoke",
+  "category": "plant",
+  "es": [
+   "hierba carmín",
+   "fitolaca"
+  ]
+ },
+ "puffball_giant": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Slice EVERY one top to bottom: must be pure featureless white inside. Any gill outline, yellow, or purple = discard (could be a deadly Amanita button). It also resembles the poisonous earthball (Scleroderma citrinum), which has a much firmer, elastic body and an inside that turns dark purplish-black with white veins early on (mirrored Wikipedia, Calvatia gigantea). Español — bejín gigante (Calvatia gigantea): COMESTIBLE COCIDO. Corte CADA uno de arriba abajo: por dentro debe ser blanco puro, sin forma alguna. Cualquier silueta de láminas, color amarillo o morado = tírelo (puede ser el botón de una Amanita mortal). También se parece al Scleroderma citrinum (venenoso), más duro y elástico, que por dentro pronto se vuelve negro violáceo con vetas blancas.",
+  "lookalike": "amanita_death_cap",
+  "category": "mushroom",
+  "es": [
+   "bejín gigante",
+   "hongo bola",
+   "hongos",
+   "setas"
+  ]
+ },
+ "ramps": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Broad leaves, red-tinged stem, and a hard requirement: strong onion smell on every plant. No smell = false hellebore or lily of the valley = hospital. The smell stays on your hands and can fool you on the next plant: pick one at a time, wash or wait between. Español — ajo silvestre americano, ramps (Allium tricoccum): COMESTIBLE. Hojas anchas, tallo rojizo y una regla estricta: cada planta debe oler fuerte a cebolla. Sin olor = eléboro falso o lirio de los valles = hospital. El olor se queda en las manos y puede engañarle con la planta siguiente: recoja una a una y lávese o espere entre una y otra.",
+  "lookalike": "false_hellebore",
+  "category": "plant",
+  "es": [
+   "ajo silvestre americano"
+  ]
+ },
+ "red_elderberry": {
+  "kind": "danger",
+  "label": "POISONOUS",
+  "note": "RED berries in cone-shaped (not flat) clusters. Toxic raw; even cooked is marginal. Only flat-topped BLACK elderberry is food. Español — saúco rojo (Sambucus racemosa): VENENOSO, NO COMER. Bayas ROJAS en racimos en forma de cono (no planos). Tóxico crudo; incluso cocido es dudoso. Solo el saúco de bayas NEGRAS, en racimos planos, es comida.",
+  "lookalike": "elderberry",
+  "category": "plant",
+  "es": [
+   "saúco rojo"
+  ]
+ },
+ "rose_hips": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Vitamin C. Split and scrape out the irritant-hairy seeds first. Photos show the flowers; hips are the red-orange fruit left after the petals fall, late summer into winter.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "serviceberry": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Blueberry-like fruit with a crown, on a shrub/small tree. Excellent and safe. Photos show the white spring flowers only; fruit ripens red to purple-black in early summer.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "stinging_nettle": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "Harvest with gloves; cooking or drying kills the sting entirely. One of the best wild greens.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "water_hemlock": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "The most poisonous plant in North America — one bite of the chambered root can kill. Wet ground, umbel flowers. Mistaken for wild celery, celery, wild carrot, wild parsnip, water parsnip and pignut (mirrored Wikipedia, Cicuta). It is also confused with poison hemlock (Conium maculatum), which is also deadly (mirrored Wikipedia, Cicuta). The root cut lengthwise shows stacked chambers holding an oily yellow juice that smells of raw parsnip. Never eat any wetland 'parsnip', 'celery' or 'carrot'. Photos 1-5 show flowers, stems and leaves; photo 6 is an 1885 drawing of the related northern water hemlock (Cicuta virosa) with the cut, chambered root at bottom right. No photo of a real root is in the library. Español — cicuta acuática (Cicuta): MORTAL, NO COMER. La planta más venenosa de Norteamérica: un bocado de su raíz con cámaras puede matar. Terreno húmedo, flores en umbela. Se confunde con el apio silvestre, el apio, la zanahoria silvestre, la chirivía silvestre, la chirivía de agua y la castaña de tierra; también con la cicuta (Conium maculatum), también mortal. Cortada a lo largo, la raíz muestra cámaras apiladas con un jugo amarillo aceitoso que huele a chirivía cruda. Nunca coma una «chirivía», un «apio» o una «zanahoria» de terreno húmedo.",
+  "lookalike": "watercress",
+  "category": "plant",
+  "es": [
+   "cicuta acuática"
+  ]
+ },
+ "watercress": {
+  "kind": "edible",
+  "label": "EDIBLE COOKED",
+  "note": "From wild water: cook it (liver-fluke risk), and confirm every stem — water hemlock grows in the same streams. Español — berro (Nasturtium officinale): COMESTIBLE COCIDO. Si es de agua silvestre, cocínelo (riesgo de duela del hígado) y revise cada tallo: la cicuta acuática crece en los mismos arroyos.",
+  "lookalike": "water_hemlock",
+  "category": "plant",
+  "es": [
+   "berro",
+   "berros"
+  ]
+ },
+ "white_snakeroot": {
+  "kind": "danger",
+  "label": "DEADLY",
+  "note": "Milk sickness from this plant was possibly what killed Lincoln's mother in 1818 (mirrored Wikipedia, Ageratina altissima) — the toxin passes through the milk of animals that graze it. Keep livestock off it.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "wild_carrot": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Queen Anne's lace. HAIRY stem, carrot smell, often one dark central floret. Smooth purple-blotched stem = poison hemlock = death. In wet ground, water hemlock (the deadliest plant in North America) is also mistaken for wild carrot (mirrored Wikipedia, Cicuta). 100% ID or don't. Español — zanahoria silvestre (Daucus carota): COMESTIBLE. Tallo VELLOSO, olor a zanahoria, a menudo una florecita oscura en el centro. Tallo liso con manchas moradas = cicuta = muerte. En terreno húmedo, la cicuta acuática (la planta más mortal de Norteamérica) también se confunde con la zanahoria silvestre. Identificación al 100 % o no la coma.",
+  "lookalike": "poison_hemlock",
+  "category": "plant",
+  "es": [
+   "zanahoria silvestre"
+  ]
+ },
+ "wild_garlic": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Broad, flat, spear-shaped leaves from the base, each on its own stalk (NOT hollow or round), triangular flower stem, white star flowers in a round head. Crush a leaf: strong garlic smell is mandatory on EVERY plant you pick — no smell means a deadly lookalike: lily-of-the-valley, autumn crocus, lords-and-ladies (Arum), false hellebore. The smell stays on your hands and can fool you on the next plant: pick one at a time and wash or wait between. Photos 1-5 are buds and flowers, which is not the stage people are poisoned at. Photo 6 (the last) is the one to study: wild garlic in LEAF (left) next to lords-and-ladies / Arum (right) — Arum leaves have irregular edges and many deep veins, wild garlic leaves are convex with one main vein; lily-of-the-valley leaves come in pairs from a single reddish-purple stem. Español — ajo de oso (Allium ursinum): COMESTIBLE. Hojas anchas, planas, en forma de lanza, cada una con su propio rabillo (NO huecas ni redondas), tallo de la flor triangular, flores blancas en estrella en una cabeza redonda. Aplaste una hoja: TODA planta que recoja debe oler fuerte a ajo; si no huele, puede ser una planta mortal parecida: lirio de los valles, cólquico, aro (Arum) o eléboro falso. El olor se queda en las manos y puede engañarle con la planta siguiente: recoja una a una y lávese o espere entre una y otra. La foto 6 (la última) es la que hay que estudiar: ajo de oso en HOJA (izquierda) junto al aro (derecha); las hojas del aro tienen bordes irregulares y muchas venas profundas, las del ajo de oso son curvadas con una vena principal; las del lirio de los valles salen de dos en dos de un solo tallo morado rojizo.",
+  "lookalike": "lily_of_the_valley",
+  "category": "plant",
+  "es": [
+   "ajo de oso"
+  ]
+ },
+ "wild_ginger": {
+  "kind": "danger",
+  "label": "POISONOUS",
+  "note": "Contains aristolochic acid (kidney damage, carcinogen). Older foraging books call it a spice; current guidance: do not consume.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "wild_parsnip": {
+  "kind": "danger",
+  "label": "BURNS SKIN",
+  "note": "Sap + sun = blistering burns, like hogweed. The root is technically edible but harvest demands gloves and long sleeves — filed as danger. Both deadly hemlocks are mistaken for parsnip: poison hemlock (mirrored Wikipedia, Conium maculatum) and water hemlock (mirrored Wikipedia, Cicuta). Deadly pokeweed roots have been mistaken for parsnip too (mirrored Wikipedia, Phytolacca americana). Never dig a wild 'parsnip' root. Español — chirivía silvestre (Pastinaca sativa): QUEMA LA PIEL, NO COMER. Savia + sol = quemaduras con ampollas, como el perejil gigante. La raíz en principio se come, pero sacarla exige guantes y mangas largas: por eso la ficha la marca como peligrosa. Las dos cicutas mortales se confunden con la chirivía: la cicuta (Conium maculatum) y la cicuta acuática (Cicuta). Las raíces de la hierba carmín, mortal, también se han confundido con la chirivía (Phytolacca americana). Nunca saque una raíz de «chirivía» silvestre.",
+  "lookalike": "giant_hogweed",
+  "category": "plant",
+  "es": [
+   "chirivía silvestre"
+  ]
+ },
+ "wild_strawberry": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Tiny intense fruit. The similar 'mock strawberry' (yellow flowers, tasteless) is harmless.",
+  "lookalike": null,
+  "category": "plant"
+ },
+ "wood_sorrel": {
+  "kind": "edible",
+  "label": "EDIBLE",
+  "note": "Heart-shaped leaflets, lemony taste. In moderation (oxalic acid).",
+  "lookalike": null,
+  "category": "plant"
+ }
+}

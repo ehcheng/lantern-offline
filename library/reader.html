@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reader — Lantern</title>
+<link rel="icon" href="_app/brand/lantern-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_app/fonts/fonts.css">
+<link rel="stylesheet" href="_app/app.26829533.css">
+<script src="_app/app.7858fbba.js" defer></script>
+<style>
+  .r-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+  .r-bar .title { font-family: var(--l-font-display); font-size: 18px; margin-right: auto;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%; }
+  .r-bar input { width: 56px; text-align: center; background: transparent;
+    color: inherit; border: 1px solid var(--l-line); border-radius: 8px; padding: 6px 4px; font: inherit; }
+  .r-stage { text-align: center; padding-bottom: 40px; }
+  .r-stage canvas { max-width: 100%; height: auto; border: 1px solid var(--l-line);
+    border-radius: 4px; background: #fff; }
+  .r-fallback { margin: 24px 0; }
+  .r-msg { color: var(--l-muted); margin: 24px 0; }
+</style>
+</head>
+<body>
+
+<main>
+<header class="l-header">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <a class="l-cta-triage l-cta-triage--side" href="triage.html"><span class="cross">+</span><span><b>Hurt or sick</b></span></a>
+  <button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+</header>
+
+<div class="l-wrap">
+  <div class="r-bar">
+    <span class="title" id="r-title">Reader</span>
+    <button class="l-chip" id="r-prev">‹ Prev</button>
+    <input id="r-page" inputmode="numeric" aria-label="Page"> <span id="r-total" class="l-caption"></span>
+    <button class="l-chip" id="r-next">Next ›</button>
+  </div>
+  <p class="r-fallback"><a class="l-chip" id="r-open" href="#">Open the PDF file</a>
+    <span class="l-caption" id="r-open-note">— works in every browser, even without JavaScript modules.</span></p>
+  <div class="r-msg" id="r-msg">Loading…</div>
+  <div class="r-stage"><canvas id="r-canvas" hidden></canvas></div>
+</div>
+</main>
+
+<!--TABBAR-->
+<nav class="l-tabbar" aria-label="Tabs">
+  <a href="index.html" class="l-tab l-tab-home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path><path d="M10 20v-5.5h4V20"></path></svg><span class="l-tab-label">Home</span></a>
+  <a href="search.html" class="l-tab l-tab-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.75" cy="10.75" r="6.75"></circle><path d="M15.75 15.75 20.5 20.5"></path></svg><span class="l-tab-label">Search</span></a>
+  <a href="triage.html" class="l-tab l-tab-triage"><span class="cross"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></span><span class="l-tab-label">Hurt or sick</span></a>
+  <a href="audio.html" class="l-tab l-tab-listening"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"></path><path d="M4 14.5h2.5A1.5 1.5 0 0 1 8 16v3a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 4 19z"></path><path d="M20 14.5h-2.5A1.5 1.5 0 0 0 16 16v3a1.5 1.5 0 0 0 1.5 1.5h1A1.5 1.5 0 0 0 20 19z"></path></svg><span class="l-tab-label">Listening</span></a>
+  <details class="l-more"><summary class="l-tab l-tab-more"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect></svg><span class="l-tab-label">More</span></summary>
+    <div class="l-msheet">
+      <div class="l-msheet-head"><h2 class="l-msheet-title">More</h2></div>
+      <div class="l-msheet-body">
+        <div class="l-msheet-links">
+          <a href="chat.html" class="needs-chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17H6.5A2.5 2.5 0 0 1 4 14.5z"></path></svg>Ask</a>
+          <a href="map.html" class="needs-maps hide-direct"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5 6-2.5v13.5L15 20l-6-2.5L3 20z"></path><path d="M9 4v13.5M15 6.5V20"></path></svg>Map</a>
+          <a href="kids.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8z"></path></svg>Kids</a>
+          <a href="video.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="m10 9 5 3-5 3z"></path></svg>Video</a>
+          <a href="plants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"></path><path d="M5 19c3-4 6-7 9-9"></path></svg>Plants</a>
+          <a href="tools/suncalc.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg>Sun &amp; moon</a>
+          <a href="tools/convert.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"></path></svg>Converters</a>
+        </div>
+        <p class="l-caption">Shelves</p>
+        <div class="l-shelflist" data-fill="shelves"></div>
+        <p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div>
+      </div>
+      <div class="l-msheet-foot"><button class="l-pill" type="button" data-role="status" onclick="lanternToggleTheme()" aria-label="Server status. Switch theme"><span class="dot"></span>checking…</button></div>
+    </div>
+  </details>
+</nav>
+<!--/TABBAR-->
+<!--TABBAR_ES-->
+<template id="tabbar-es">
+<nav class="l-tabbar" aria-label="Pestañas" lang="es">
+  <a href="es.html" class="l-tab l-tab-home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path><path d="M10 20v-5.5h4V20"></path></svg><span class="l-tab-label">Inicio</span></a>
+  <a href="search.html?lang=spa" class="l-tab l-tab-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.75" cy="10.75" r="6.75"></circle><path d="M15.75 15.75 20.5 20.5"></path></svg><span class="l-tab-label">Buscar</span></a>
+  <a href="triage_es.html" class="l-tab l-tab-triage"><span class="cross"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></span><span class="l-tab-label">Herido o enfermo</span></a>
+  <a href="audio.html" class="l-tab l-tab-listening"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"></path><path d="M4 14.5h2.5A1.5 1.5 0 0 1 8 16v3a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 4 19z"></path><path d="M20 14.5h-2.5A1.5 1.5 0 0 0 16 16v3a1.5 1.5 0 0 0 1.5 1.5h1A1.5 1.5 0 0 0 20 19z"></path></svg><span class="l-tab-label">Escuchar</span></a>
+  <details class="l-more"><summary class="l-tab l-tab-more"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect></svg><span class="l-tab-label">Más</span></summary>
+    <div class="l-msheet">
+      <div class="l-msheet-head"><h2 class="l-msheet-title">Más</h2></div>
+      <div class="l-msheet-body">
+        <div class="l-msheet-links">
+          <a href="chat.html?lang=es" class="needs-chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17H6.5A2.5 2.5 0 0 1 4 14.5z"></path></svg>Preguntar</a>
+          <a href="map.html?lang=es" class="needs-maps hide-direct"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5 6-2.5v13.5L15 20l-6-2.5L3 20z"></path><path d="M9 4v13.5M15 6.5V20"></path></svg>Mapa</a>
+          <a href="kids.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8z"></path></svg>Niños</a>
+          <a href="video.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="m10 9 5 3-5 3z"></path></svg>Videos</a>
+          <a href="plants.html?lang=es"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"></path><path d="M5 19c3-4 6-7 9-9"></path></svg>Plantas</a>
+          <a href="tools/suncalc.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg>Sol y luna</a>
+          <a href="tools/convert.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"></path></svg>Conversiones</a>
+          <a href="index.html" lang="en" hreflang="en"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"></path><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"></path></svg>English</a>
+        </div>
+      </div>
+      <div class="l-msheet-foot"><button class="l-pill" type="button" data-role="status" onclick="lanternToggleTheme()" aria-label="Estado del servidor. Cambiar tema"><span class="dot"></span>…</button></div>
+    </div>
+  </details>
+</nav>
+</template>
+<!--/TABBAR_ES-->
+
+<script>
+(function () {
+  'use strict';
+  function el(id) { return document.getElementById(id); }
+  function qs(name) {
+    var m = location.search.match(new RegExp('[?&]' + name + '=([^&]*)'));
+    return m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : null;
+  }
+  /* FIXES #232 (a7a W6): Spanish chrome when opened from a Spanish page (&lang=es from Spanish shelves, or a Spanish
+     referrer: search.html?lang=spa, chat.html?lang=es, es.html, triage_es). English stays the default. */
+  var ES = qs('lang') === 'es' || /[?&]lang=(es|spa)\b|\/(es|triage_es|triage_es_v1|es_docs)\.html/.test(document.referrer || '');
+  function T(en, es) { return ES ? es : en; }
+  if (ES) {
+    document.documentElement.lang = 'es';
+    el('r-title').textContent = 'Lector';
+    el('r-prev').textContent = '‹ Anterior';
+    el('r-next').textContent = 'Siguiente ›';
+    el('r-page').setAttribute('aria-label', 'Página');
+    el('r-open').textContent = 'Abrir el archivo PDF';
+    el('r-open-note').textContent = '— funciona en cualquier navegador, incluso sin módulos de JavaScript.';
+    el('r-msg').textContent = 'Cargando…';
+    var cta = document.querySelector('.l-header .l-cta-triage');
+    if (cta) { cta.href = 'triage_es.html'; cta.querySelector('b').textContent = 'Herido o enfermo'; }
+    var wm = document.querySelector('.l-header .l-wordmark');
+    if (wm) { wm.href = 'es.html'; }
+    var tpl = el('tabbar-es'), bar = document.querySelector('nav.l-tabbar');
+    if (tpl && bar) { bar.parentNode.replaceChild(tpl.content.cloneNode(true), bar); }
+  }
+  var f = qs('f');
+  /* trust boundary: only relative .pdf paths inside the library */
+  if (!f || f.indexOf('..') !== -1 || f.charAt(0) === '/' || f.indexOf(':') !== -1 ||
+      !/\.pdf$/i.test(f)) {
+    el('r-msg').textContent = T('No document given. Open a PDF from a shelf or search.', 'No se indicó ningún documento. Abra un PDF desde un estante o el buscador.');
+    el('r-open').style.display = 'none';
+    return;
+  }
+  /* &t= carries the curated title from shelf and search links; filename otherwise */
+  var name = (qs('t') || '').slice(0, 200) || decodeURIComponent(f.split('/').pop()).replace(/\.pdf$/i, '').replace(/_/g, ' ');
+  el('r-title').textContent = name;
+  /* E4: shelf rows pass &y= (document year) on the health shelves so the viewer header says how old the text is */
+  var yr = (qs('y') || '').match(/^\d{4}$/);
+  if (yr) { el('r-title').textContent = name + ' (' + yr[0] + ')'; }
+  document.title = name + ' — Lantern';
+  el('r-open').href = f;
+
+  var q = (qs('q') || '').toLowerCase();
+  var saved = null;
+  function positions() { return window.lanternPositions; }
+
+  /* pdf.js v6 is ESM-only; file:// and old browsers get the plain link above.
+     FIXES #208 (a7a W5): on the drive the reader cannot draw, so it hands over to the browser's own PDF viewer at once
+     (replace: Back returns to the shelf, not here). The message and link stay for a browser that refuses. */
+  if (location.protocol === 'file:') {
+    el('r-msg').textContent = T('Reading direct from the drive — use “Open the PDF file” above.', 'Leyendo directamente del disco: use «Abrir el archivo PDF» arriba.');
+    var pg = (qs('p') || '').match(/^\d+$/);
+    location.replace(f.split('/').map(encodeURIComponent).join('/') + (pg ? '#page=' + pg[0] : ''));
+    return;
+  }
+  var supportsModules = 'noModule' in document.createElement('script');
+  if (!supportsModules) {
+    el('r-msg').textContent = T('This browser can’t run the in-page reader — use “Open the PDF file” above.', 'Este navegador no puede usar el lector de la página: use «Abrir el archivo PDF» arriba.');
+    return;
+  }
+
+  var doc = null, pageNum = 1, rendering = false, pendingPage = null;
+
+  function clampPage(n) { return Math.max(1, Math.min(doc.numPages, n)); }
+
+  function renderPage(n) {
+    if (rendering) { pendingPage = n; return; }
+    rendering = true;
+    pageNum = n;
+    el('r-page').value = n;
+    doc.getPage(n).then(function (page) {
+      var wrap = document.querySelector('.l-wrap');
+      var scale = (wrap.clientWidth - 2) / page.getViewport({ scale: 1 }).width;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var vp = page.getViewport({ scale: scale * dpr });
+      var canvas = el('r-canvas'), ctx = canvas.getContext('2d');
+      canvas.width = vp.width; canvas.height = vp.height;
+      canvas.style.width = Math.floor(vp.width / dpr) + 'px';
+      canvas.hidden = false;
+      el('r-msg').textContent = '';
+      page.render({ canvasContext: ctx, viewport: vp }).promise.then(function () {
+        var done = function () {
+          rendering = false;
+          if (pendingPage !== null) { var p = pendingPage; pendingPage = null; renderPage(p); }
+        };
+        if (!q) { done(); return; }
+        /* highlight: box every text item containing the term (item-level,
+           good enough to spot the hit on the page) */
+        page.getTextContent().then(function (tc) {
+          ctx.fillStyle = 'rgba(255, 200, 0, 0.35)';
+          for (var i = 0; i < tc.items.length; i++) {
+            var it = tc.items[i];
+            if (!it.str || it.str.toLowerCase().indexOf(q) === -1) { continue; }
+            var tx = it.transform;
+            var x = tx[4] * vp.scale, yTop = vp.height - (tx[5] + it.height) * vp.scale;
+            ctx.fillRect(x, yTop, it.width * vp.scale, it.height * 1.3 * vp.scale);
+          }
+          done();
+        }, done);
+      }, function () {
+        rendering = false;
+        el('r-msg').textContent = T('Couldn’t draw that page — use “Open the PDF file” above.', 'No se pudo mostrar esa página: use «Abrir el archivo PDF» arriba.');
+      });
+      positions().set(f, { page: n, total: doc.numPages, title: name, kind: 'pdf' });
+    });
+  }
+
+  function go(n) { if (doc) { renderPage(clampPage(n)); } }
+  el('r-prev').addEventListener('click', function () { go(pageNum - 1); });
+  el('r-next').addEventListener('click', function () { go(pageNum + 1); });
+  el('r-page').addEventListener('change', function () { go(parseInt(el('r-page').value, 10) || 1); });
+  document.addEventListener('keydown', function (e) {
+    if (e.target.tagName === 'INPUT') { return; }
+    if (e.key === 'ArrowLeft') { go(pageNum - 1); }
+    if (e.key === 'ArrowRight') { go(pageNum + 1); }
+  });
+  var resizeT = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeT); resizeT = setTimeout(function () { go(pageNum); }, 200);
+  });
+
+  import('./_app/vendor/pdfjs/pdf.mjs').then(function (pdfjs) {
+    pdfjs.GlobalWorkerOptions.workerSrc = '_app/vendor/pdfjs/pdf.worker.mjs';
+    return pdfjs.getDocument({ url: f }).promise;
+  }).then(function (d) {
+    doc = d;
+    el('r-total').textContent = '/ ' + d.numPages;
+    var want = parseInt(qs('p') || '0', 10);
+    if (!want) {
+      saved = positions().get(f);
+      want = saved && saved.page ? saved.page : 1;
+    }
+    renderPage(clampPage(want));
+  }, function (err) {
+    el('r-msg').textContent = T('The in-page reader couldn’t open this file (', 'El lector de la página no pudo abrir este archivo (') +
+      (err && err.name || 'error') + T(') — use “Open the PDF file” above.', '): use «Abrir el archivo PDF» arriba.');
+  });
+})();
+</script>
+</body>
+</html>

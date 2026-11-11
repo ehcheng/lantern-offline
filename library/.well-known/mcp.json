@@ -1,0 +1,8 @@
+{
+  "name": "Lantern Offline Survival Library",
+  "description": "MCP server for the Lantern offline survival library: full-text search, paginated document reading, shelf listing, sun times, climate normals, and ham callsign lookup.",
+  "endpoint": "http://library.lan/mcp",
+  "transport": "streamable-http",
+  "tools": "search_library, read_document, list_shelves, sun_times, climate_normals, callsign_lookup",
+  "safety": "This library's own pages, summaries and search never state drug doses. The medical books on the shelf do: use the printed drug guide (Davis's, Lippincott pocket) for any dose. No plant-identification inference; read lookalike warnings verbatim before eating anything."
+}

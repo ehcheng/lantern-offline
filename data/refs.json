@@ -1,0 +1,42 @@
+{
+  "_doc": "Named link targets for prose. Sources write <a data-ref=\"KEY\"> (HTML) or [text](ref:KEY) (markdown); refs.py resolves at build. Paths are relative to library/. ZIM keys are filename prefixes matched against library/zim/ so a refresh needs no edit here. Optional pdf = second link appended as ' (PDF)'.",
+  "zims": {
+    "wikimed": "wikipedia_en_medicine",
+    "wikimed_es": "wikipedia_es_medicine",
+    "wikipedia": "wikipedia_en_all",
+    "water": "zimgit-water",
+    "medicine": "zimgit-medicine"
+  },
+  "docs": {
+    "wtnd":           { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor.html", "label": "Where There Is No Doctor" },
+    "wtnd_firstaid":  { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Chapter_3:_First_Aid.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2014_03g.pdf" },
+    "wtnd_unconscious": { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Loss_of_Consciousness.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2014_03g.pdf" },
+    "wtnd_breathing": { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Breathing.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2014_03g.pdf" },
+    "wtnd_shock": { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Shock.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2014_03g.pdf" },
+    "wtnd_bones": { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Broken_Bones,_Dislocations,_and_Sprains.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2014_03g.pdf" },
+    "wtnd_belly": { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Pain_in_the_Belly_or_Gut.html" },
+    "wtnd_burns":     { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Burns.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2014_03g.pdf" },
+    "wtnd_bleeding":  { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Bleeding.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2014_03g.pdf" },
+    "wtnd_wounds":    { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Wounds.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2014_03g.pdf" },
+    "wtnd_diarrhea":  { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Chapter_15:_Belly_Pain,_Diarrhea,_and_Worms.html" },
+    "wtnd_dehydration": { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Dehydration.html" },
+    "wtnd_children":  { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Chapter_28:_Caring_for_Children.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2011_28d.pdf" },
+    "wtnd_eyes":      { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Chapter_9:_Problems_with_the_Eyes_and_Seeing.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2017_9.pdf" },
+    "wtnd_growth_chart": { "href": "docs/medical/hesperian_where_there_is_no_doctor/Child_growth_chart_nwtnd.pdf" },
+    "dentist":        { "href": "docs/medical/hesperian_where_there_is_no_dentist.pdf", "label": "Where There Is No Dentist" },
+    "dentist_wiki":   { "href": "mirrors/hesperian/en.hesperian.org/hhg/Where_There_Is_No_Dentist:A_Good_Diagnosis.html" },
+    "wtnd_heart":     { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Heart_Attack.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2014_03g.pdf" },
+    "wtnd_poison":    { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Poison.html", "pdf": "docs/medical/hesperian_where_there_is_no_doctor/en_nwtnd_2014_03g.pdf" },
+    "wtnd_animal_bites": { "href": "mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Medicines_for_Animal_Bites:_First_Aid.html" },
+    "hesperian":      { "href": "mirrors/hesperian/en.hesperian.org/hhg/HealthWiki.html", "label": "Hesperian HealthWiki mirror" },
+    "hesperian_es":   { "href": "mirrors/hesperian/es.hesperian.org/hhg/Nuevo_Donde_no_hay_doctor.html" },
+    "msf":            { "href": "docs/medical/msf/" },
+    "msf_clinical":   { "href": "docs/medical/msf/msf_clinical_guidelines.pdf" },
+    "tccc":           { "href": "docs/medical/tccc/" },
+    "who_medical":    { "href": "_app/shelf/docs_medical.html" },
+    "fm4_25":         { "href": "docs/medical/fm_4-25.11_first_aid.pdf" },
+    "usda_canning":   { "href": "docs/food_preservation/usda_complete_guide_home_canning_2015.pdf" },
+    "plants":         { "href": "plants.html" },
+    "search":         { "href": "search.html" }
+  }
+}

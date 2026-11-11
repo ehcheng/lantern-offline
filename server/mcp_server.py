@@ -1,0 +1,1 @@
+../image/stage-lantern/00-lantern/files/mcp_server.py

@@ -1,0 +1,19 @@
+<?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<!-- R14: advertise the library + MCP endpoint so agents/browsers on the LAN
+     can discover them without knowing library.lan (mDNS: lantern.local) -->
+<service-group>
+  <name replace-wildcards="yes">Lantern Library on %h</name>
+  <service>
+    <type>_http._tcp</type>
+    <port>80</port>
+    <txt-record>path=/</txt-record>
+  </service>
+  <service>
+    <type>_mcp._tcp</type>
+    <port>80</port>
+    <txt-record>path=/mcp</txt-record>
+    <txt-record>transport=streamable-http</txt-record>
+    <txt-record>llms=/llms.txt</txt-record>
+  </service>
+</service-group>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit Converters (offline)</title>
+<style>
+ body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:40rem;margin:0 auto;padding:1rem;line-height:1.5;font-size:18px}
+ fieldset{margin:1rem 0;border:1px solid #ccc;border-radius:6px}
+ input,select{font-size:1em;padding:.3em;margin:.2em}
+ input{width:8em}
+ .note{color:#666;font-size:.85em}
+ table{border-collapse:collapse;font-size:.9em}
+ td,th{border:1px solid #ccc;padding:.3em .6em}
+</style>
+</head>
+<body>
+<h1>Unit Converters</h1>
+<p>All offline. Type in either box; the other updates.
+<strong>No medical dosing here by design — use the printed licensed reference.</strong></p>
+
+<div id="widgets"></div>
+
+<h2>Kitchen quick table (US)</h2>
+<table>
+<tr><th>This</th><th>Equals</th></tr>
+<tr><td>1 tablespoon</td><td>3 teaspoons = 15 mL</td></tr>
+<tr><td>1 cup</td><td>16 tbsp = 8 fl oz = 237 mL</td></tr>
+<tr><td>1 pint</td><td>2 cups = 473 mL</td></tr>
+<tr><td>1 quart</td><td>4 cups = 0.946 L</td></tr>
+<tr><td>1 gallon</td><td>4 quarts = 3.785 L</td></tr>
+<tr><td>1 lb</td><td>454 g</td></tr>
+<tr><td>1 oz (weight)</td><td>28.35 g</td></tr>
+</table>
+
+<h2>Water &amp; fuel reference</h2>
+<table>
+<tr><td>1 gallon water weighs</td><td>8.34 lb (3.79 kg)</td></tr>
+<tr><td>Drinking water minimum</td><td>~1 gal (4 L) per person per day</td></tr>
+<tr><td>Rolling boil to disinfect</td><td>1 min (3 min above 6,500 ft / 2,000 m)</td></tr>
+<tr><td>1 kWh</td><td>3,412 BTU</td></tr>
+<tr><td>Propane</td><td>~91,500 BTU per gallon · 21,600 BTU per lb</td></tr>
+<tr><td>Gasoline</td><td>~114,000 BTU per gallon · 33.7 kWh per gallon</td></tr>
+<tr><td>Seasoned firewood</td><td>~20 million BTU per full cord (varies by species)</td></tr>
+</table>
+
+<script>
+// Each widget: [title, unit A label, unit B label, A→B fn, B→A fn]
+var W=[
+ ['Temperature','°F','°C',f=>(f-32)*5/9,c=>c*9/5+32],
+ ['Length','feet','meters',f=>f*0.3048,m=>m/0.3048],
+ ['Distance','miles','kilometers',mi=>mi*1.609344,km=>km/1.609344],
+ ['Weight','pounds','kilograms',lb=>lb*0.45359237,kg=>kg/0.45359237],
+ ['Volume','US gallons','liters',g=>g*3.785412,l=>l/3.785412],
+ ['Small volume','fl oz','milliliters',o=>o*29.5735,ml=>ml/29.5735],
+ ['Pressure (canning!)','PSI','kPa',p=>p*6.89476,k=>k/6.89476],
+ ['Area','acres','hectares',a=>a*0.404686,h=>h/0.404686],
+ ['Energy','kWh','BTU',k=>k*3412.14,b=>b/3412.14],
+ ['Power','watts','BTU/hr',w=>w*3.41214,b=>b/3.41214],
+];
+var host=document.getElementById('widgets');
+W.forEach(function(w,i){
+ var fs=document.createElement('fieldset');
+ fs.innerHTML='<legend>'+w[0]+'</legend>'
+  +'<input id="a'+i+'" type="number" step="any"> '+w[1]
+  +' = <input id="b'+i+'" type="number" step="any"> '+w[2];
+ host.appendChild(fs);
+ var a=fs.querySelector('#a'+i), b=fs.querySelector('#b'+i);
+ var r=x=>Math.round(x*10000)/10000;
+ a.oninput=()=>{b.value=a.value===''?'':r(w[3](+a.value))};
+ b.oninput=()=>{a.value=b.value===''?'':r(w[4](+b.value))};
+});
+</script>
+
+<p class="note">Altitude matters for canning: above 1,000 ft, follow the
+altitude adjustment tables in the USDA canning guide — do not guess from PSI
+conversion alone.</p>
+<p><a href="suncalc.html">Sun &amp; moon calculator</a> · <a href="../index.html">Library home</a></p>
+</body>
+</html>

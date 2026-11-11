@@ -1,0 +1,2 @@
+# 2026-10-06: every error is fixed or removed (FIXES.md rules). This file stays empty.
+# 2026-10-06: the 23 PDF lines left with fix81 (#81-#86); known_gold_v2:summary left with #87 (gold v2 34/40, bar 32).

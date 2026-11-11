@@ -1,0 +1,19 @@
+[Unit]
+Description=Lantern MCP server
+# RequiresMountsFor, not Requires=data.mount: data.mount doesn't exist until
+# firstboot writes the fstab entry (generators already ran on first boot), so
+# a hard Requires can never start. RequiresMountsFor is a no-op when /data
+# isn't in fstab (first boot: firstboot mounts it manually, ordered Before us)
+# and waits for the generated data.mount on every later boot.
+RequiresMountsFor=/data
+After=network.target lantern-firstboot.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/lantern/mcp_server.py --library /data/library --port 8090 --kiwix http://127.0.0.1:8080
+Restart=on-failure
+RestartSec=5
+User=www-data
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listening — Lantern</title>
+<link rel="icon" href="_app/brand/lantern-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_app/fonts/fonts.css">
+<link rel="stylesheet" href="_app/app.26829533.css">
+<script src="_app/app.7858fbba.js" defer></script>
+<style>
+  .a-group { margin: 20px 0 6px; font-family: var(--l-font-display); font-size: 20px; }
+  .a-albums { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+  .a-album { border: 1px solid var(--l-line); border-radius: 10px; padding: 12px 14px;
+    text-decoration: none; color: inherit; display: block; }
+  .a-album b { display: block; margin-bottom: 2px; }
+  .a-album:hover { border-color: var(--l-accent, currentColor); }
+  .a-tracks { list-style: none; padding: 0; margin: 12px 0 90px; max-width: 640px; }
+  .a-tracks li a { display: flex; justify-content: space-between; gap: 10px; padding: 9px 10px;
+    border-bottom: 1px solid var(--l-line); text-decoration: none; color: inherit; border-radius: 6px; }
+  .a-tracks li a.is-playing { background: var(--l-surface1, rgba(128,128,128,.12)); font-weight: bold; }
+  .a-continue { margin: 16px 0; }
+  .a-player { position: fixed; bottom: 0; left: 0; right: 0; padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: var(--l-ground); border-top: 1px solid var(--l-line); display: none; z-index: 30; }
+  .a-player.is-on { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .a-player audio { flex: 1; min-width: 220px; }
+  .a-player .now { font-size: 14px; max-width: 40%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--l-text); }
+  /* phones: title + ✕ on row one, controls on row two */
+  @media (max-width: 560px) {
+    .a-player .now { flex: 1 1 calc(100% - 64px); max-width: none; }
+    .a-player audio { order: 3; }
+    .a-player #next-track { order: 4; }
+  }
+  body.has-player .l-tabbar { display: none; }
+</style>
+</head>
+<body class="has-sidebar">
+
+<aside class="l-sidebar">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <!--SIDEPILL--><button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+  <a class="l-cta-triage l-cta-triage--side" href="triage.html">
+    <span class="cross">+</span><span><b>Hurt or sick</b></span>
+  </a>
+  <!--NAV-->
+  <nav class="l-nav" aria-label="Primary">
+    <a href="index.html">Shelves</a>
+    <a href="search.html">Search</a>
+    <a href="audio.html" aria-current="page">Listening</a>
+    <a href="chat.html" class="needs-chat">Ask</a>
+    <a href="map.html" class="needs-maps hide-direct">Map</a>
+    <a href="kids.html">Kids</a>
+  </nav>
+  <!--/NAV-->
+  <div class="l-shelflist" id="sidebar-shelves"></div>
+  <!--SIDEFOOT-->
+  <div class="l-foot"><p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div></div>
+  <!--/SIDEFOOT-->
+</aside>
+
+<main>
+<header class="l-header">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+</header>
+
+<div class="l-wrap">
+  <h1 style="font-family:var(--l-font-display);margin:24px 0 4px">Listening</h1>
+  <p class="l-caption">Audiobooks read by LibriVox volunteers. Playback picks up where you left off.</p>
+  <div class="a-continue" id="continue"></div>
+  <div id="view"></div>
+  <noscript><p>This page needs JavaScript. The audio files themselves are in
+    <a href="audio/librivox/">audio/librivox/</a>.</p></noscript>
+</div>
+</main>
+
+<div class="a-player" id="player">
+  <span class="now" id="now"></span>
+  <audio id="audio" controls preload="none"></audio>
+  <button class="l-chip" id="next-track">Next ›</button>
+  <button class="l-chip" id="close-player" aria-label="Stop and close player" title="Stop and close">✕</button>
+</div>
+
+<!--TABBAR-->
+<nav class="l-tabbar" aria-label="Tabs">
+  <a href="index.html" class="l-tab l-tab-home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path><path d="M10 20v-5.5h4V20"></path></svg><span class="l-tab-label">Home</span></a>
+  <a href="search.html" class="l-tab l-tab-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.75" cy="10.75" r="6.75"></circle><path d="M15.75 15.75 20.5 20.5"></path></svg><span class="l-tab-label">Search</span></a>
+  <a href="triage.html" class="l-tab l-tab-triage"><span class="cross"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></span><span class="l-tab-label">Hurt or sick</span></a>
+  <a href="audio.html" class="l-tab l-tab-listening" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"></path><path d="M4 14.5h2.5A1.5 1.5 0 0 1 8 16v3a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 4 19z"></path><path d="M20 14.5h-2.5A1.5 1.5 0 0 0 16 16v3a1.5 1.5 0 0 0 1.5 1.5h1A1.5 1.5 0 0 0 20 19z"></path></svg><span class="l-tab-label">Listening</span></a>
+  <details class="l-more"><summary class="l-tab l-tab-more"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect></svg><span class="l-tab-label">More</span></summary>
+    <div class="l-msheet">
+      <div class="l-msheet-head"><h2 class="l-msheet-title">More</h2></div>
+      <div class="l-msheet-body">
+        <div class="l-msheet-links">
+          <a href="chat.html" class="needs-chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17H6.5A2.5 2.5 0 0 1 4 14.5z"></path></svg>Ask</a>
+          <a href="map.html" class="needs-maps hide-direct"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5 6-2.5v13.5L15 20l-6-2.5L3 20z"></path><path d="M9 4v13.5M15 6.5V20"></path></svg>Map</a>
+          <a href="kids.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8z"></path></svg>Kids</a>
+          <a href="video.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="m10 9 5 3-5 3z"></path></svg>Video</a>
+          <a href="plants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"></path><path d="M5 19c3-4 6-7 9-9"></path></svg>Plants</a>
+          <a href="tools/suncalc.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg>Sun &amp; moon</a>
+          <a href="tools/convert.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"></path></svg>Converters</a>
+        </div>
+        <p class="l-caption">Shelves</p>
+        <div class="l-shelflist" data-fill="shelves"></div>
+        <p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div>
+      </div>
+      <div class="l-msheet-foot"><button class="l-pill" type="button" data-role="status" onclick="lanternToggleTheme()" aria-label="Server status. Switch theme"><span class="dot"></span>checking…</button></div>
+    </div>
+  </details>
+</nav>
+<!--/TABBAR-->
+
+<script>
+(function () {
+  'use strict';
+  function el(id) { return document.getElementById(id); }
+  var GROUPS = { '01_young_child': 'Young child', '02_child': 'Child', '03_teen': 'Teen',
+    '04_adult': 'Adult', '05_elder_comfort': 'Elder comfort' };
+  var ALBUMS = null;   /* { albumPath: {group, name, tracks:[{t,p}] } } in disc order */
+
+  function pretty(s) {
+    s = s.replace(/_/g, ' ');
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  function build(titles, cb) {
+    var map = {}, order = [];
+    for (var i = 0; i < titles.length; i++) {
+      var it = titles[i];
+      if (!it.p || it.p.indexOf('audio/librivox/') !== 0) { continue; }
+      var parts = it.p.split('/');   /* audio librivox group album file */
+      if (parts.length < 5) { continue; }
+      var key = parts.slice(0, 4).join('/');
+      /* FIXES #175 (a4 F1): every LibriVox row ends with "(Book by Author)" (gen_media_titles.py); the album takes
+         that heading and the rows drop it. An index built without the overlay falls back to the folder slug. */
+      var book = /\(([^()]*)\)$/.exec(it.t || '');
+      if (!map[key]) { map[key] = { group: parts[2], name: book ? book[1] : pretty(parts[3]), tracks: [] }; order.push(key); }
+      map[key].tracks.push(it);
+    }
+    for (var k in map) {
+      map[k].tracks.sort(function (a, b) { return a.p < b.p ? -1 : 1; });
+    }
+    ALBUMS = { map: map, order: order.sort() };
+    cb();
+  }
+  function section(t) { return String(t.t || t.p.split('/').pop()).replace(/\s*\([^()]*\)$/, ''); }
+  function ensure(cb) {
+    if (ALBUMS) { cb(); return; }
+    window.lanternLoadIndex('titles', function (t) { build(t || [], cb); });
+  }
+
+  function renderAlbums() {
+    ensure(function () {
+      var h = '', lastGroup = '';
+      for (var i = 0; i < ALBUMS.order.length; i++) {
+        var key = ALBUMS.order[i], a = ALBUMS.map[key];
+        if (a.group !== lastGroup) {
+          if (lastGroup) { h += '</div>'; }
+          h += '<div class="a-group">' + (GROUPS[a.group] || pretty(a.group)) + '</div><div class="a-albums">';
+          lastGroup = a.group;
+        }
+        h += '<a class="a-album" href="#' + encodeURIComponent(key) + '"><b>' +
+          window.lanternEsc(a.name) + '</b><span class="l-caption">' + a.tracks.length + ' parts</span></a>';
+      }
+      if (lastGroup) { h += '</div>'; }
+      el('view').innerHTML = h;
+    });
+  }
+
+  function renderAlbum(key) {
+    ensure(function () {
+      var a = ALBUMS.map[key];
+      if (!a) { renderAlbums(); return; }
+      var h = '<p><a href="#">‹ All audiobooks</a></p>' +
+        '<h2 style="font-family:var(--l-font-display)">' + window.lanternEsc(a.name) + '</h2>' +
+        '<ul class="a-tracks">';
+      for (var i = 0; i < a.tracks.length; i++) {
+        h += '<li><a href="#" data-i="' + i + '"><span>' + (i + 1) + '. ' +
+          window.lanternEsc(section(a.tracks[i])) + '</span><span>▸</span></a></li>';
+      }
+      h += '</ul>';
+      el('view').innerHTML = h;
+      var links = el('view').querySelectorAll('a[data-i]');
+      for (var j = 0; j < links.length; j++) {
+        (function (link) {
+          link.addEventListener('click', function (e) {
+            e.preventDefault();
+            play(key, parseInt(link.getAttribute('data-i'), 10));
+          });
+        })(links[j]);
+      }
+    });
+  }
+
+  /* ── player ── */
+  var cur = { key: null, i: -1 };
+  var audio = el('audio');
+  function play(key, i, resumeAt) {
+    var a = ALBUMS.map[key];
+    if (!a || !a.tracks[i]) { return; }
+    cur = { key: key, i: i };
+    audio.src = a.tracks[i].p;
+    audio.currentTime = 0;
+    audio.play();
+    if (resumeAt) {
+      audio.addEventListener('loadedmetadata', function once() {
+        audio.removeEventListener('loadedmetadata', once);
+        if (resumeAt < (audio.duration || Infinity) - 5) { audio.currentTime = resumeAt; }
+      });
+    }
+    el('now').textContent = a.name + ' — ' + section(a.tracks[i]);
+    el('player').className = 'a-player is-on';
+    document.body.className += document.body.className.indexOf('has-player') === -1 ? ' has-player' : '';
+    var rows = el('view').querySelectorAll('a[data-i]');
+    for (var j = 0; j < rows.length; j++) {
+      rows[j].className = j === i ? 'is-playing' : '';
+    }
+  }
+  el('next-track').addEventListener('click', function () {
+    if (cur.key !== null) { play(cur.key, cur.i + 1); }
+  });
+  /* H33: stop playback AND close the footer (position was saved by
+     timeupdate; save once more so resume is exact) */
+  el('close-player').addEventListener('click', function () {
+    if (cur.key !== null && audio.currentTime) {
+      window.lanternPositions.set(cur.key, {
+        kind: 'audio', track: cur.i, time: Math.floor(audio.currentTime),
+        title: ALBUMS.map[cur.key].name + ' — ' + section(ALBUMS.map[cur.key].tracks[cur.i])
+      });
+    }
+    audio.pause();
+    audio.removeAttribute('src'); audio.load();
+    cur = { key: null, i: -1 };
+    el('player').className = 'a-player';
+    document.body.className = document.body.className.replace(/\s*has-player/g, '');
+    var rows = el('view').querySelectorAll('a.is-playing');
+    for (var j = 0; j < rows.length; j++) { rows[j].className = ''; }
+    renderContinue();
+  });
+  audio.addEventListener('ended', function () {
+    if (cur.key !== null && ALBUMS.map[cur.key].tracks[cur.i + 1]) { play(cur.key, cur.i + 1); }
+  });
+  var saveT = 0;
+  audio.addEventListener('timeupdate', function () {
+    var now = Date.now();
+    if (now - saveT < 5000 || cur.key === null) { return; }
+    saveT = now;
+    window.lanternPositions.set(cur.key, {
+      kind: 'audio', track: cur.i, time: Math.floor(audio.currentTime),
+      title: ALBUMS.map[cur.key].name + ' — ' + section(ALBUMS.map[cur.key].tracks[cur.i])
+    });
+  });
+
+  function renderContinue() {
+    var all = window.lanternPositions.all(), latest = null, latestKey = null;
+    for (var k in all) {
+      if (all[k].kind !== 'audio') { continue; }
+      if (!latest || all[k].at > latest.at) { latest = all[k]; latestKey = k; }
+    }
+    if (!latest) { return; }
+    el('continue').innerHTML = '<button class="l-chip" id="resume">▸ Continue: ' +
+      window.lanternEsc(latest.title) + '</button>';
+    el('resume').addEventListener('click', function () {
+      ensure(function () {
+        location.hash = '#' + encodeURIComponent(latestKey);
+        setTimeout(function () { play(latestKey, latest.track, latest.time); }, 60);
+      });
+    });
+  }
+
+  function route() {
+    var key = decodeURIComponent(location.hash.slice(1));
+    if (key) { renderAlbum(key); } else { renderAlbums(); }
+  }
+  window.addEventListener('hashchange', route);
+  (function ready() {
+    if (!window.lanternLoadIndex) { setTimeout(ready, 40); return; }
+    route(); renderContinue();
+  })();
+})();
+</script>
+</body>
+</html>

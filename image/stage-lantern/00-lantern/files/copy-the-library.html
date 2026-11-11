@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lantern — no library yet</title>
+<style>body{font-family:system-ui;max-width:560px;margin:60px auto;padding:0 20px;line-height:1.5}
+code,pre{background:#eee;padding:2px 6px;border-radius:4px}pre{padding:10px;overflow-x:auto}</style></head>
+<body>
+<h1>The box works, but the library isn't loaded yet</h1>
+<p>This Lantern box started fine, but its data partition is empty.</p>
+<p>To load it, plug the backup SSD (the Samsung T5, a palm-sized silver drive; its
+partition is named LANTERN_BAK) into one of the Pi's blue USB ports, log in over ssh as lantern, and copy the library over. It takes
+1 to 2 hours over USB 3 for 1.3 TB:</p>
+<pre>sudo mkdir -p /mnt/bak
+mountpoint -q /mnt/bak || sudo mount -L LANTERN_BAK /mnt/bak
+sudo rsync -aH --info=progress2 /mnt/bak/library/ /data/library/
+cd /data &amp;&amp; sha256sum -c --quiet library/MANIFEST.sha256 &amp;&amp; echo all files OK
+sudo umount /mnt/bak</pre>
+<p>The first two lines make the folder /mnt/bak and attach the SSD there; if the
+SSD is already attached, the second line does nothing. The check on the fourth
+line reads every file and takes 1.5 to 2 hours. It prints
+nothing until it ends, so a quiet screen does not mean it has stopped.
+These are the same steps as the printed RUNBOOK, Part 3, "Rebuilding from
+nothing", step 4.</p>
+<p>When the copy finishes, restart the box. This page is replaced by the
+library front page.</p>
+</body>
+</html>

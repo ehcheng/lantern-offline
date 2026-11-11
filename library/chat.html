@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask — Lantern</title>
+<link rel="icon" href="_app/brand/lantern-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_app/fonts/fonts.css">
+<link rel="stylesheet" href="_app/app.26829533.css">
+<script src="_app/app.7858fbba.js" defer></script>
+<style>
+  .c-log { max-width: 720px; margin: 16px 0 120px; }
+  .c-msg { padding: 12px 16px; border-radius: 12px; margin: 10px 0; white-space: pre-wrap; }
+  .c-msg.me { background: var(--l-surface2); margin-left: 15%; }
+  .c-msg.bot { border: 1px solid var(--l-line); margin-right: 10%; }
+  .c-msg.bot.thinking { color: var(--l-muted); }
+  .c-form { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    background: var(--l-ground); border-top: 1px solid var(--l-line); display: flex; gap: 10px; z-index: 30; }
+  body.has-sidebar .c-form { left: var(--l-sidebar-w, 0); }
+  @media (max-width: 900px) { body.has-sidebar .c-form { left: 0; } }
+  @media (max-width: 1023px) { .c-form { bottom: calc(var(--l-tab-h) + env(safe-area-inset-bottom, 0px)); padding-bottom: 12px; } }  /* above the tab bar */
+  .c-form[hidden], #mic[hidden] { display: none; }   /* red team 2026-10-09 #148: author display:flex beat the hidden attribute; a6 F2 (round 7): .l-chip's on #mic too */
+  .c-msg a { color: inherit; }
+  .c-form textarea { flex: 1; resize: none; font: inherit; color: inherit; background: transparent;
+    border: 1px solid var(--l-line); border-radius: 10px; padding: 10px 12px; height: 46px; }
+  .c-empty { max-width: 640px; border: 1px solid var(--l-line); border-radius: 12px; padding: 20px; margin: 24px 0; }
+  .c-empty input { width: 100%; box-sizing: border-box; font: inherit; color: inherit; background: transparent;
+    border: 1px solid var(--l-line); border-radius: 8px; padding: 8px 10px; margin: 8px 0; }
+  .c-warn { font-size: 13px; color: var(--l-muted); max-width: 720px; margin-top: 8px; }
+  .c-msg .l-caption { white-space: normal; }
+  .c-msg.cards { white-space: normal; padding: 6px 16px; }
+  .c-msg.cards summary { cursor: pointer; padding: 6px 0; }
+  .c-msg.cards ul { margin: 4px 0 6px; padding-left: 20px; columns: 2 220px; }
+  .c-msg.cards li { margin: 0 0 6px; break-inside: avoid; }
+</style>
+</head>
+<body class="has-sidebar">
+
+<aside class="l-sidebar">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <!--SIDEPILL--><button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+  <a class="l-cta-triage l-cta-triage--side" href="triage.html">
+    <span class="cross">+</span><span><b>Hurt or sick</b></span>
+  </a>
+  <!--NAV-->
+  <nav class="l-nav" aria-label="Primary">
+    <a href="index.html">Shelves</a>
+    <a href="search.html">Search</a>
+    <a href="audio.html">Listening</a>
+    <a href="chat.html" class="needs-chat" aria-current="page">Ask</a>
+    <a href="map.html" class="needs-maps hide-direct">Map</a>
+    <a href="kids.html">Kids</a>
+  </nav>
+  <!--/NAV-->
+  <div class="l-shelflist" id="sidebar-shelves"></div>
+  <!--SIDEFOOT-->
+  <div class="l-foot"><p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div></div>
+  <!--/SIDEFOOT-->
+</aside>
+
+<main>
+<header class="l-header">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <button class="l-pill" data-role="chat"><span class="dot"></span>checking…</button>
+</header>
+
+<div class="l-wrap">
+  <h1 style="font-family:var(--l-font-display);margin:24px 0 4px" id="ask-h1">Ask</h1>
+  <p style="text-align:right;margin:0 0 4px;font-size:15px"><a id="es" href="chat.html?lang=es" lang="es" hreflang="es">Español</a></p>
+  <p class="c-warn" id="intro">Ask a question: this page shows the emergency cards and a list of the library’s matching pages,
+    by title; open a page to read it. Nothing is quoted here. When an offline AI is running, it only puts the pages in order; it
+    writes nothing you read here. This
+    library’s own pages, summaries and search never state drug doses, and neither does this page. The medical books on
+    the shelf do: use the printed drug guide (Davis’s, Lippincott pocket) for any dose. Hurt or sick?
+    <a href="triage.html">Go to triage</a>.</p>
+  <div id="empty" class="c-empty" hidden>
+    <b id="empty-head">No AI is sorting results right now. You can still ask below: the page lists the matching pages in search order.</b>
+    <p id="empty-alt">Or go straight to <a href="search.html">Search</a> or <a href="triage.html">Hurt or sick (triage)</a>.</p>
+    <p id="empty-how">To have an AI put the most useful pages first, run it on any laptop on the LIBRARY wifi, then type that laptop's address here. The library
+      ships one: <a href="tools/llamafile/README.html">llamafile</a>, no internet needed (type
+      <code>http://LAPTOP-ADDRESS:8081</code>). If the laptop already has Ollama, start it with
+      <code>OLLAMA_HOST=0.0.0.0 OLLAMA_ORIGINS=* ollama serve</code> and type the address on its own.</p>
+    <input id="ep" placeholder="192.168.1.20  (or http://192.168.1.20:11434)">
+    <button class="l-chip" id="save-ep">Save &amp; check again</button>
+    <p class="l-caption" id="ep-status" style="margin-top:8px"></p>
+  </div>
+  <div class="c-log" id="log"></div>
+</div>
+</main>
+
+<form class="c-form" id="form">
+  <textarea id="q" rows="1" placeholder="Ask about first aid, water, food, repairs…"></textarea>
+  <button class="l-chip" type="button" id="mic" title="Tap to talk, tap again to stop (needs the Lantern box)" hidden>🎤</button>
+  <button class="l-chip" type="button" id="say" title="Read the page titles aloud" aria-pressed="false">🔇</button>
+  <button class="l-chip" type="submit" id="send">Send</button>
+</form>
+
+<!--TABBAR-->
+<nav class="l-tabbar" aria-label="Tabs">
+  <a href="index.html" class="l-tab l-tab-home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path><path d="M10 20v-5.5h4V20"></path></svg><span class="l-tab-label">Home</span></a>
+  <a href="search.html" class="l-tab l-tab-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.75" cy="10.75" r="6.75"></circle><path d="M15.75 15.75 20.5 20.5"></path></svg><span class="l-tab-label">Search</span></a>
+  <a href="triage.html" class="l-tab l-tab-triage"><span class="cross"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></span><span class="l-tab-label">Hurt or sick</span></a>
+  <a href="audio.html" class="l-tab l-tab-listening"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"></path><path d="M4 14.5h2.5A1.5 1.5 0 0 1 8 16v3a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 4 19z"></path><path d="M20 14.5h-2.5A1.5 1.5 0 0 0 16 16v3a1.5 1.5 0 0 0 1.5 1.5h1A1.5 1.5 0 0 0 20 19z"></path></svg><span class="l-tab-label">Listening</span></a>
+  <details class="l-more"><summary class="l-tab l-tab-more" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect></svg><span class="l-tab-label">More</span></summary>
+    <div class="l-msheet">
+      <div class="l-msheet-head"><h2 class="l-msheet-title">More</h2></div>
+      <div class="l-msheet-body">
+        <div class="l-msheet-links">
+          <a href="chat.html" class="needs-chat" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17H6.5A2.5 2.5 0 0 1 4 14.5z"></path></svg>Ask</a>
+          <a href="map.html" class="needs-maps hide-direct"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5 6-2.5v13.5L15 20l-6-2.5L3 20z"></path><path d="M9 4v13.5M15 6.5V20"></path></svg>Map</a>
+          <a href="kids.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8z"></path></svg>Kids</a>
+          <a href="video.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="m10 9 5 3-5 3z"></path></svg>Video</a>
+          <a href="plants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"></path><path d="M5 19c3-4 6-7 9-9"></path></svg>Plants</a>
+          <a href="tools/suncalc.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg>Sun &amp; moon</a>
+          <a href="tools/convert.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"></path></svg>Converters</a>
+        </div>
+        <p class="l-caption">Shelves</p>
+        <div class="l-shelflist" data-fill="shelves"></div>
+        <p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div>
+      </div>
+      <div class="l-msheet-foot"><button class="l-pill" type="button" data-role="status" onclick="lanternToggleTheme()" aria-label="Server status. Switch theme"><span class="dot"></span>checking…</button></div>
+    </div>
+  </details>
+</nav>
+<!--/TABBAR-->
+
+<script>
+(function () {
+  'use strict';
+  function el(id) { return document.getElementById(id); }
+  /* D1 = A (2026-10-11, FIXES #182), then D4 (10-28, #278): the answer is the emergency cards and a list of the
+     library's matching pages, titles with page links; nothing is quoted. A model, when one is running, only puts the
+     titles in order: its reply is read as a list of page numbers and nothing else, so no model prose is ever shown and the
+     model sees titles only. */
+  var PICK_SYSTEM = 'You sort page titles from an emergency library. Reply with JSON only, in the form {"pick":[2,1]}: the ' +
+    'numbers of the pages most likely to help answer the question, most useful first, at most 4. Reply {"pick":[]} if none ' +
+    'look helpful. Write nothing else.';
+  var caps = null;
+  var lastQ = '';
+
+  /* ── D1/D2 (red team 2026-10-09 #147 #149 #150): the page, not the model, enforces "no doses". One dose pattern
+     across the library: DRUGS, DOSE_ES_RE, DRUGS_ES, DOSE_RE, fold and drugQuery below are copied VERBATIM from
+     library/search.html (fix_f2_test.py fails if they drift). A drug question or a dose figure in the question is
+     refused before any model call; a dose figure in the model's answer replaces the whole answer. */
+  var DRUGS = ('aspirin ibuprofen advil motrin naproxen aleve acetaminophen paracetamol tylenol ' +
+    'castor-oil gentian-violet ' +  /* round 10: dose_r39.txt DRUGS_EN_ADD */
+    'amoxicillin augmentin penicillin ampicillin azithromycin zithromax doxycycline ciprofloxacin cipro ' +
+    'levofloxacin metronidazole flagyl cephalexin keflex clindamycin erythromycin trimethoprim ' +
+    'sulfamethoxazole bactrim septra nitrofurantoin macrobid tetracycline vancomycin gentamicin ' +
+    'codeine morphine oxycodone hydrocodone vicodin percocet tramadol fentanyl naloxone narcan ' +
+    'prednisone prednisolone dexamethasone hydrocortisone epinephrine adrenaline albuterol salbutamol ' +
+    'diphenhydramine benadryl loratadine claritin cetirizine zyrtec fexofenadine allegra ' +
+    'pseudoephedrine sudafed dextromethorphan guaifenesin loperamide imodium ondansetron zofran ' +
+    'promethazine phenergan meclizine dramamine omeprazole prilosec ranitidine famotidine pepcid ' +
+    'insulin metformin glipizide lisinopril amlodipine losartan metoprolol atenolol propranolol ' +
+    'atorvastatin lipitor simvastatin warfarin coumadin heparin clopidogrel plavix nitroglycerin ' +
+    'furosemide lasix hydrochlorothiazide digoxin amiodarone fluconazole diflucan nystatin ' +
+    'acyclovir valacyclovir valtrex oseltamivir tamiflu ivermectin permethrin albendazole ' +
+    'mebendazole chloroquine hydroxychloroquine doxylamine lorazepam ativan diazepam valium ' +
+    'alprazolam xanax zolpidem ambien gabapentin phenytoin dilantin carbamazepine levothyroxine ' +
+    'synthroid sertraline zoloft fluoxetine prozac lithium haloperidol naltrexone misoprostol ' +
+    'oxytocin magnesium-sulfate ceftriaxone rocephin chloramphenicol streptomycin rifampin isoniazid ' +
+    'melatonin bismuth pepto-bismol simethicone docusate senna bisacodyl lidocaine benzocaine bacitracin neosporin ' +
+    'polysporin phenylephrine oxymetazoline afrin chlorpheniramine calcium-carbonate tums milk-of-magnesia ' +  /* F2 A1 en58: OTC names */
+    'cotrimoxazole co-trimoxazole cotrimoxazol benzylpenicillin benzathine procaine phenoxymethylpenicillin cloxacillin flucloxacillin dicloxacillin cefixime cefotaxime spectinomycin kanamycin amikacin tinidazole praziquantel niclosamide pyrantel artesunate artemether lumefantrine coartem sulfadoxine pyrimethamine fansidar primaquine quinine mefloquine griseofulvin miconazole clotrimazole zidovudine nevirapine lamivudine efavirenz tenofovir ergometrine methylergometrine carbetocin glibenclamide gliclazide chlorphenamine aminophylline theophylline phenobarbital phenobarbitone amitriptyline chlorpromazine risperidone cimetidine hyoscine atropine ketamine nifedipine enalapril hydralazine methyldopa labetalol tranexamic phytomenadione pyrazinamide ethambutol rifampicin dapsone clofazimine diclofenac mefenamic bupivacaine'  /* G2 b2 F2: MSF essential drugs */
+  ).split(' ');
+  var TABLET_RE = /^(pill|pills|tablet|tablets|tab|tabs|pastilla|pastillas|tableta|tabletas|comprimido|comprimidos)$/;
+  var WATER_RE = /\b(water|agua|purif\w*|potabiliz\w*|chlorine|cloro|iodine|yodo|bleach|lejia|aquatabs?)\b/;
+  /* #171 (round 4): in a water-treatment TEXT (not a query) "dose", "dosage" and "mg" name the amount of disinfectant,
+     beside an amount per volume of water ("4 drops per litre", "1 quart/liter 2 drops"); a drug or medicine word still
+     trips. Same lists as TREAT_RE / TREAT_WORD_RE / WATER_AMOUNT_RE in server/mcp_server.py. */
+  var TREAT_RE = /\b(bleach|chlorin\w*|hypochlorite|cloro|clorad\w*|lejia|blanqueador|iodine|yodo|purif\w*|potabiliz\w*|aquatabs?|disinfect\w*|desinfec\w*)\b/;
+  var WITHOUT_DRUG_RE = /\b(?:without|w\/o|no|other than|instead of|besides|sin|en lugar de|en vez de)\s+(?:any\s+|using\s+|taking\s+|usar\s+|tomar\s+)?(?:medicine|medicines|medication|medications|drugs|pills|medicina|medicinas|medicamentos?|pastillas|farmacos)\b/g;
+  var TREAT_WORD_RE = /^(dose|doses|dosage|dosages|dosing|dosis|mg|milligram|milligrams|miligramo|miligramos)$/;
+  var WATER_AMOUNT_RE = /\b(?:drops?|gotas?|teaspoons?|tablespoons?|cucharaditas?|cucharadas?|tablets?|tabletas?|pastillas?|mg|ml|ppm)\s*(?:per|por|\/|for\s+each|in\s+each|para\s+cada|cada)\s*(?:\d+\s*)?(?:lit(?:re|er)s?|litros?|l|gal(?:lons?)?|galon(?:es)?|quarts?|qt|cuartos?)\b|\b(?:lit(?:re|er)s?|litros?|gallons?|galon(?:es)?|quarts?)(?:\/lit(?:re|er))?\s+\d+\s*(?:drops?|gotas?)\b/;
+  var DOSE_ES_RE = /^(dosis|medicina|medicinas|medicamento|medicamentos|antibiotico|antibioticos|analgesico|analgesicos|farmaco|farmacos|pastilla|pastillas|tableta|tabletas|comprimido|comprimidos|capsula|capsulas|jarabe|jarabes|inyeccion|inyecciones|miligramo|miligramos|antiacido|antiacidos|laxante|laxantes)$/;
+  var DRUGS_ES = ('amoxicilina ampicilina penicilina bencilpenicilina benzatinica espectinomicina doxiciclina tetraciclina eritromicina ' +
+    'ricino violeta-de-genciana ' +  /* round 10: dose_r39.txt DRUGS_ES_ADD */
+    'azitromicina ciprofloxacina cefalexina cefixima ceftriaxona gentamicina cloranfenicol estreptomicina rifampicina ' +
+    'isoniacida metronidazol cotrimoxazol sulfametoxazol trimetoprima nitrofurantoina clindamicina paracetamol ' +
+    'acetaminofen ibuprofeno aspirina naproxeno diclofenaco codeina morfina tramadol albendazol mebendazol piperazina ' +
+    'praziquantel ivermectina permetrina cloroquina primaquina quinina artemeter fluconazol nistatina clotrimazol ' +
+    'aciclovir misoprostol oxitocina ergometrina insulina metformina prednisona prednisolona dexametasona hidrocortisona ' +
+    'epinefrina adrenalina salbutamol difenhidramina loratadina clorfeniramina diazepam fenobarbital fenitoina ' +
+    'carbamazepina omeprazol loperamida sertralina fluoxetina haloperidol melatonina'
+  ).split(' ');
+  var DOSE_RE = /(?!(?<=iphone\s)[2-5]\s?g\b)(?!(?<=phone\s)[2-5]\s?g\b)(?![2-5]\s?g\b(?=\s*(?:lte|networks?|phones?|iphones?|modems?|signal|wi-?fi|cellular|data|service|coverage|speeds?|internet|front|back|screen|battery|case|replacement|red|se[nñ]al|celular|m[oó]vil)\b))(?<!\bFM\s)(?<!\bTM\s)(?<!\bTC\s)(?<!\bATP\s)(?<!\bSTP\s)(?<!\d-)(?<!\d\.)(?<!gallon\s)(?<!gallons\s)(?<!quart\s)(?<!quarts\s)(?<!liter\s)(?<!liters\s)(?<!litre\s)(?<!litres\s)(?<!litro\s)(?<!litros\s)(?<!gal[oó]n\s)(?<!galones\s)(?<!barrel\s)(?<!barrels\s)(?<!barril\s)(?<!barriles\s)(?<!drum\s)(?<!drums\s)(?<!tank\s)(?<!tanks\s)(?<!tambo\s)(?<!tambos\s)(?<!tanque\s)(?<!tanques\s)(?<!drops\s\()(?<!gotas\s\()(?<!\d\/)(?<!\d\/)(?<!\d\/)(?!(?<=\bdrops\s)\d+\s*drops\b)(?!(?<=\bgotas\s)\d+\s*gotas\b)(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*(?:(?:parte\s+)?de\s+(?:una?\s+)?)?(?:mg|mcg|µg|ug|g|ml|cc|mililitros?|millilit(?:er|re)s?|m\s?iu|m\s?ui|iu|ui|(?:million|mill[oó]n(?:es)?)\s+(?:de\s+)?(?:(?:international\s+)?(?:units?|unidades)|ui|iu)|units?|unidades|grams?|gramos?|milligrams?|miligramos?|micrograms?|microgramos?|tabs?|tablets?|tabletas?|pills?|pastillas?|comprimidos?|caps?|capsules?|c[aá]psulas?|(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|capfuls?|dropperfuls?|tsp|tbsp|c[àá]c|c[àá]s|c\.[àá]\.[cs](?=\.)|cucharaditas?|cucharadas?|drops?|gotas?|ampoules?|ampules?|ampuls?|ampollas?|ampolletas?|vials?|frascos?[-\s]ampollas?)\b(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))(?:\s*(?:\/|per|por(?:\s+cada)?)\s*(?:kg|kilos?|kilogramos?|kilograms?|d[ií]a|day|dose|dosis|m2)\b(?:\s+(?:of\s+body\s+weight|de\s+peso(?:\s+corporal)?))?)*(?:\s*x\s*\d+(?:\s*(?:[-–]|or|o|to|a)\s*\d+)?\b)?(?:,?\s+(?:daily|a\s+day|per\s+day|each\s+day|al\s+d[ií]a|por\s+d[ií]a|cada\s+d[ií]a|diari[oa]s?))?|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|o|ó|u|a|y|and)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+(?:of\s+)?an?)?|cuarto\s+de(?:\s+una?)?|an?(?=\s+(?:(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|capfuls?|dropperfuls?|ampoules?|ampules?|vials?)\b))\s+(?:tabletas?|pastillas?|comprimidos?|c[aá]psulas?|tablets?|pills?|capsules?|ampoules?|ampules?|vials?|(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|capfuls?|dropperfuls?|cucharaditas?|cucharadas?|goteros?|ampolletas?|frascos?[-\s]ampollas?|drops?|gotas?|ampollas?(?=\s+(?:de\s+(?:\w*ina\b|suero|antiveneno|antiof[ií]dico|antitet[aá]nic)|i\.?[mv]\b|intramuscular|intraven)))\b(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))(?:\s*(?:\/|per|por(?:\s+cada)?)\s*(?:kg|kilos?|kilogramos?|kilograms?|d[ií]a|day|dose|dosis|m2)\b(?:\s+(?:of\s+body\s+weight|de\s+peso(?:\s+corporal)?))?)*(?:\s*x\s*\d+(?:\s*(?:[-–]|or|o|to|a)\s*\d+)?\b)?(?:,?\s+(?:daily|a\s+day|per\s+day|each\s+day|al\s+d[ií]a|por\s+d[ií]a|cada\s+d[ií]a|diari[oa]s?))?|(?:(?=every\s|cada\s)(?<!compost\s)(?<!pile\s)(?<!dough\s)(?<!wake\s)(?<!wake\sthem\s)(?<!wake\shim\s)(?<!wake\sher\s)(?<!wake\sit\s)(?<!wake\sup\s)(?<!wake\sthem\sup\s)(?<!wake\shim\sup\s)(?<!wake\sher\sup\s)(?<!wake\son\sthem\s)(?<!wake\son\shim\s)(?<!wake\son\sher\s)(?<!wake\sthe\sperson\s)(?<!wake\sthe\schild\s)(?<!wake\sthe\sbaby\s)(?<!wake\sthe\spatient\s)(?<!wake\son\sthe\sperson\s)(?<!wake\son\sthe\schild\s)(?<!wake\son\sthe\spatient\s)(?<!waken\s)(?<!waken\sthem\s)(?<!waken\shim\s)(?<!waken\sher\s)(?<!waken\sit\s)(?<!waken\sup\s)(?<!waken\sthem\sup\s)(?<!waken\shim\sup\s)(?<!waken\sher\sup\s)(?<!waken\son\sthem\s)(?<!waken\son\shim\s)(?<!waken\son\sher\s)(?<!waken\sthe\sperson\s)(?<!waken\sthe\schild\s)(?<!waken\sthe\sbaby\s)(?<!waken\sthe\spatient\s)(?<!waken\son\sthe\sperson\s)(?<!waken\son\sthe\schild\s)(?<!waken\son\sthe\spatient\s)(?<!awaken\s)(?<!awaken\sthem\s)(?<!awaken\shim\s)(?<!awaken\sher\s)(?<!awaken\sit\s)(?<!awaken\sup\s)(?<!awaken\sthem\sup\s)(?<!awaken\shim\sup\s)(?<!awaken\sher\sup\s)(?<!awaken\son\sthem\s)(?<!awaken\son\shim\s)(?<!awaken\son\sher\s)(?<!awaken\sthe\sperson\s)(?<!awaken\sthe\schild\s)(?<!awaken\sthe\sbaby\s)(?<!awaken\sthe\spatient\s)(?<!awaken\son\sthe\sperson\s)(?<!awaken\son\sthe\schild\s)(?<!awaken\son\sthe\spatient\s)(?<!waking\s)(?<!waking\sthem\s)(?<!waking\shim\s)(?<!waking\sher\s)(?<!waking\sit\s)(?<!waking\sup\s)(?<!waking\sthem\sup\s)(?<!waking\shim\sup\s)(?<!waking\sher\sup\s)(?<!waking\son\sthem\s)(?<!waking\son\shim\s)(?<!waking\son\sher\s)(?<!waking\sthe\sperson\s)(?<!waking\sthe\schild\s)(?<!waking\sthe\sbaby\s)(?<!waking\sthe\spatient\s)(?<!waking\son\sthe\sperson\s)(?<!waking\son\sthe\schild\s)(?<!waking\son\sthe\spatient\s)(?<!check\s)(?<!check\sthem\s)(?<!check\shim\s)(?<!check\sher\s)(?<!check\sit\s)(?<!check\sup\s)(?<!check\sthem\sup\s)(?<!check\shim\sup\s)(?<!check\sher\sup\s)(?<!check\son\sthem\s)(?<!check\son\shim\s)(?<!check\son\sher\s)(?<!check\sthe\sperson\s)(?<!check\sthe\schild\s)(?<!check\sthe\sbaby\s)(?<!check\sthe\spatient\s)(?<!check\son\sthe\sperson\s)(?<!check\son\sthe\schild\s)(?<!check\son\sthe\spatient\s)(?<!checking\s)(?<!checking\sthem\s)(?<!checking\shim\s)(?<!checking\sher\s)(?<!checking\sit\s)(?<!checking\sup\s)(?<!checking\sthem\sup\s)(?<!checking\shim\sup\s)(?<!checking\sher\sup\s)(?<!checking\son\sthem\s)(?<!checking\son\shim\s)(?<!checking\son\sher\s)(?<!checking\sthe\sperson\s)(?<!checking\sthe\schild\s)(?<!checking\sthe\sbaby\s)(?<!checking\sthe\spatient\s)(?<!checking\son\sthe\sperson\s)(?<!checking\son\sthe\schild\s)(?<!checking\son\sthe\spatient\s)(?<!recheck\s)(?<!recheck\sthem\s)(?<!recheck\shim\s)(?<!recheck\sher\s)(?<!recheck\sit\s)(?<!recheck\sup\s)(?<!recheck\sthem\sup\s)(?<!recheck\shim\sup\s)(?<!recheck\sher\sup\s)(?<!recheck\son\sthem\s)(?<!recheck\son\shim\s)(?<!recheck\son\sher\s)(?<!recheck\sthe\sperson\s)(?<!recheck\sthe\schild\s)(?<!recheck\sthe\sbaby\s)(?<!recheck\sthe\spatient\s)(?<!recheck\son\sthe\sperson\s)(?<!recheck\son\sthe\schild\s)(?<!recheck\son\sthe\spatient\s)(?<!despi[eé]rtela\s)(?<!despi[eé]rtela\sa\sla\spersona\s)(?<!despi[eé]rtela\sal\sni[nñ]o\s)(?<!despi[eé]rtela\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtela\sal\senfermo\s)(?<!despi[eé]rtela\sa\sla\senferma\s)(?<!despi[eé]rtela\sal\sbeb[eé]\s)(?<!despi[eé]rtelo\s)(?<!despi[eé]rtelo\sa\sla\spersona\s)(?<!despi[eé]rtelo\sal\sni[nñ]o\s)(?<!despi[eé]rtelo\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtelo\sal\senfermo\s)(?<!despi[eé]rtelo\sa\sla\senferma\s)(?<!despi[eé]rtelo\sal\sbeb[eé]\s)(?<!despi[eé]rtele\s)(?<!despi[eé]rtele\sa\sla\spersona\s)(?<!despi[eé]rtele\sal\sni[nñ]o\s)(?<!despi[eé]rtele\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtele\sal\senfermo\s)(?<!despi[eé]rtele\sa\sla\senferma\s)(?<!despi[eé]rtele\sal\sbeb[eé]\s)(?<!despi[eé]rtenla\s)(?<!despi[eé]rtenla\sa\sla\spersona\s)(?<!despi[eé]rtenla\sal\sni[nñ]o\s)(?<!despi[eé]rtenla\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtenla\sal\senfermo\s)(?<!despi[eé]rtenla\sa\sla\senferma\s)(?<!despi[eé]rtenla\sal\sbeb[eé]\s)(?<!despi[eé]rtenlo\s)(?<!despi[eé]rtenlo\sa\sla\spersona\s)(?<!despi[eé]rtenlo\sal\sni[nñ]o\s)(?<!despi[eé]rtenlo\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtenlo\sal\senfermo\s)(?<!despi[eé]rtenlo\sa\sla\senferma\s)(?<!despi[eé]rtenlo\sal\sbeb[eé]\s)(?<!despi[eé]rtenle\s)(?<!despi[eé]rtenle\sa\sla\spersona\s)(?<!despi[eé]rtenle\sal\sni[nñ]o\s)(?<!despi[eé]rtenle\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtenle\sal\senfermo\s)(?<!despi[eé]rtenle\sa\sla\senferma\s)(?<!despi[eé]rtenle\sal\sbeb[eé]\s)(?<!despi[eé]rtala\s)(?<!despi[eé]rtala\sa\sla\spersona\s)(?<!despi[eé]rtala\sal\sni[nñ]o\s)(?<!despi[eé]rtala\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtala\sal\senfermo\s)(?<!despi[eé]rtala\sa\sla\senferma\s)(?<!despi[eé]rtala\sal\sbeb[eé]\s)(?<!despi[eé]rtalo\s)(?<!despi[eé]rtalo\sa\sla\spersona\s)(?<!despi[eé]rtalo\sal\sni[nñ]o\s)(?<!despi[eé]rtalo\sa\sla\sni[nñ]a\s)(?<!despi[eé]rtalo\sal\senfermo\s)(?<!despi[eé]rtalo\sa\sla\senferma\s)(?<!despi[eé]rtalo\sal\sbeb[eé]\s)(?<!despertarla\s)(?<!despertarla\sa\sla\spersona\s)(?<!despertarla\sal\sni[nñ]o\s)(?<!despertarla\sa\sla\sni[nñ]a\s)(?<!despertarla\sal\senfermo\s)(?<!despertarla\sa\sla\senferma\s)(?<!despertarla\sal\sbeb[eé]\s)(?<!despertarlo\s)(?<!despertarlo\sa\sla\spersona\s)(?<!despertarlo\sal\sni[nñ]o\s)(?<!despertarlo\sa\sla\sni[nñ]a\s)(?<!despertarlo\sal\senfermo\s)(?<!despertarlo\sa\sla\senferma\s)(?<!despertarlo\sal\sbeb[eé]\s)(?<!despertarle\s)(?<!despertarle\sa\sla\spersona\s)(?<!despertarle\sal\sni[nñ]o\s)(?<!despertarle\sa\sla\sni[nñ]a\s)(?<!despertarle\sal\senfermo\s)(?<!despertarle\sa\sla\senferma\s)(?<!despertarle\sal\sbeb[eé]\s)(?<!despierte\s)(?<!despierte\sa\sla\spersona\s)(?<!despierte\sal\sni[nñ]o\s)(?<!despierte\sa\sla\sni[nñ]a\s)(?<!despierte\sal\senfermo\s)(?<!despierte\sa\sla\senferma\s)(?<!despierte\sal\sbeb[eé]\s)(?<!despertar\s)(?<!despertar\sa\sla\spersona\s)(?<!despertar\sal\sni[nñ]o\s)(?<!despertar\sa\sla\sni[nñ]a\s)(?<!despertar\sal\senfermo\s)(?<!despertar\sa\sla\senferma\s)(?<!despertar\sal\sbeb[eé]\s)(?<!rev[ií]sela\s)(?<!rev[ií]sela\sa\sla\spersona\s)(?<!rev[ií]sela\sal\sni[nñ]o\s)(?<!rev[ií]sela\sa\sla\sni[nñ]a\s)(?<!rev[ií]sela\sal\senfermo\s)(?<!rev[ií]sela\sa\sla\senferma\s)(?<!rev[ií]sela\sal\sbeb[eé]\s)(?<!rev[ií]selo\s)(?<!rev[ií]selo\sa\sla\spersona\s)(?<!rev[ií]selo\sal\sni[nñ]o\s)(?<!rev[ií]selo\sa\sla\sni[nñ]a\s)(?<!rev[ií]selo\sal\senfermo\s)(?<!rev[ií]selo\sa\sla\senferma\s)(?<!rev[ií]selo\sal\sbeb[eé]\s)(?<!rev[ií]sele\s)(?<!rev[ií]sele\sa\sla\spersona\s)(?<!rev[ií]sele\sal\sni[nñ]o\s)(?<!rev[ií]sele\sa\sla\sni[nñ]a\s)(?<!rev[ií]sele\sal\senfermo\s)(?<!rev[ií]sele\sa\sla\senferma\s)(?<!rev[ií]sele\sal\sbeb[eé]\s)(?<!revise\s)(?<!revise\sa\sla\spersona\s)(?<!revise\sal\sni[nñ]o\s)(?<!revise\sa\sla\sni[nñ]a\s)(?<!revise\sal\senfermo\s)(?<!revise\sa\sla\senferma\s)(?<!revise\sal\sbeb[eé]\s)(?<!revisar\s)(?<!revisar\sa\sla\spersona\s)(?<!revisar\sal\sni[nñ]o\s)(?<!revisar\sa\sla\sni[nñ]a\s)(?<!revisar\sal\senfermo\s)(?<!revisar\sa\sla\senferma\s)(?<!revisar\sal\sbeb[eé]\s)(?<!revisarla\s)(?<!revisarla\sa\sla\spersona\s)(?<!revisarla\sal\sni[nñ]o\s)(?<!revisarla\sa\sla\sni[nñ]a\s)(?<!revisarla\sal\senfermo\s)(?<!revisarla\sa\sla\senferma\s)(?<!revisarla\sal\sbeb[eé]\s)(?<!revisarlo\s)(?<!revisarlo\sa\sla\spersona\s)(?<!revisarlo\sal\sni[nñ]o\s)(?<!revisarlo\sa\sla\sni[nñ]a\s)(?<!revisarlo\sal\senfermo\s)(?<!revisarlo\sa\sla\senferma\s)(?<!revisarlo\sal\sbeb[eé]\s)(?<!vig[ií]lela\s)(?<!vig[ií]lela\sa\sla\spersona\s)(?<!vig[ií]lela\sal\sni[nñ]o\s)(?<!vig[ií]lela\sa\sla\sni[nñ]a\s)(?<!vig[ií]lela\sal\senfermo\s)(?<!vig[ií]lela\sa\sla\senferma\s)(?<!vig[ií]lela\sal\sbeb[eé]\s)(?<!vig[ií]lelo\s)(?<!vig[ií]lelo\sa\sla\spersona\s)(?<!vig[ií]lelo\sal\sni[nñ]o\s)(?<!vig[ií]lelo\sa\sla\sni[nñ]a\s)(?<!vig[ií]lelo\sal\senfermo\s)(?<!vig[ií]lelo\sa\sla\senferma\s)(?<!vig[ií]lelo\sal\sbeb[eé]\s)(?<!vig[ií]lele\s)(?<!vig[ií]lele\sa\sla\spersona\s)(?<!vig[ií]lele\sal\sni[nñ]o\s)(?<!vig[ií]lele\sa\sla\sni[nñ]a\s)(?<!vig[ií]lele\sal\senfermo\s)(?<!vig[ií]lele\sa\sla\senferma\s)(?<!vig[ií]lele\sal\sbeb[eé]\s)(?<!vigile\s)(?<!vigile\sa\sla\spersona\s)(?<!vigile\sal\sni[nñ]o\s)(?<!vigile\sa\sla\sni[nñ]a\s)(?<!vigile\sal\senfermo\s)(?<!vigile\sa\sla\senferma\s)(?<!vigile\sal\sbeb[eé]\s)(?<!vigilar\s)(?<!vigilar\sa\sla\spersona\s)(?<!vigilar\sal\sni[nñ]o\s)(?<!vigilar\sa\sla\sni[nñ]a\s)(?<!vigilar\sal\senfermo\s)(?<!vigilar\sa\sla\senferma\s)(?<!vigilar\sal\sbeb[eé]\s)(?<!vigilarla\s)(?<!vigilarla\sa\sla\spersona\s)(?<!vigilarla\sal\sni[nñ]o\s)(?<!vigilarla\sa\sla\sni[nñ]a\s)(?<!vigilarla\sal\senfermo\s)(?<!vigilarla\sa\sla\senferma\s)(?<!vigilarla\sal\sbeb[eé]\s)(?<!vigilarlo\s)(?<!vigilarlo\sa\sla\spersona\s)(?<!vigilarlo\sal\sni[nñ]o\s)(?<!vigilarlo\sa\sla\sni[nñ]a\s)(?<!vigilarlo\sal\senfermo\s)(?<!vigilarlo\sa\sla\senferma\s)(?<!vigilarlo\sal\sbeb[eé]\s)(?:every|cada)\s+(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)|\b(?:two|three|four|five|six|seven|eight|nine|ten|twelve|twenty-four|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|veinticuatro)(?:\s+(?:to|or|and|o|a|y)\s+(?:two|three|four|five|six|seven|eight|nine|ten|twelve|twenty-four|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|veinticuatro))?)\s*(?:h|hrs?|hours?|horas?)\b(?!\s*,?\s*(?:turn|stir|mix|knead|rotate)\b)|(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)|(?:one|two|three|four|five|six|una|dos|tres|cuatro|cinco|seis))\s*(?:times?|x|veces|vez)\s*(?:(?:a|per|al|por|each|cada)\s*(?:day|d[ií]a)|daily|diari[oa]s?)|(?:once|twice|thrice)\s+(?:(?:a|per|each)\s+day|daily)|(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s+(?:doses|dosis)\b)(?:,?\s*(?:for|por|durante)\s+(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*(?:days?|d[ií]as|weeks?|semanas)\b)?|(?:en\s+)?una\s+sola\s+dosis|\b1\s+sola\s+vez|(?:again|repeat(?:ed)?|otra\s+vez|de\s+nuevo|repetir|repita)\s+(?:in|after|en|despu[eé]s\s+de)\s+(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*(?:h|hrs?|hours?|horas?)\b|\b(?:every\s+(?:[\w-]+\s+){0,2}?hours?|hourly|cada\s+(?:\w+\s+){0,2}?horas?|doses?|dosis|dosage|given|give|gives|giving|administer\w*|administr\w*|take|takes|taken|inject\w*|ivermectin|dele|dale|darle|dar|d[eé]selo|d[eé]sele|tome|tomar|toma|tomando|tinctures?|tintura|infusions?|infusi[oó]n|decoctions?|remed(?:y|ies)|remedios?|medicinal(?:ly)?|medicines?|medicinas?|mixtures?|prescrib\w*|recommend\w*|purgatives?|purgantes?|cathartics?|emetics?|vomitivos?|antispasmodic|anodyne|laxatives?|laxantes?|tonics?|t[oó]nicos?|physic|draughts?|drench\w*|bolus|pills?|liniments?|ointments?|salves?|embrocations?|poultices?|gargles?|lotions?|eye-?waters?|collyri\w*|pomadas?|ung[uü]entos?|linimentos?|cataplasmas?|quinine|quinina|opium|opio|laudanum|l[aá]udano|morphi\w*|morfina|calomel|camphor\w*|alcanfor|digitalis|foxglove|strychni\w*|estricnina|bromides?|bromuro|salicin|salicyl\w*|buchu|creosote|creosota|elaterium|ipecac\w*|paregoric|parag[oó]rico|castor\s+oil|ricino|epsom|glauber|iodides?|yoduro|aloes|rhubarb|ruibarbo|senna|jalap|turpentine|trementina|chloral|chloroform|cloroformo|ether|belladonn?a|aconite|ac[oó]nito|ergot\w*|arseni\w*|ars[eé]nico|mercury|mercurio|antitoxins?|antitoxina|serum|suero|antimony|tartar\s+emetic|pine\s+tar|penny\s*royal|carbolic|creolin|sulphur|azufre|magnesia|bismuth|santonin|cocaine|atropine|aspirin\w*|chlorodyne|squills?|antipyrin\w*|acetanilid\w*|phenacetin|cod[\s-]liver\s+oil|vermifuge|nux\s+vomica|nitre|lobelia|asaf\w*tida|valerian|hyoscyam\w*|cannabis|cantharides|croton\s+oil|podophyll\w*|sarsaparilla|guaiac\w*|colchicum|stramonium|hellebore|savin|tansy|wormwood|quassia|gentian|cinchona)\b[^;!?]{0,80}?(?:(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:fluid\s+|fl\.\s*)?(?:(?:grains?|minims?|drachms?|drams?|ounces?|gills?|scruples?|granos?|dracmas?|onzas?|escr[uú]pulos?)\b|(?:grs?|oz)(?:\.|\b)|oz\b|c\.\s?c\.)|\b(?:a\s+few\s+drops|a\s+drop\s+or\s+two|unas\s+(?:cuantas\s+|pocas\s+)?gotas)\b)(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))(?!\s*(?:(?:of|de)\s+)?(?:wheat|corn|oats?|barley|rye|bran|meal|seeds?|feed|hay|yeast|lard|suet|starch|gelatine?|cheese|meat|beef|tea(?!\s+tree)|coffee|cocoa|chocolate|vinegar|gold|silver|sand|clay|wax|beeswax|rosin|resin|gunpowder|trigo|ma[ií]z|cebada|avena|salvado|semillas?|levadura|manteca|almid[oó]n|queso|carne|caf[eé]|cacao|vinagre|oro|plata|arena|cera)\b)|(?:(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:fluid\s+|fl\.\s*)?(?:(?:grains?|minims?|drachms?|drams?|ounces?|gills?|scruples?|granos?|dracmas?|onzas?|escr[uú]pulos?)\b|(?:grs?|oz)(?:\.|\b)|oz\b|c\.\s?c\.)|\b(?:a\s+few\s+drops|a\s+drop\s+or\s+two|unas\s+(?:cuantas\s+|pocas\s+)?gotas)\b)(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))(?!\s*(?:(?:of|de)\s+)?(?:wheat|corn|oats?|barley|rye|bran|meal|seeds?|feed|hay|yeast|lard|suet|starch|gelatine?|cheese|meat|beef|tea(?!\s+tree)|coffee|cocoa|chocolate|vinegar|gold|silver|sand|clay|wax|beeswax|rosin|resin|gunpowder|trigo|ma[ií]z|cebada|avena|salvado|semillas?|levadura|manteca|almid[oó]n|queso|carne|caf[eé]|cacao|vinagre|oro|plata|arena|cera)\b)(?=[^;!?]{0,80}?\b(?:every\s+(?:[\w-]+\s+){0,2}?hours?|hourly|cada\s+(?:\w+\s+){0,2}?horas?|doses?|dosis|dosage|given|give|gives|giving|administer\w*|administr\w*|take|takes|taken|inject\w*|ivermectin|dele|dale|darle|dar|d[eé]selo|d[eé]sele|tome|tomar|toma|tomando|tinctures?|tintura|infusions?|infusi[oó]n|decoctions?|remed(?:y|ies)|remedios?|medicinal(?:ly)?|medicines?|medicinas?|mixtures?|prescrib\w*|recommend\w*|purgatives?|purgantes?|cathartics?|emetics?|vomitivos?|antispasmodic|anodyne|laxatives?|laxantes?|tonics?|t[oó]nicos?|physic|draughts?|drench\w*|bolus|pills?|liniments?|ointments?|salves?|embrocations?|poultices?|gargles?|lotions?|eye-?waters?|collyri\w*|pomadas?|ung[uü]entos?|linimentos?|cataplasmas?|quinine|quinina|opium|opio|laudanum|l[aá]udano|morphi\w*|morfina|calomel|camphor\w*|alcanfor|digitalis|foxglove|strychni\w*|estricnina|bromides?|bromuro|salicin|salicyl\w*|buchu|creosote|creosota|elaterium|ipecac\w*|paregoric|parag[oó]rico|castor\s+oil|ricino|epsom|glauber|iodides?|yoduro|aloes|rhubarb|ruibarbo|senna|jalap|turpentine|trementina|chloral|chloroform|cloroformo|ether|belladonn?a|aconite|ac[oó]nito|ergot\w*|arseni\w*|ars[eé]nico|mercury|mercurio|antitoxins?|antitoxina|serum|suero|antimony|tartar\s+emetic|pine\s+tar|penny\s*royal|carbolic|creolin|sulphur|azufre|magnesia|bismuth|santonin|cocaine|atropine|aspirin\w*|chlorodyne|squills?|antipyrin\w*|acetanilid\w*|phenacetin|cod[\s-]liver\s+oil|vermifuge|nux\s+vomica|nitre|lobelia|asaf\w*tida|valerian|hyoscyam\w*|cannabis|cantharides|croton\s+oil|podophyll\w*|sarsaparilla|guaiac\w*|colchicum|stramonium|hellebore|savin|tansy|wormwood|quassia|gentian|cinchona)\b)|\b(?:emetics?|vomitivos?|laxatives?|laxantes?|purgatives?|purgantes?|purg(?:e|es|ed|ing)|cathartics?|physic)\b[^;!?]{0,80}?(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|cucharaditas?|cucharadas?|cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b(?:[\s,]+(?:(?:or|and|to|o|y)\s+)?(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|cucharaditas?|cucharadas?|cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b)*|(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|cucharaditas?|cucharadas?|cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b(?:[\s,]+(?:(?:or|and|to|o|y)\s+)?(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:(?:tea|table|dessert)(?:-\s*|\s)?spoons?(?:-?\s*f[-\s]?ul{1,2}s?)?|spoons?ful{1,2}s?|wine-?glass(?:es)?ful{1,2}s?|cucharaditas?|cucharadas?|cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b)*(?=[^;!?]{0,80}?\b(?:emetics?|vomitivos?|laxatives?|laxantes?|purgatives?|purgantes?|purg(?:e|es|ed|ing)|cathartics?|physic)\b)|(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:fluid\s+|fl\.\s*)?(?:drachms?|minims?|scruples?|dracmas?|escr[uú]pulos?)\b|\b(?:castor\s+oil|ricino|emetics?|vomitivos?|laxatives?|laxantes?|purgatives?|purgantes?|cathartics?|quinine|quinina|opium|opio|laudanum|l[aá]udano|morphi\w*|morfina|calomel|camphor\w*|alcanfor|digitalis|foxglove|strychni\w*|estricnina|bromides?|bromuro|salicin|salicyl\w*|buchu|creosote|creosota|elaterium|ipecac\w*|paregoric|parag[oó]rico|epsom|glauber|iodides?|yoduro|aloes|senna|jalap|turpentine|trementina|chloral|chloroform|cloroformo|belladonn?a|aconite|ac[oó]nito|ergot\w*|arseni\w*|ars[eé]nico|antitoxins?|antitoxina|antimony|tartar\s+emetic|pine\s+tar|penny\s*royal|carbolic|creolin|magnesia|bismuth|santonin|cocaine|atropine|aspirin\w*|chlorodyne|squills?|antipyrin\w*|acetanilid\w*|phenacetin|cod[\s-]liver\s+oil|vermifuge|nux\s+vomica|lobelia|asaf\w*tida|valerian|hyoscyam\w*|cannabis|cantharides|croton\s+oil|podophyll\w*|colchicum|stramonium|hellebore|savin|tansy|wormwood|quassia|gentian|cinchona|ivermectin)\b[^;!?]{0,80}?(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:de\s+(?:una?\s+)?)?(?:cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))|(?:(?:(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+)(?:(?:\s*[-–]\s*|\s+(?:to|a|or|o|ó|u|y|and|hasta)\s+)(?:\b\d+(?:[.,]\d+)*(?:\s*(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;))?|(?:[½¼¾⅓⅔⅛]|&#\d{3,4};|&frac\d\d;)|\b\d+\/\d+))?)\s*|\b(?:(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty)(?:\s+(?:to|or|and|o|ó|u|a|y)\s+(?:una?|media|medio|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|doce|quince|veinte|treinta|cuarenta|cincuenta|one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty))?|(?:one|two|three)-(?:halves|half|thirds?|fourths?|quarters?|eighths?)(?:\s+of\s+an?)?|half(?:\s+(?:of\s+)?an?)?|(?:a\s+|one\s+)?quarter(?:\s+of)?\s+an?|(?:a\s+)?few|several|an?)\s+)(?:de\s+(?:una?\s+)?)?(?:cups?(?:ful{1,2}s?)?|tazas?|tacitas?|vasos?|glass(?:es)?(?:ful{1,2}s?)?)\b(?!\s+(?:if|when)\s+(?:the\s+)?water\b|\s+si\s+el\s+agua\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:rasas?|llenas?|level|heaping)\s+)?(?:(?:de|of)\s+)?(?:(?:\d+(?:[.,]\d+)?\s*%|clean|boiled|cooled|safe|drinking|potable|fresh|cool|cold|warm|limpia|hervida|tibia|fr[ií]a|regular|unscented|non-scented|plain|liquid|household|chlorine|common|ordinary|cloro|lej[ií]a|blanqueador|l[ií]quid[oa]|com[uú]n|sin\s+(?:perfume|aroma)|tinctures?\s+of|tintura\s+de|this|the|esta|la|clorox(?:-type)?)[,\s]+)*(?:sal|az[uú]car|agua|harina|aceite(?!\s+de\s+(?:ricino|h[ií]gado|bacalao))|leche(?!\s+de\s+magnesia)|miel|mantequilla|arroz|cloro|lej[ií]a|blanqueador|yodo|salt|sugar|water|flour|oil(?!\s+(?:of|rendered|from|extracted)\b)|milk(?!\s+of\s+magnesia)|honey|butter|rice|cereal(?:es)?|lemon|lim[oó]n|stock(?:\s+solution)?|soluci[oó]n\s+madre|chlorinated\s+lime|cal\s+clorada|hypochlorite|hipoclorito|bleaching\s+powder|halazone|bleach|chlorine|iodine)\b|\s*\)?\s*(?:\([^)]{0,40}\)\s*)?(?:(?:potabilizadoras?|purificadoras?|purification|chlorine|iodine|aquatabs?|halazone)\s+)?(?:(?:of|de)\s+(?:(?:\d+(?:[.,]\d+)?\s*(?:%|percent|per\s+cent|por\s+ciento)|solution|soluci[oó]n|stock|chlorine|cloro|bleach|household|liquid|the|this|a|la|esta)\s+){1,4})?(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?)|\s*(?:de|of)\s+\d+(?:[.,]\d+)?\s*(?:mg|g|ml)\s*(?:por(?:\s+cada)?|per|\/|for\s+(?:each|every)|para\s+cada|cada|(?:to|in|into)\s+(?:each|every)|to(?=\s+\d+(?:[.,]\d+)?\s*(?:imperial\s+)?gal))\s*(?:\d+(?:[.,]\d+)?\s*(?:[^\s()]{1,8}\s*\(\s*\d+\s*)?|(?:an?|una?|one|two|three|four|five|ten|dos|tres|cuatro|cinco|diez)\s+)?(?:imperial\s+)?(?:litros?|lit(?:re|er)s?|l\b|gal|quarts?|qt\b|cuartos?|barrels?|barril(?:es)?|drums?|tanks?|tambos?|tanques?))(?=[^;!?]{0,80}?\b(?:castor\s+oil|ricino|emetics?|vomitivos?|laxatives?|laxantes?|purgatives?|purgantes?|cathartics?|quinine|quinina|opium|opio|laudanum|l[aá]udano|morphi\w*|morfina|calomel|camphor\w*|alcanfor|digitalis|foxglove|strychni\w*|estricnina|bromides?|bromuro|salicin|salicyl\w*|buchu|creosote|creosota|elaterium|ipecac\w*|paregoric|parag[oó]rico|epsom|glauber|iodides?|yoduro|aloes|senna|jalap|turpentine|trementina|chloral|chloroform|cloroformo|belladonn?a|aconite|ac[oó]nito|ergot\w*|arseni\w*|ars[eé]nico|antitoxins?|antitoxina|antimony|tartar\s+emetic|pine\s+tar|penny\s*royal|carbolic|creolin|magnesia|bismuth|santonin|cocaine|atropine|aspirin\w*|chlorodyne|squills?|antipyrin\w*|acetanilid\w*|phenacetin|cod[\s-]liver\s+oil|vermifuge|nux\s+vomica|lobelia|asaf\w*tida|valerian|hyoscyam\w*|cannabis|cantharides|croton\s+oil|podophyll\w*|colchicum|stramonium|hellebore|savin|tansy|wormwood|quassia|gentian|cinchona|ivermectin)\b)/gi;
+  function fold(s) { return s.normalize ? s.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : s; }
+  /* #215 (a8 F1): "tetanus shot" asks for an injection; "got shot", "shot in the leg", "gun shot" name a wound and keep
+     their quotes. Query only. Same words and pattern as SHOT_WORD_RE / SHOT_WOUND_RE in server/mcp_server.py */
+  var SHOT_WORD_RE = /^(shot|shots|jab|jabs|vial|vials|ampolla|ampollas|ampolleta|ampolletas|ampoule|ampoules|ampule|ampules)$/;
+  var SHOT_WOUND_RE = /\b(?:(?:got|get|gets|getting|was|were|been|being|is|are|accidentally|gun|bullet|arrow|pellet|bird|buck)\s+(?:shot|jabbed)|(?:shot|shots|jab|jabbed)\s+(?:in|through|by|with|at|myself|himself|herself|themselves|me|him|her|them|us|you|wounds?|injur\w*|dead|fired)|shotguns?|gun\s*shots?|gunshots?)\b/g;
+  var AMPOLLA_CTX_RE = /\b(?:inyect\w*|inyecci\w*|suero\w*|vacun\w*|tetan\w*|antiven\w*|antiofidic\w*|antialacran\w*|intramuscular\w*|intraven\w*|im|iv|vial\w*|frasco\w*|jeringa\w*|aguja\w*|ampolletas?|penicilin\w*|antibiotic\w*)\b/;
+  var COMPLAINT_RE = /\b(?:cough\w*|croup|fever\w*|colic\w*|pain\w*|ache\w*|teething|worms?|diarrh\w*|vomit\w*|tos|crup|fiebre|calentura|c[oó]licos?|dolor\w*|lombrices|par[aá]sitos|diarrea|v[oó]mito\w*|dentici[oó]n|t[eé]tanos)\b/gi;
+  function drugQuery(q) {
+    /* drugQuery(text, true): the snippet rule (doseText); the signature stays (q) for fix_f2_test's identity block */
+    var text = arguments[1], f = fold(q.toLowerCase()), toks, i, t, en = false;
+    /* #171: EPA "iodine in your medicine cabinet" is a cupboard; #193 (a1a en60): "anxiety without medicine" asks for no
+       drug (a drug name still trips). Same as dose_guard() in server/mcp_server.py. */
+    f = text ? f.replace(/\bmedicine cabinets?\b/g, ' ') : f.replace(WITHOUT_DRUG_RE, ' ').replace(SHOT_WOUND_RE, ' ');
+    f = f.replace(/\b(?:milk of|leche de) magnesia\b/g, ' milk-of-magnesia ').replace(/\bcastor oil\b/g, ' castor-oil ').replace(/\b(?:gentian violet|purple of gentian)\b/g, ' gentian-violet ').replace(/\bvioleta de genciana\b/g, ' violeta-de-genciana ');  /* #228 #263 #264: the phrases, not bare magnesia / castor / gentian */
+    /* round 10 (#269, a7a F5, a7b note 2): a takeover "poison pill" names no medicine; a swallowed one, a child or an animal keeps it */
+    if (!text && /\bpoison pills?\b/.test(f) && !/swallow|\bate\b|took|kid|child|baby|toddler|\bdog|trag|comio|tomo|nin[oa]|bebe|hij[oa]/.test(f)) { f = f.replace(/\bpoison pills?\b/g, ' '); }
+    toks = f.split(/[^a-z-]+/);
+    var treat = !!text && TREAT_RE.test(f) && WATER_AMOUNT_RE.test(f), storage = !text && STORAGE_RE.test(f);
+    for (i = 0; i < toks.length; i++) {
+      t = toks[i];
+      if (!t) { continue; }
+      if (storage && !STORAGE_DOSE_RE.test(t)) { continue; }
+      /* a bare tablet word next to water context is purification, not a drug (en20/es20: "water purification tablets",
+         "pastillas potabilizadoras"); a drug name still trips the guard */
+      if (TABLET_RE.test(t) && WATER_RE.test(fold(q))) { continue; }
+      if (treat && TREAT_WORD_RE.test(t)) { continue; }
+      /* round 10 (#269, a8 F5; dose_r39.txt NOTE-USE-AMPOLLA): «ampolla» is also a blister: a drug word only beside an injection,
+         serum or tetanus word; «ampolleta» always. Both are Spanish for the language flag */
+      if (!text && /^ampoll/.test(t) && SHOT_WORD_RE.test(t)) { if (/^ampollet/.test(t) || AMPOLLA_CTX_RE.test(f)) { return 'es'; } continue; }
+      if (/^(dose|doses|dosage|dosages|dosing|mg|milligram|milligrams|medicine|medicines|medication|medications|antibiotic|antibiotics|painkiller|painkillers|drug|drugs|pill|pills|tablet|tablets|injection|injections|inject|injects|injected|injecting|injectable|injectables|ampoule|ampoules|ampule|ampules|ampul|ampuls|antacid|antacids|laxative|laxatives)$/.test(t) ||
+          DRUGS.indexOf(t) !== -1 || (!text && SHOT_WORD_RE.test(t))) { en = true; continue; }  /* "paracetamol" is both: English unless a Spanish word says otherwise */
+      if (DOSE_ES_RE.test(t) || DRUGS_ES.indexOf(t) !== -1) { return 'es'; }
+    }
+    return en ? 'en' : false;
+  }
+  /* red team 2026-10-11 class 1 (#181): an excerpt or summary is withheld whole, not scrubbed, when it is dose-bearing
+     (same rule as safe_snippet() in server/mcp_server.py): the dose pattern matches, or a drug or dose word sits
+     beside a figure, or it already carries a removal mark (the Pagefind index stores scrubbed text). Scrubbing left "half tablet ([dose removed]) per day for 10-14 days" readable. */
+  var DOSE_NUM_RE = /\d|[½¼¾⅓⅔⅛]|&#\d|&frac|\b(?:half|quarter|media|medio|cuarto|million|millones|double|doble|twice|triple|dos veces)\b/i;
+  var NOT_DOSE_FIG = /\d+(?:[.,]\d+)?(?:\s*(?:-|–|to|a)\s*\d+)?\s*(?:min(?:ute)?s?|minutos?|h(?:ou)?rs?|horas?|days?|d[ií]as?|weeks?|semanas?|months?|mes(?:es)?|years?|a[nñ]os?|°\s*[cf]?|degrees?|grados?)(?![a-z])|\b(?:page|pages|p\.|chapter|cap[ií]tulo|p[aá]gina)\s*\d+/gi;
+  function doseText(s) {
+    if (!s) { return false; }
+    var plain = s.replace(/<\/?mark>/g, '');
+    DOSE_RE.lastIndex = 0;
+    return plain.indexOf('[dose removed') !== -1 || DOSE_RE.test(plain) || (!!drugQuery(plain, true) && DOSE_NUM_RE.test(plain.replace(NOT_DOSE_FIG, ' ')));
+  }
+  function hasDose(s) { DOSE_RE.lastIndex = 0; return DOSE_RE.test(s || ''); }
+  /* round 10 (#269, a8 F4; dose_r39.txt NOTE-USE-COMPLAINT, the server's dose_guard query branch): in a QUESTION a complaint word
+     counts as the medicine word ("two grains for a child with croup"); never on snippets or pages */
+  function hasDoseQ(q) { DOSE_RE.lastIndex = 0; return hasDose(q) || DOSE_RE.test((q || '').replace(COMPLAINT_RE, '$& dose')); }
+  var PURPOSE_RE = /\bwhat(?:'s|s| is| are)\b[^.?]{0,40}\b(?:for|used for|good for)\b|\bwhat (?:does|do)\b[^.?]{0,40}\b(?:do|treat|cure)\b|\bpara que (?:sirven?|es|son|se usan?|se toman?)\b/;
+  function noDrugWords(q) {
+    return q.split(/\s+/).filter(function (w) { return !drugQuery(w.replace(/[^\w\u00C0-\u024F-]/g, '')); }).join(' ');
+  }
+  var DOSE_MSG = {
+    en: 'This library’s own pages, summaries and search never state drug doses. The medical books on the shelf do: ' +
+        'use the printed drug guide (Davis’s, Lippincott pocket) for any dose.',
+    es: 'Las páginas, los resúmenes y la búsqueda propios de esta biblioteca nunca indican dosis de medicamentos. ' +
+        'Los libros de medicina del estante sí las indican: para cualquier dosis, use la guía impresa de medicamentos ' +
+        '(Davis’s, Lippincott de bolsillo).'
+  };
+  var MSG = {
+    en: { head: 'From the library: the matching pages, by title. Open a page to read it; nothing here is quoted or written by an AI.',
+          picked: 'An AI (%m) chose, by their titles, which of these %n pages to list first. It wrote none of the text.',
+          nopick: 'The AI found no title that answers this directly, so these are in search order.',
+          order: 'In search order: no AI is sorting results right now.',
+          failed: 'The AI did not answer, so these are in search order.',
+          sorting: 'An AI is putting the most useful pages first…',
+          none: 'No page in the library matched these words. Try other words, or use the triage page or search.',
+          timeout: 'The library search did not answer in time (the box may be busy). Ask again in a moment; triage and search still work.',
+          more: 'Other matching pages: ', searching: 'Searching the library…',
+          drugtitles: 'Pages about a medicine give doses, so the pages that name it are listed first below; open one to read it.' },
+    es: { head: 'De la biblioteca: las páginas que coinciden, por título. Abra una página para leerla; aquí no se cita nada ni lo escribe una IA.',
+          picked: 'Una IA (%m) eligió, por sus títulos, cuáles de estas %n páginas van primero. No escribió nada del texto.',
+          nopick: 'La IA no encontró un título que conteste directamente; van en el orden de la búsqueda.',
+          order: 'En el orden de la búsqueda: ninguna IA está ordenando resultados ahora.',
+          failed: 'La IA no contestó; van en el orden de la búsqueda.',
+          sorting: 'Una IA está poniendo primero las páginas más útiles…',
+          none: 'Ninguna página de la biblioteca coincide con estas palabras. Pruebe otras palabras, o use la página de triaje o la búsqueda.',
+          timeout: 'La búsqueda de la biblioteca no contestó a tiempo (la caja puede estar ocupada). Pregunte de nuevo en un momento; el triaje y la búsqueda siguen funcionando.',
+          more: 'Otras páginas que coinciden: ', searching: 'Buscando en la biblioteca…',
+          drugtitles: 'Las páginas sobre un medicamento dan dosis, así que abajo van primero las que lo nombran; abra una para leerla.' }
+  };
+  /* D8 (#117): the embeddings are English-only (nomic); Spanish vectors score 0.62-0.76 and are off-topic in most cases,
+     so a Spanish question uses a semantic row only above every observed Spanish score; its passages come from the
+     keyword index (the Spanish Hesperian pages are in it). */
+  var ES_FLOOR = 0.80;
+  /* #182 (a1gen 6): a weak semantic top hit was forced to source [1] (Math Grade 3 0.668, Roget's Thesaurus 0.684 for
+     acorns). English rows below this floor now come after every keyword hit; they are not dropped, because the right
+     page can score as low as the junk (Head Injuries 0.664 beside a Grade 1 reader 0.666 for "fell and hit his head").
+     A bad page above it ("Electricity, grade 7", 0.789) is left to the picker. ponytail: one knob; re-measure if the
+     embedding model changes. */
+  var SEM_FLOOR = 0.70;
+  /* question language: accents or an inverted mark, else a stopword vote (same idea as the stopword vote in gen_doc_answers).
+     #270 (a7a F1, a7b W1): Spanish body and symptom words vote too, so a bare keyword question («ojo infectado rojo pus hinchado»,
+     «muela hinchada dolor») is Spanish; a tie at 0 stays English, so an English keyword question in Spanish mode stays English */
+  var ES_WORDS = /^(que|como|para|el|la|los|las|de|del|es|mi|mis|con|por|sin|un|una|unos|unas|se|le|al|cuanto|cuanta|cuantos|cuantas|cuando|donde|puedo|puede|tengo|tiene|hago|hacer|hay|muy|mas|si|su|sus|lo|y|o|ya|esta|este|estoy|dentro|despues|antes|cada|tomar|tomo|darle|doy|dar|agua|casa|hijo|hija|bebe|nino|nina|peligroso|seguro|sol|luz|ojo|ojos|muela|muelas|diente|dientes|dolor|duele|rojo|roja|hinchado|hinchada|hinchazon|infectado|infectada|fiebre|calentura|herida|sangre|sangrando|cabeza|pierna|brazo|mano|pecho|panza|barriga|quemadura|vomito|diarrea|piel|oido|garganta|tobillo|rodilla|nariz|boca|espalda)$/;
+  var EN_WORDS = /^(the|is|to|what|how|for|my|do|i|in|of|and|with|can|it|on|if|safe|much|many|long|when|where|should|are|be|was|does|have|from|an|or|at|without|after|before|give|take|make|put|out|up|get|will|need|vs|which|tell|use)$/;
+  function isSpanish(q) {
+    if (/[áéíóúñ¿¡]/i.test(q)) { return true; }
+    var toks = fold(q.toLowerCase()).split(/[^a-z]+/), es = 0, en = 0, i;
+    for (i = 0; i < toks.length; i++) { if (ES_WORDS.test(toks[i])) { es++; } else if (EN_WORDS.test(toks[i])) { en++; } }
+    return ES_MODE ? es > 0 && es >= en : es > en;  /* E6: in chat.html?lang=es a tie is Spanish */
+  }
+
+  /* ── K1 (red team 2026-10-16, FIXES #199 #200 #206 #207): pure helpers for send() and retrieve() ── */
+  var ES_MODE = false;   /* E6 (#206): set from chat.html?lang=es below; the Spanish landing page links it */
+  /* E6 (#206): an English question never shows a Spanish passage or title. The server's English mode should return none
+     (K2); this is the page's own check, by path (Spanish Hesperian, Spanish encyclopedias, /es/ mirrors, CD3WD _es_ files)
+     by the catalogue language (ROWLANG below) and by a stopword vote over the title. */
+  var ES_PATH_RE = /es\.hesperian\.org\/|^zim\/[a-z]+_es_|\/es\/|_es_|_spa[_.]/;
+  /* #270: a row is English when its path says so or its title votes English (2+ English function words, more than Spanish) */
+  /* D4 (#278): the server sends no snippet any more, so a document's language comes from the catalogue (titles.json packed
+     element 4, absent = "en"; K2 follow-up 2), read here as search.html's ROWLANG does; a path the catalogue does not list
+     (mirror pages, encyclopedia articles) falls back to the path rules and the title vote. null until loaded. */
+  function getIndex(name, cb) {   /* cb(parsed JSON, or null when it did not load) */
+    var x = new XMLHttpRequest();
+    x.open('GET', '_app/index/' + name + '.json', true); x.timeout = 20000;
+    x.onreadystatechange = function () {
+      if (x.readyState !== 4) { return; }
+      var v = null;
+      if (x.status === 200) { try { v = JSON.parse(x.responseText); } catch (e) {} }
+      cb(v);
+    };
+    x.send();
+  }
+  var ROWLANG = null;
+  /* follow-up (round 11 fix F): an outdated page (the server's outdated flag, or outdated_pages.json for the page shown, the list
+     search.html's OUTD reads) is never listed on the Ask page: before D4 it was never quoted, and with N1 it would come back with
+     no mark. OUTD: null while loading (merge waits), {} when it did not load (the server flag alone then decides). */
+  var OUTD = null, outdWait = [];
+  if (location.protocol.indexOf('http') === 0) {
+    getIndex('titles', function (v) {
+      if (!v || !v.i || !v.d) { return; }
+      var m = {}, i, it;
+      for (i = 0; i < v.i.length; i++) { it = v.i[i]; m[v.d[it[0]] + it[1]] = it[4] || 'en'; }
+      ROWLANG = m;
+    });
+    getIndex('outdated_pages', function (v) { OUTD = v || {}; while (outdWait.length) { outdWait.shift()(); } });
+  }
+  /* outdated_pages.json is the server's outdated_aid() pages plus every dose_page() page (build_mcp_index.py). The server's own
+     outdated flag is outdated_aid() on the page it returns, so it drops a row on any shelf. A listed page drops it everywhere but
+     the medical shelf and the mirrored health guides, where a listed page is a dose page of a current guide (MSF 2026, the
+     Hesperian pages a purpose question lists first), not old advice. ponytail: two prefixes; a per-page reason field in the
+     list is the upgrade. */
+  var CURRENT_RE = /^(?:docs\/medical\/|mirrors\/)/;
+  function outdPage(h) {
+    var l = OUTD && OUTD[h.path || ''];
+    return !!h.outdated || (!!l && !CURRENT_RE.test(h.path || '') && (!h.page || l.indexOf(h.page) !== -1));
+  }
+  function rowLang(h) { return ROWLANG && ROWLANG[h.path || ''] || null; }
+  function englishHit(h) {
+    if (spanishHit(h) || /_en_(?:fr_)?es_/.test(h.path || '')) { return false; }   /* a bilingual glossary is not English-only */
+    if (rowLang(h)) { return rowLang(h) === 'en'; }
+    if (/(?:^|[\/_.-])en(?:[\/_.-]|$)|wikipedia_en|\ben\.hesperian/.test(h.path || '')) { return true; }
+    var toks = fold((h.title || '').toLowerCase()).split(/[^a-z]+/), es = 0, en = 0, i;
+    for (i = 0; i < toks.length; i++) { if (ES_WORDS.test(toks[i])) { es++; } else if (EN_WORDS.test(toks[i])) { en++; } }
+    return en >= 2 && en > es;
+  }
+  function spanishHit(h) {   /* CD3WD "_en_es_" files are bilingual glossaries, not Spanish */
+    if (ES_PATH_RE.test(h.path || '') && !/_en_(?:fr_)?es_/.test(h.path)) { return true; }
+    if (rowLang(h)) { return rowLang(h) === 'es'; }
+    var toks = fold((h.title || '').toLowerCase()).split(/[^a-z]+/), es = 0, en = 0, i;
+    for (i = 0; i < toks.length; i++) { if (ES_WORDS.test(toks[i])) { es++; } else if (EN_WORDS.test(toks[i])) { en++; } }
+    return es >= 4 && es > 2 * en;
+  }
+  /* #207 (a7a S3b, K2 verbatim; drugQuery reads it): "how do I keep insulin cold?" is a storage question, not a dose search; a dose word still trips. Same
+     pattern as STORAGE_RE in server/mcp_server.py dose_guard() */
+  var STORAGE_RE = /\b(?:keep|keeping|store|storing|storage|guardar|guardo|conservar|conservo|mantener|mantengo)\b[^.?!]{0,40}\b(?:cold|cool|fresh|refrigerat\w*|fridge|cooler|ice|frozen|freez\w*|heat|hot|warm|temperature|fri[oa]|fresc[oa]|refrigera\w*|nevera|heladera|hielo|calor|temperatura)\b|\b(?:without|with no|no|sin)\s+(?:a\s+)?(?:fridge|refrigerator|refrigeration|electricity|power|nevera|refrigerador|electricidad|luz)\b/;
+  var STORAGE_DOSE_RE = /^(dose|doses|dosage|dosages|dosing|mg|milligram|milligrams|dosis|miligramo|miligramos)$/;
+  /* #207 note (b5 N1): the search page pins the coastal mussel card for shellfish words; Ask does the same */
+  var PINS = [[/mejill|almeja|marisco|\bostras?\b|\bostion(?:es)?\b|molusco|marea roja|shellfish|mussel|\bclams?\b|oyster|red tide/,
+    'plants.html#coastal/bay_mussel', 'Mussels, clams, shellfish: biotoxin risk — cooking does NOT destroy it (coastal card)',
+    'plants.html?lang=es#coastal/bay_mussel', 'Mejillones, almejas y mariscos: riesgo de biotoxinas — la cocción no las destruye (ficha de la costa)']];
+  /* #193 rule kept, round 7 [final] (a1a: a salt-meat note at [1] on a stroke question): a library note stays [1] only when
+     its title shares a word of 5 or more letters with the question */
+  function sharesWord(title, q) {
+    var a = fold((title || '').toLowerCase()).split(/[^a-z]+/), b = ' ' + fold(q.toLowerCase()).split(/[^a-z]+/).join(' ') + ' ', i;
+    for (i = 0; i < a.length; i++) { if (a[i].length >= 5 && b.indexOf(' ' + a[i].slice(0, 5)) !== -1) { return true; } }
+    return false;
+  }
+  var CARD_PINS = { chest: [null, 'mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Heart_Attack.html',
+    'Heart attack: what to do (New Where There Is No Doctor)',
+    'mirrors/hesperian/es.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Ataque_al_coraz%C3%B3n_(Infarto).html',
+    'Ataque al corazón: qué hacer (Nuevo Donde no hay doctor)'],
+    diabetic: [null, 'mirrors/hesperian/en.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Diabetic_Emergencies.html#Low_blood_sugar_.28hypoglycemia.29',
+    'Low blood sugar: diabetic emergencies (New Where There Is No Doctor)',
+    'mirrors/hesperian/es.hesperian.org/hhg/New_Where_There_Is_No_Doctor:Emergencias_diab%C3%A9ticas.html#Az.C3.BAcar_baja_en_la_sangre_.28hipoglicemia.29',
+    'Azúcar baja: emergencias diabéticas (Nuevo Donde no hay doctor)'] };
+  /* E12 (10-21, B): the 28 cards in triage.html order, with each page's own heading */
+  var CARDS = [
+    ['bleeding', 'Severe bleeding / amputation', 'Sangrado fuerte o amputación'],
+    ['unconscious', 'Unconscious / not breathing', 'No responde o no respira'],
+    ['choking', 'Choking', 'Algo atorado en la garganta'],
+    ['chest', 'Chest pain / trouble breathing', 'Dolor de pecho o falta de aire'],
+    ['stroke', 'Stroke: face droops, one arm weak, speech slurred', 'Derrame cerebral: cara caída, brazo débil, habla mal'],
+    ['shock', 'Shock — pale, cold, sweaty, fast weak pulse', 'Choque: pálida, fría, sudorosa, pulso rápido y débil'],
+    ['burns', 'Burns', 'Quemaduras'],
+    ['fire', 'Kitchen / grease fire — a pan of oil or fat on fire', 'Fuego de aceite o grasa en la cocina'],
+    ['fracture', 'Broken bone / sprain / dislocation', 'Huesos rotos, torceduras o dislocaciones'],
+    ['wound', 'Wounds & wound infection', 'Heridas e infección de heridas'],
+    ['head', 'Head injury', 'Golpe en la cabeza'],
+    ['seizure', 'Seizure / convulsions: shaking, falls, will not respond', 'Ataques o convulsiones: tiembla, se cae, no responde'],
+    ['diabetic', 'Diabetic: low blood sugar (confused, sweating, shaking, passing out)', 'Diabetes: azúcar baja (confundida, suda, tiembla, se desmaya)'],
+    ['poison', 'Poisoning — pills or medicine, overdose, chemical, plant, mushroom', 'Envenenamiento: pastillas, químicos, plantas u hongos'],
+    ['co', 'Whole group with headache, nausea, confusion — carbon monoxide', 'Varias personas con dolor de cabeza y náuseas: monóxido de carbono'],
+    ['bite', 'Snakebite / animal bite', 'Mordedura de víbora o de animal'],
+    ['allergy', 'Severe allergic reaction — swelling face/throat, hives, wheeze', 'Alergia grave: se hincha la cara o la garganta'],
+    ['fever', 'Fever / suspected infection', 'Fiebre o infección'],
+    ['gut', 'Diarrhea / vomiting / dehydration', 'Diarrea, vómitos, deshidratación'],
+    ['belly', 'Severe belly pain', 'Dolor fuerte de barriga'],
+    ['cold', 'Hypothermia / frostbite', 'Frío: hipotermia y congelación'],
+    ['heat', 'Heat exhaustion / heatstroke', 'Calor: agotamiento y golpe de calor'],
+    ['birth', 'Childbirth / bleeding in pregnancy', 'Parto, placenta y sangrado en el embarazo'],
+    ['child', 'Sick baby or child', 'Bebé o niño enfermo'],
+    ['tooth', 'Toothache / dental', 'Dolor de muelas'],
+    ['eye', 'Eye injury', 'Lesiones de los ojos'],
+    ['mind', 'Panic / despair / mental crisis', 'Crisis emocional, desesperación o suicidio'],
+    ['water', 'Is this water safe? (prevent the next patient)', '¿Es segura esta agua?']
+  ];
+  /* every bubble decision for one question, in one place (fix_k1_rules.py runs it on the test sets) */
+  var OVERDOSE_RE = /\boverdos\w*|\bsobredosis\b|\bo\.?d\.?'?(?:ed|d)\b|\b(?:took|taken|swallowed|ate|downed|chugged|popped|tomo|trago|comio|se tomo|se trago|se comio|se acabo)\b.{0,25}\b(?:all|whole|entire|bunch|handful|lots?|full|every|todas?|todo|entero|enter[oa]|punado|monton|muchas|toda la)\b.{0,25}\b(?:pills?|tablets?|meds|medicines?|medication|bottle|pastillas?|tabletas?|pildoras?|medicinas?|medicamentos?|frasco|caja|blister)\b|\b(?:pills?|tablets?|pastillas?|frasco|bottle)\b.{0,25}\b(?:on purpose|a proposito|de golpe|all at once|todas juntas|de una vez)/;
+  /* app.js did not load (a stale hashed name on a copied drive): no card, the open list and the generic door, so the page
+     still answers and still points to the triage cards */
+  var NO_ROUTE = { cards: [], how: null, drop: null, health: true, amount: false, ask: false, amountWord: false, antivenom: false, door: true };
+  function decide(text) {
+    /* E26 (#245): the card matcher is window.lanternRoute in _app/app.7858fbba.js (ROUTER-BEGIN), shared with the Search and front pages */
+    var es = isSpanish(text), f = fold(text.toLowerCase()), drug = drugQuery(text), R = window.lanternRoute ? window.lanternRoute(text, !!drug) : NO_ROUTE, i, pin = null;
+    var tri = R.cards.length ? [R.cards[0]] : null;
+    var amount = R.amountWord || hasDoseQ(text) || R.ask;
+    /* #212 (a7a F3, a7b F4): a diabetic card question that names insulin ("¿le doy azúcar? ya no queda insulina") is not a
+       dose question either; same rule as a poisoning: no refusal, the search runs without the drug words */
+    /* round 8 follow-up 3 (#239): an overdose is a poisoning too ("took all his pills", "swallowed the whole bottle", "overdose",
+       «se tomó todas las pastillas», «sobredosis»), whatever card comes first; an amount word keeps the refusal */
+    var ingest = (!!tri && (tri[0] === 'poison' || tri[0] === 'diabetic') || OVERDOSE_RE.test(f)) && !amount && !!drug;
+    /* #223 (round 7 pre-flight PF3): "what is <drug> for", "para qué sirve <drug>" asks what a medicine treats, not how much:
+       no refusal when no amount word is asked. Nothing is quoted (D4, #278): the answer is titles only. */
+    var purpose = !!drug && !amount && PURPOSE_RE.test(f);
+    /* round 8 (a8 F1; M2 dose_r37 shared ANTIVENOM_RE, same rule as dose_guard()): antivenom with an amount word or figure */
+    var antivenom = R.antivenom && (R.amountWord || hasDoseQ(text));
+    /* the takeover "poison pill" idiom is handled in drugQuery() (round 10, #269), so every door reads it alike */
+    var guard = ingest || purpose ? false : drug || (hasDoseQ(text) || R.ask || antivenom ? (es ? 'es' : 'en') : false);
+    if (guard === 'es') { es = true; }
+    /* round 9 (#245, E26 amount rule): an amount question the page refuses shows no card row, as on Search and the front page
+       ("how often can I give her the fever medicine", "how many vials of antivenom"); a drug question with no amount keeps its cards */
+    var amountQ = !!guard && (R.amount || R.ask || antivenom || hasDoseQ(text)), cardsR = amountQ ? [] : R.cards;
+    if (amountQ) { tri = null; }
+    for (i = 0; i < PINS.length; i++) { if (PINS[i][0].test(f)) { pin = PINS[i]; break; } }
+    if (!pin && tri && R.how === 'exact' && CARD_PINS[tri[0]]) { pin = CARD_PINS[tri[0]]; }   /* PF1: a card's pin only on exact */
+    return { es: es, tri: tri, card: tri ? tri[0] : null, how: amountQ ? null : R.how, guard: !!guard, ingest: ingest, purpose: purpose, matched: cardsR,
+             cards: tri ? 'match' : (R.health && !amountQ ? 'open' : 'closed'),   /* E23 match (open, matched first); E19 open or closed */
+             fallback: !tri && !guard && R.door, pin: pin ? pin[1] : null, pinRow: pin };
+  }
+
+  function render(role, text, thinking) {
+    var d = document.createElement('div');
+    d.className = 'c-msg ' + (role === 'user' ? 'me' : 'bot') + (thinking ? ' thinking' : '');
+    d.textContent = text;
+    el('log').appendChild(d);
+    d.scrollIntoView({ block: 'nearest' });
+    return d;
+  }
+  function link(node, href, text) {
+    var a = document.createElement('a'); a.href = href; a.textContent = text; node.appendChild(a); return a;
+  }
+  /* E6 (#206, K3 hand-off): a Spanish bubble or footer opens the Spanish triage page (same card ids); English never links Spanish */
+  /* E12: on the drive (file://, no server) the triage links open the _v1 pages, which work without one; same card ids */
+  function triageHref(id, es) {
+    var v1 = location.protocol.indexOf('http') !== 0 ? '_v1' : '';
+    return (es ? 'triage_es' : 'triage') + v1 + '.html' + (id ? '#' + id : '');
+  }
+  /* mode: 'match', 'open' or 'closed'. #230 (E19 = A, 10-24): the list is labelled "Emergency? All emergency cards".
+     E23 (10-25, B; #237): a card match never shows a single-card bubble; it opens the list with the matched cards first
+     (decide().matched, closest first), the first in bold and marked "Closest match", then the other cards in E12 order.
+     With no card: 'open' when healthQ() fires, 'closed' (collapsed) otherwise. */
+  function renderCards(mode, es, matched) {   /* E12: all 28 cards, page order and names as on triage.html / triage_es.html */
+    var d = render('assistant', ''), det = document.createElement('details'), s = document.createElement('summary'),
+        ul = document.createElement('ul'), i, j, li, a, order = [], rest = CARDS.slice();
+    d.className += ' cards';
+    det.open = mode === 'match' || mode === 'open';
+    s.textContent = es ? '¿Emergencia? Todas las tarjetas de emergencia' : 'Emergency? All emergency cards';
+    det.appendChild(s);
+    for (j = 0; mode === 'match' && j < matched.length; j++) {
+      for (i = 0; i < rest.length; i++) { if (rest[i][0] === matched[j]) { order.push(rest.splice(i, 1)[0]); break; } }
+    }
+    order = order.concat(rest);
+    for (i = 0; i < order.length; i++) {
+      li = document.createElement('li'); a = link(li, triageHref(order[i][0], es), order[i][es ? 2 : 1]); ul.appendChild(li);
+      if (mode === 'match' && i === 0) {
+        li.className = 'guess'; a.style.fontWeight = '700';
+        li.appendChild(document.createTextNode(es ? ' ← Lo más parecido' : ' ← Closest match'));
+      }
+    }
+    det.appendChild(ul);
+    /* FIXES #287: the fixed emergency line above the card list, every answer (its own nav.l-emerg, not a card row) */
+    if (window.lanternEmergHTML) { d.insertAdjacentHTML('beforeend', window.lanternEmergHTML(es, function (id) { return triageHref(id, es); })); }
+    d.appendChild(det);
+    return d;
+  }
+  function renderTriage(tri, es) {
+    var d = render('assistant', es ? '¿Herido o enfermo? Primero los pasos verificados: ' : 'Hurt or sick? Vetted steps first: ');
+    d.className += ' triage';
+    link(d, triageHref(tri[0], es), (es ? tri[3] : tri[2]) + (es ? ' — página de triaje' : ' — triage page'));
+    return d;
+  }
+  function renderPin(pin, es) {
+    var d = render('assistant', '');
+    d.className += ' pin';
+    link(d, es ? pin[3] : pin[1], es ? pin[4] : pin[2]);
+    return d;
+  }
+  /* every turn ends with these: triage, the Spanish Hesperian door for a Spanish question only, and a search link */
+  function pointers(node, q, es) {
+    var p = document.createElement('p'); p.className = 'l-caption';
+    link(p, triageHref('', es), es ? 'Herido o enfermo (triaje)' : 'Hurt or sick (triage)');
+    if (es) {
+      p.appendChild(document.createTextNode(' · '));
+      link(p, 'mirrors/hesperian/es.hesperian.org/hhg/Nuevo_Donde_no_hay_doctor.html', 'Nuevo Donde no hay doctor (Hesperian, en español)');
+    }
+    p.appendChild(document.createTextNode(' · '));
+    link(p, 'search.html?' + (es ? 'lang=spa&' : '') + 'q=' + encodeURIComponent(q), es ? 'Buscar en español: «' + q + '»' : 'Search the library: “' + q + '”');
+    node.appendChild(p);
+  }
+  function caption(node, text) {
+    var p = document.createElement('p'); p.className = 'l-caption'; p.textContent = text; node.appendChild(p); return p;
+  }
+  function sources(node, hits, label, es) {
+    if (!hits.length) { return; }
+    var p = caption(node, label), i;
+    for (i = 0; i < hits.length; i++) {
+      if (i) { p.appendChild(document.createTextNode(' · ')); }
+      link(p, hitHref(hits[i], es), hits[i].title + (hits[i].page ? ' p.' + hits[i].page : '') +
+           (es && englishHit(hits[i]) ? ' (en inglés)' : '') +   /* #270 (a1b W9, es70): an English title in a Spanish answer says so */
+           (hits[i].historical ? (es ? ' (HISTÓRICO, anticuado)' : ' (HISTORICAL, outdated)') : ''));   /* N1 (#284): no card-pointer note */
+    }
+  }
+  /* a turn with no ordered list: dose refusal (no sources: refused before retrieval), nothing matched, or no answer */
+  function finish(wait, msg, hits, es, retry) {
+    wait.className = 'c-msg bot';
+    wait.textContent = msg;
+    if (retry) {   /* #212 (a1a W3, es34): one tap asks the same question again */
+      var q0 = lastQ, b = document.createElement('button');
+      b.className = 'l-chip'; b.type = 'button'; b.style.marginLeft = '8px';
+      b.textContent = es ? 'Buscar de nuevo' : 'Search again';
+      b.onclick = function () { b.disabled = true; send(q0); };
+      wait.appendChild(b);
+    }
+    sources(wait, hits, MSG[es ? 'es' : 'en'].more, es);
+    pointers(wait, lastQ, es);
+    el('send').disabled = false;
+  }
+  /* D4 (#278, 10-28): the matching pages as titles with page links; nothing is quoted */
+  function show(node, hits, note, es, done) {
+    var M = MSG[es ? 'es' : 'en'];
+    node.className = 'c-msg bot' + (done ? '' : ' thinking');
+    node.textContent = '';
+    caption(node, M.head);
+    caption(node, note);
+    sources(node, hits, M.more, es);
+    pointers(node, lastQ, es);
+    if (done) {
+      el('send').disabled = false;
+      speak(hits.map(function (h) { return h.title; }).join('. '));
+    }
+  }
+  /* #207 (a1a, a1b W7): under concurrent use a request hit the 8 s timeout and the page said "no passage". A timeout or a
+     dropped connection is retried once with a longer wait; cb(ok, responseText). #210 (r31 Pi): right after the box read all of
+     /data (cold cache) one Spanish search took 20 s, past the old 15 s retry; warm it is under 4 s, so the retry waits 30 s. */
+  function req(url, body, cb, retried) {
+    var x = new XMLHttpRequest();
+    x.open(body ? 'POST' : 'GET', url, true);
+    if (body) {
+      x.setRequestHeader('Content-Type', 'application/json');
+      x.setRequestHeader('Accept', 'application/json, text/event-stream');
+    }
+    x.timeout = retried ? 30000 : 8000;
+    x.onreadystatechange = function () {
+      if (x.readyState !== 4) { return; }
+      if (!x.status && !retried) { req(url, body, cb, true); return; }
+      cb(x.status === 200, x.responseText);
+    };
+    x.send(body || null);
+  }
+  function mcp(name, args, cb) {                 /* cb(parsed tool result, or null when the server did not answer) */
+    req('mcp', JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: name, arguments: args } }), function (ok, text) {
+      var c = null;
+      if (ok) { try { c = JSON.parse(JSON.parse(text).result.content[0].text) || {}; } catch (e) { c = {}; } }
+      cb(c);
+    });
+  }
+  function hitHref(h) {   /* hitHref(h, es): es adds &lang=es to a historical link (round 8, M3 hand-off); fix_f2_test reads this line */
+    var es = arguments[1];
+    if (h.path.indexOf('zim/') === 0) { return window.lanternKiwixBase() + '/content/' + h.path.slice(4); }
+    if (h.historical) { return window.lanternHref({ p: h.path, h: 1, es: !!es }); }
+    if (/\.pdf$/i.test(h.path)) {
+      return 'reader.html?f=' + encodeURIComponent(h.path) + (h.page ? '&p=' + h.page : '');
+    }
+    /* #148: Hesperian filenames end in "?" ("¿Qué es...?.html") and CD3WD ones carry "#"; raw they become a query/fragment */
+    return h.path.replace(/[%?#]/g, function (c) { return encodeURIComponent(c); });
+  }
+  /* /semantic and search_library in parallel, interleaved (semantic first: BM25 favours old scanned books), one row per
+     document. cb(titles, searchResult, failed): titles only (D4, #278); no snippet text is read or shown. */
+  function isNote(p) { return /^docs\/.*\.html$/.test(p.path) ? 1 : 0; }
+  function retrieve(q, es, cb) {
+    if (location.protocol.indexOf('http') !== 0) { cb([], {}, false); return; }
+    var sem = [], res = {}, n = 0, failed = false;
+    function both() { if (++n === 2) { merge(); } }
+    req('semantic?q=' + encodeURIComponent(q) + '&limit=6&lang=' + (es ? 'spa' : 'eng'), null, function (ok, text) {
+      if (!ok) { failed = true; }
+      try { sem = JSON.parse(text) || []; } catch (e) { sem = []; }
+      both();
+    });
+    mcp('search_library', { query: q, limit: 8, language: es ? 'spa' : 'eng' }, function (r) { if (!r) { failed = true; } res = r || {}; both(); });
+    function merge() {
+      if (OUTD === null) { outdWait.push(merge); return; }   /* the outdated list decides which rows are listed */
+      var a = [], weak = [], b = (res.hits || []), oth = [], seenO = {}, i, j, h, nn = 0;   /* nn: merge order (#271) */
+      for (i = 0; i < sem.length; i++) {
+        h = { title: sem[i].title || sem[i].path, path: sem[i].path, page: sem[i].page || null, historical: !!sem[i].historical,
+              outdated: !!sem[i].outdated };
+        if (sem[i].score >= (es ? ES_FLOOR : SEM_FLOOR)) { a.push(h); } else if (!es) { weak.push(h); }
+      }
+      b = b.concat(weak);            /* weak semantic rows go last, never first (a1gen 6) */
+      if (!es) {                     /* E6 (#206): English questions get no Spanish passages or titles */
+        a = a.filter(function (x) { return !spanishHit(x); });
+        b = b.filter(function (x) { return !spanishHit(x); });
+      }
+      /* D4 (#278 #279, 10-28): nothing is quoted; every hit is a title with its page link, one per document, in merge
+         order (E5: the two server orders interleaved as they come, each server applies the tie-break key) */
+      for (i = 0; i < Math.max(a.length, b.length); i++) {
+        for (j = 0; j < 2; j++) {
+          h = j ? b[i] : a[i];
+          if (!h || seenO[h.path] || outdPage(h)) { continue; }   /* an outdated page is dropped, not listed unmarked */
+          seenO[h.path] = 1;
+          oth.push({ n: ++nn, title: h.title || h.path, path: h.path, page: h.page || null, historical: !!h.historical });
+        }
+      }
+      /* a HISTORICAL book was never quoted as an answer (it was listed after the passages); with titles only it is listed after
+         the other titles, as Search lists it in its own section below */
+      oth = oth.filter(function (o) { return !o.historical; }).concat(oth.filter(function (o) { return o.historical; }));
+      if (es) { oth = oth.filter(spanishHit).concat(oth.filter(function (o) { return !spanishHit(o); })); }   /* es09 */
+      cb(oth, res, failed);
+    }
+  }
+  /* the model's only job: a list of page numbers. Anything else in its reply is ignored. */
+  function parsePick(reply, n) {
+    var m = /\[([\d\s,]*)\]/.exec(reply || ''), out = [], seen = {}, i, k, parts;
+    if (!m) { return null; }
+    parts = m[1].split(',');
+    for (i = 0; i < parts.length && out.length < 4; i++) {
+      k = parseInt(parts[i], 10);
+      if (k >= 1 && k <= n && !seen[k]) { seen[k] = 1; out.push(k - 1); }
+    }
+    return out;
+  }
+  function pick(q, hits, cb) {                    /* cb(array of indexes, or null when the model did not answer) */
+    var lines = [], i, url, body;
+    for (i = 0; i < hits.length; i++) { lines.push('[' + (i + 1) + '] ' + hits[i].title + (hits[i].page ? ', p.' + hits[i].page : '')); }
+    var turn = [{ role: 'system', content: PICK_SYSTEM },
+                { role: 'user', content: 'QUESTION: ' + q + '\n\nPAGES:\n' + lines.join('\n') }];
+    if (caps.chatKind === 'ollama') {
+      url = caps.chatEndpoint + '/api/chat';
+      body = { model: caps.chatModel, stream: false, format: 'json', options: { temperature: 0, num_predict: 40 }, messages: turn };
+    } else {
+      url = caps.chatEndpoint + '/v1/chat/completions';
+      body = { model: caps.chatModel || 'default', temperature: 0, max_tokens: 40, response_format: { type: 'json_object' }, messages: turn };
+    }
+    var x = new XMLHttpRequest();
+    x.open('POST', url, true);
+    x.setRequestHeader('Content-Type', 'application/json');
+    x.timeout = 120000;
+    x.onreadystatechange = function () {
+      if (x.readyState !== 4) { return; }
+      var reply = '';
+      try {
+        var j = JSON.parse(x.responseText);
+        reply = (j.message && j.message.content) || (j.choices && j.choices[0].message.content) || '';
+      } catch (e) {}
+      cb(x.status === 200 ? parsePick(reply, hits.length) : null);
+    };
+    x.send(JSON.stringify(body));
+  }
+  function modelName() {
+    return (caps.chatModel || caps.chatLabel || '').split('/').pop().replace(/\.gguf$/i, '');
+  }
+
+  function send(text) {
+    render('user', text);
+    lastQ = text;
+    var D = decide(text), es = D.es, M = MSG[es ? 'es' : 'en'];
+    /* E23 (#237): no single-card bubble; a matched card heads the open list below. #198: an emergency-looking question with
+       no card gets the general triage door first, passages or not */
+    if (D.fallback) { renderTriage(['', null, 'Emergency first steps', 'Primeros pasos de emergencia'], es); }
+    renderCards(D.cards, es, D.matched);   /* E12, E19, E23 */
+    if (D.pinRow) { renderPin(D.pinRow, es); }
+    var wait = render('assistant', M.searching, true);
+    el('send').disabled = true;
+    /* #207 (a7a S3a, b5 N7): a drug question or a dose figure in the question is refused BEFORE retrieval, so the refusal
+       lists no source pages (it listed the MSF ibuprofen monograph page) */
+    if (D.guard) { finish(wait, DOSE_MSG[es ? 'es' : 'en'], [], es); return; }
+    retrieve(D.ingest ? noDrugWords(text) : text, es, function (oth, res, failed) {
+      if (res.dose_guard) { finish(wait, DOSE_MSG[es ? 'es' : 'en'], [], es); return; }
+      /* D4 (#278 #279, 10-28): the page quotes nothing, so the passage demotions and their notes are gone with the
+         passages; N1 (#284): every title is listed bare (no card-pointer note) */
+      var fq = fold(text.toLowerCase());
+      if (D.purpose) {   /* "what is metronidazole for": its own pages (MSF, WikiMed) carry doses; the pages that name it first */
+        var names = fq.split(/[^a-z-]+/).filter(function (t) { return t.length >= 5 && (DRUGS.indexOf(t) !== -1 || DRUGS_ES.indexOf(t) !== -1); });
+        var named = function (o) { var ti = fold((o.title || '').toLowerCase()); return names.some(function (n) { return ti.indexOf(n.slice(0, 7)) !== -1; }); };
+        var yr = function (o) { var m = /\b(1[5-9]\d\d|20\d\d)\b/.exec(o.title || ''); return m ? +m[1] : 0; };   /* a7a F9: the newer edition first */
+        oth = oth.filter(named).sort(function (x, y) { return yr(y) - yr(x) || (x.n || 0) - (y.n || 0); }).concat(oth.filter(function (o) { return !named(o); }));
+      }
+      /* #207 (W7): a search that did not answer is not "no page" */
+      if (failed || !oth.length || D.purpose) { finish(wait, failed ? M.timeout : !oth.length ? M.none : M.drugtitles, oth, es, failed); return; }
+      /* no model: the titles in search order, nothing waits on a probe */
+      if (!caps || !caps.chat || !caps.chatEndpoint) { show(wait, oth, M.order, es, true); return; }
+      show(wait, oth, M.sorting, es, false);
+      pick(text, oth, function (order) {
+        if (!order) { show(wait, oth, M.failed, es, true); return; }
+        if (!order.length) { show(wait, oth, M.nopick, es, true); return; }
+        /* #193: a library-written note (vetted, docs/**.html) that the search put first stays first whatever the model's
+           order; a note further down is left to the model */
+        if (isNote(oth[0]) && sharesWord(oth[0].title, text)) { if (order.indexOf(0) !== -1) { order.splice(order.indexOf(0), 1); } order.unshift(0); }
+        var chosen = order.map(function (i) { return oth[i]; }), i;
+        for (i = 0; i < oth.length; i++) { if (order.indexOf(i) === -1) { chosen.push(oth[i]); } }
+        show(wait, chosen, M.picked.replace('%m', modelName()).replace('%n', oth.length), es, true);
+      });
+    });
+  }
+
+  /* E6 (#206): explicit Spanish mode, chat.html?lang=es (linked from the Spanish landing page): Spanish intro and labels.
+     Questions still auto-detect; a tie counts as Spanish. Without it the page is English only. */
+  ES_MODE = /[?&]lang=(?:es|spa)\b/.test(location.search);
+  if (ES_MODE) {
+    document.documentElement.lang = 'es';
+    el('intro').innerHTML = 'Haga una pregunta: esta página muestra las tarjetas de emergencia y una lista de las páginas de la ' +
+      'biblioteca que coinciden, por título; abra una página para leerla. Aquí no se cita nada. Cuando hay una IA funcionando ' +
+      'sin internet, solo pone las páginas en orden; no escribe nada de lo que usted lee aquí. Las páginas, los resúmenes y la búsqueda propios de esta biblioteca nunca indican dosis de medicamentos, y esta ' +
+      'página tampoco. Los libros de medicina del estante sí: para cualquier dosis, use la guía impresa de medicamentos ' +
+      '(Davis’s, Lippincott de bolsillo). ¿Herido o enfermo? <a href="triage_es.html">Vaya al triaje</a>.';
+    el('empty-head').textContent = 'Ninguna IA está ordenando resultados ahora. Puede preguntar abajo: la página muestra las ' +
+      'páginas que coinciden, en el orden de la búsqueda.';
+    el('empty-alt').innerHTML = 'O vaya directo a la <a href="search.html?lang=spa">búsqueda en español</a> o a ' +
+      '<a href="triage_es.html">Herido o enfermo (triaje)</a>.';
+    el('q').placeholder = 'Pregunte sobre primeros auxilios, agua, comida, reparaciones…';
+    el('send').textContent = 'Enviar';
+    /* #212 (a1a W4, b2 F11, a7b F7): the rest of the page in Spanish; app.js reads the h1 for the breadcrumb */
+    document.title = 'Preguntar — Lantern';
+    el('ask-h1').textContent = 'Preguntar';
+    el('es').textContent = 'English'; el('es').href = 'chat.html'; el('es').lang = 'en'; el('es').hreflang = 'en';
+    el('empty-how').innerHTML = 'Para que una IA ponga primero las páginas más útiles, póngala a funcionar en cualquier laptop ' +
+      'conectada al wifi LIBRARY y escriba aquí la dirección de esa laptop. La biblioteca trae una: ' +
+      '<a href="tools/llamafile/README.html">llamafile</a> (en inglés), sin internet (escriba <code>http://DIRECCION-DE-LA-LAPTOP:8081</code>). ' +
+      'Si la laptop ya tiene Ollama, iníciela con <code>OLLAMA_HOST=0.0.0.0 OLLAMA_ORIGINS=* ollama serve</code> y escriba solo la dirección.';
+    el('ep').placeholder = '192.168.1.20  (o http://192.168.1.20:11434)';
+    el('save-ep').textContent = 'Guardar y comprobar';
+    el('mic').title = 'Toque para hablar y otra vez para terminar (necesita la caja Lantern)';   /* a6 N6 */
+    el('say').title = 'Leer en voz alta los títulos de las páginas';
+  }
+
+  el('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var t = el('q').value.replace(/^\s+|\s+$/g, '');
+    if (!t || el('send').disabled) { return; }
+    el('q').value = '';
+    send(t);
+  });
+  el('q').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      var evt; try { evt = new Event('submit', { cancelable: true }); } catch (err) { return; }
+      el('form').dispatchEvent(evt);
+    }
+  });
+
+  /* ── R15 voice: STT via the box's whisper service (/stt nginx proxy),
+     TTS via the browser's own speechSynthesis (offline, no box needed). */
+  var speakOn = false;
+  el('say').addEventListener('click', function () {
+    speakOn = !speakOn;
+    el('say').textContent = speakOn ? '🔊' : '🔇';
+    el('say').setAttribute('aria-pressed', String(speakOn));
+    if (!speakOn && window.speechSynthesis) { speechSynthesis.cancel(); }
+  });
+  function speak(text) {
+    if (!speakOn || !window.speechSynthesis) { return; }
+    speechSynthesis.cancel();
+    speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+  }
+
+  function toWav16k(buf, ac) {                 /* mono 16 kHz 16-bit WAV */
+    return ac.decodeAudioData(buf).then(function (audio) {
+      var off = new OfflineAudioContext(1, Math.ceil(audio.duration * 16000), 16000);
+      var src = off.createBufferSource();
+      src.buffer = audio; src.connect(off.destination); src.start();
+      return off.startRendering();
+    }).then(function (rendered) {
+      var pcm = rendered.getChannelData(0);
+      var out = new DataView(new ArrayBuffer(44 + pcm.length * 2));
+      function str(o, s) { for (var i = 0; i < s.length; i++) { out.setUint8(o + i, s.charCodeAt(i)); } }
+      str(0, 'RIFF'); out.setUint32(4, 36 + pcm.length * 2, true); str(8, 'WAVE');
+      str(12, 'fmt '); out.setUint32(16, 16, true); out.setUint16(20, 1, true);
+      out.setUint16(22, 1, true); out.setUint32(24, 16000, true);
+      out.setUint32(28, 32000, true); out.setUint16(32, 2, true); out.setUint16(34, 16, true);
+      str(36, 'data'); out.setUint32(40, pcm.length * 2, true);
+      for (var i = 0; i < pcm.length; i++) {
+        var s = Math.max(-1, Math.min(1, pcm[i]));
+        out.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+      return new Blob([out.buffer], { type: 'audio/wav' });
+    });
+  }
+
+  var rec = null, chunks = [];
+  function micStop() { if (rec && rec.state !== 'inactive') { rec.stop(); } }
+  function micStart() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {   /* a6 F2: plain http */
+      render('assistant', ES_MODE ? 'La entrada por voz no funciona en esta página; escriba la pregunta.' :
+        'Voice input does not work on this page; type the question instead.'); return;
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+      chunks = [];
+      rec = new MediaRecorder(stream);
+      rec.ondataavailable = function (e) { chunks.push(e.data); };
+      rec.onstop = function () {
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        el('mic').textContent = '…';
+        new Blob(chunks).arrayBuffer().then(function (buf) {
+          return toWav16k(buf, new (window.AudioContext || window.webkitAudioContext)());
+        }).then(function (wav) {
+          var fd = new FormData();
+          fd.append('file', wav, 'q.wav');
+          fd.append('response_format', 'json');
+          return fetch('/stt', { method: 'POST', body: fd });
+        }).then(function (r) { return r.json(); }).then(function (j) {
+          var t = (j.text || '').replace(/^\s+|\s+$/g, '');
+          if (t) { el('q').value = t; el('q').focus(); }
+          el('mic').textContent = '🎤';
+        }).catch(function () {
+          el('mic').textContent = '🎤';
+          render('assistant', ES_MODE ? 'La entrada por voz necesita la caja Lantern (su servicio /stt no contestó).' :
+            'Voice input needs the Lantern box (its /stt service didn’t answer).');
+        });
+      };
+      rec.start();
+      el('mic').textContent = '⏺';
+    }).catch(function () {
+      render('assistant', ES_MODE ? 'Se negó el permiso del micrófono, así que la entrada por voz no funciona.' :
+        'Microphone permission was refused, so voice input can’t work.');
+    });
+  }
+  el('mic').addEventListener('click', function () {
+    if (rec && rec.state === 'recording') { micStop(); } else { micStart(); }
+  });
+  /* mic is pointless on file:// (no /stt origin) or without MediaRecorder */
+  if (location.protocol.indexOf('http') === 0 && window.MediaRecorder &&
+      navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    el('mic').hidden = false;
+  }
+
+  /* H7: bare "localhost" / "192.168.x.x" used to fail SILENTLY here.
+     Now: normalize (add http:// and :11434), probe right away, and always
+     say what happened — success reloads into the model picker, failure
+     shows the error + the OLLAMA_ORIGINS/HOST reminder. */
+  el('save-ep').addEventListener('click', function () {
+    var st = el('ep-status');
+    var v = el('ep').value.replace(/^\s+|\s+$|\/+$/g, '');
+    if (!v) { st.textContent = ES_MODE ? 'Escriba la dirección de la computadora que tiene llamafile u Ollama.' : 'Enter the address of the computer running llamafile or Ollama.'; return; }
+    if (!/^https?:\/\//.test(v)) { v = 'http://' + v; }
+    if (!/:\d+$/.test(v.replace(/^https?:\/\//, ''))) { v += ':11434'; }
+    st.textContent = (ES_MODE ? 'Comprobando ' : 'Checking ') + v + ' …';
+    /* #148: Ollama answers /api/tags, the shipped llamafile only /v1/models (same order as the page-load probe in app.js) */
+    function probe(path, next) {
+      var x = new XMLHttpRequest();
+      x.open('GET', v + path, true); x.timeout = 4000;
+      x.onreadystatechange = function () { if (x.readyState === 4) { next(x.status); } };
+      x.send();
+    }
+    probe('/api/tags', function (s1) {
+      if (s1 === 200) { return ok(); }
+      probe('/v1/models', function (s2) {
+        if (s2 === 200) { return ok(); }
+        st.textContent = ES_MODE ? 'No se pudo llegar a ' + v + ' desde este aparato (Ollama /api/tags: ' + (s1 ? 'HTTP ' + s1 : 'sin respuesta') +
+          '; llamafile /v1/models: ' + (s2 ? 'HTTP ' + s2 : 'sin respuesta') + '). Revise la dirección y el puerto: llamafile es :8081, ' +
+          'Ollama es :11434 y debe iniciarse con OLLAMA_HOST=0.0.0.0 OLLAMA_ORIGINS=* (un 403 quiere decir que OLLAMA_ORIGINS bloquea esta página).' :
+          'Could not reach ' + v + ' from this device (Ollama /api/tags: ' + (s1 ? 'HTTP ' + s1 : 'no response') +
+          '; llamafile /v1/models: ' + (s2 ? 'HTTP ' + s2 : 'no response') + '). Check the address and port: llamafile is :8081, ' +
+          'Ollama is :11434 and must be started with OLLAMA_HOST=0.0.0.0 OLLAMA_ORIGINS=* (a 403 means OLLAMA_ORIGINS is blocking this page).';
+      });
+    });
+    function ok() {
+      st.textContent = ES_MODE ? 'Conectado. Cargando los modelos…' : 'Connected. Loading models…';
+      try { localStorage.setItem('lantern.llm.endpoints', JSON.stringify([v])); } catch (e) {}
+      try { sessionStorage.removeItem('lantern.caps'); } catch (e) {}
+      location.reload();
+    }
+  });
+
+  (function ready() {
+    if (!window.lanternCaps) { setTimeout(ready, 40); return; }
+    caps = window.lanternCaps();
+    /* probe is async — poll until it has settled (chat set, or 8 s passed). The form shows at once (#182, a1gen: it
+       took 8.4 s with no model): a question asked before the probe settles gets the titles in search order. */
+    var t0 = Date.now();
+    (function waitProbe() {
+      caps = window.lanternCaps();
+      if (!caps.chat && Date.now() - t0 < 8000) { setTimeout(waitProbe, 250); return; }
+      if (caps.chat) {
+        /* model picker (H7): list every model on the endpoint, remember
+           the choice */
+        var url = caps.chatKind === 'ollama' ? caps.chatEndpoint + '/api/tags'
+                                             : caps.chatEndpoint + '/v1/models';
+        var mx = new XMLHttpRequest();
+        mx.open('GET', url, true); mx.timeout = 4000;
+        mx.onreadystatechange = function () {
+          if (mx.readyState !== 4 || mx.status !== 200) { return; }
+          var names = [];
+          try {
+            var j = JSON.parse(mx.responseText);
+            var arr = j.models || j.data || [];
+            for (var i = 0; i < arr.length; i++) { names.push(arr[i].name || arr[i].id); }
+          } catch (e) {}
+          if (names.length < 2) { return; }   /* one model: nothing to pick */
+          var sel = document.createElement('select');
+          sel.className = 'l-chip'; sel.style.marginBottom = '8px';
+          for (var k = 0; k < names.length; k++) {
+            var o = document.createElement('option');
+            o.value = o.textContent = names[k];
+            if (names[k] === caps.chatModel) { o.selected = true; }
+            sel.appendChild(o);
+          }
+          sel.onchange = function () {
+            caps.chatModel = sel.value;
+            try { localStorage.setItem('lantern.llm.model', JSON.stringify(sel.value)); } catch (e) {}
+            render('assistant', 'Switched to ' + sel.value + '.');
+          };
+          el('log').parentNode.insertBefore(sel, el('log'));
+        };
+        mx.send();
+        /* #182 (a1gen 8): "Ready — llamafile." named neither model; the model now says which one sorts */
+        render('assistant', ES_MODE ? 'IA lista (' + modelName() + '): ordena las páginas de la biblioteca por sus títulos y no escribe nada.' :
+          'AI ready (' + modelName() + '): it puts the library pages in order by their titles and writes nothing.');
+      } else {
+        /* G2 (#173, a1gen 3): the form stays usable with no model; send() then lists the titles in search order
+           with the triage and search pointers */
+        el('empty').hidden = false;
+      }
+    })();
+  })();
+})();
+</script>
+</body>
+</html>

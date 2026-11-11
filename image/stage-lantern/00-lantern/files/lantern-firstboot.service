@@ -1,0 +1,14 @@
+[Unit]
+Description=Lantern first-boot: identity regen + data partition
+DefaultDependencies=no
+After=local-fs.target
+Before=nginx.service kiwix.service kolibri.service ssh.service
+Wants=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/lantern/lantern-firstboot.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

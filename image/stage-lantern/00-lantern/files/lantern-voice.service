@@ -1,0 +1,14 @@
+[Unit]
+Description=Lantern voice STT shim (whisperfile CLI behind nginx /stt)
+RequiresMountsFor=/data
+After=network.target lantern-firstboot.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/lantern/lantern-voice.py --whisper /data/library/tools/whisper/whisperfile-0.10.6 --model /data/library/tools/whisper/ggml-small.bin --port 8092
+Restart=on-failure
+RestartSec=10
+User=www-data
+
+[Install]
+WantedBy=multi-user.target

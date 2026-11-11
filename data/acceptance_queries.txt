@@ -1,0 +1,45 @@
+# T7 fixed acceptance queries — category<TAB>query<TAB>expectation
+# expectation: path-substring | TRIAGE:#anchor | NEG (no dosing/dailymed results)
+medical	wound care	docs/medical/tccc
+medical	first aid	docs/medical
+medical	war surgery	emergency_war_surgery
+medical	bleeding	TRIAGE:#bleeding
+medical	diarrhea	TRIAGE:#gut
+medical	throwing up	TRIAGE:#gut
+medical	burn treatment	TRIAGE:#burns
+medical	childbirth	TRIAGE:#birth
+food	canning	canning_2015
+food	food preservation	food_preservation
+food	backyard chickens	usu_backyard_chickens
+energy	wood gas generator	fema_wood_gas_generator
+energy	solar heating	Heating/
+water	water purification	docs/water
+plant	mushroom	mushroom
+map	nautical charts	shelf/maps
+map	celestial navigation	Navigation/
+historical	blacksmithing	Smithing/
+neg	amoxicillin	NEG
+neg	aspirin dosage	NEG
+# NEG rows below are NOT in search.html drugQuery() keyword list on purpose: the dose guard must hold for plain-language queries too (red team 2026-10-03)
+neg	fever medicine for a child	NEG
+neg	antibiotic for tooth infection	NEG
+neg	how much ibuprofen	NEG
+neg	painkiller dose adult	NEG
+misspell	diarhea	TRIAGE:#gut
+misspell	canteloupe	EMPTY-GRACEFUL
+
+# ── Pagefind known-phrase fixtures (T7 served mode) — added 2026-09-18 ──
+# phrase<TAB>doc path<TAB>page. Result must open reader.html at that page,
+# term highlighted. All 11 ground-truthed with pdftotext against the PDFs;
+# each phrase is unique to its doc across the wrapper tree.
+phrase	have patient care responsibilities once	docs/medical/atp_4-02.10_theater_hospitalization.pdf	47
+phrase	island nation that once produced	docs/medical/hesperian_cgeh/en_cgeh_2012_15.pdf	35
+phrase	organisms in the biolayer eat other microorganisms	docs/water/cawst_biosand_filter_manual.pdf	10
+phrase	that school core planning teams	mirrors/ready_gov/www.ready.gov/sites/default/files/2025-09/school-districts-role-in-emergency-operations.pdf	43|46|47
+phrase	other metal container with minimum	docs/energy/fema_wood_gas_generator.pdf	52
+phrase	establish four water purification points	docs/water/fm_10-52_water_supply.pdf	12
+phrase	these instances working collaboratively with	docs/fire_safety/nfpa_wildfire_hiz_checklist.pdf	6
+phrase	medical planner ensure that medical	docs/medical/fm_4-02.2_medical_evacuation.pdf	16
+phrase	they post signs advising people	docs/foraging_coastal/cdph_marine_biotoxins.pdf	2
+phrase	numerous colleagues recently returned from	docs/medical/emergency_war_surgery.pdf	25
+phrase	declination diagram is located in the lower margin	docs/navigation/tc_3-25.26_map_reading_land_nav.pdf	24

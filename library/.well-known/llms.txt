@@ -1,0 +1,45 @@
+# Lantern Offline Survival Library
+
+> A self-contained offline survival library served from a Raspberry Pi on the LIBRARY WiFi network (http://library.lan/). ~9,700 documents across 22 shelves: medical, food preservation, water, plants, maps, radio, education, and more. No internet required or expected.
+
+## Entry points
+
+- [Home](/index.html): landing page with all shelves
+- [Search](/search.html): full-text search across the library
+- [Triage](/triage.html): emergency medical triage guide
+- [Runbook](/RUNBOOK.md): operator manual — power, services, content safety rules
+- [Kiwix ZIM server](http://library.lan:8080/): Wikipedia, iFixit, and other ZIM archives
+- [MCP endpoint](/mcp): JSON-RPC 2.0 over streamable HTTP for AI clients; discovery at [/.well-known/mcp.json](/.well-known/mcp.json)
+
+## Shelves
+
+- [Medical](/docs/medical/): TCCC 2024, MSF, WHO, Hesperian, war surgery (55 items)
+- [Plants & mushrooms](/docs/plant_id/): 62 species, edible and deadly, 5 photos each (682 items)
+- [Food preservation](/docs/food_preservation/): USDA Complete Guide to Home Canning 2015 (2 items)
+- [Water](/docs/water/): Treatment, storage, quality (5 items)
+- [Sanitation](/docs/sanitation/): Waste, hygiene, disease prevention (36 items)
+- [Audiobooks](/audio/librivox/): 52 classics in five age shelves (1564 items)
+- [CD3WD](/docs/cd3wd/): Development technology collection (131 items) — HISTORICAL: background only, do not use for food or drug guidance
+- [Communications](/docs/comms/): Radio, mesh, antennas (17 items)
+- [Emergency management](/docs/emergency_mgmt/): Planning, response (14 items)
+- [Energy & power](/docs/energy/): NEETS electronics course, wood gas, solar (25 items)
+- [Films](/video/prelinger/): Prelinger archive picks (20 items)
+- [Fire safety](/docs/fire_safety/): Wildfire prep, defensible space (2 items)
+- [Historical medical](/docs/HISTORICAL/): Pre-2010 — background only (3 items) — HISTORICAL: background only, do not use for food or drug guidance
+- [Homestead & garden](/docs/homesteading_extension/): Canning, dehydrating, seeds, soils, livestock (27 items)
+- [Maps & charts](/maps/): Topo, satellite, nautical, world vectors (33052 items)
+- [MIT OpenCourseWare](/docs/mit_ocw/): 23 college and grad courses (283 items)
+- [Navigation](/docs/navigation/): Land nav, celestial (1 item)
+- [Nuclear](/docs/nuclear/): Fallout, sheltering (1 item)
+- [Shelter](/docs/shelter/): Building, insulation, repair (5 items)
+- [Site mirrors](/mirrors/): Hesperian, NCHFP, Ready.gov, Sheldon Brown… (31512 items)
+- [Survivor Library](/docs/survivor_library/): 7,448 pre-industrial technology scans (7449 items) — HISTORICAL: background only, do not use for food or drug guidance
+- [Tools](/tools/): Sun calculator, converters, offline AI (745 items)
+
+## Content safety rules (RUNBOOK Part 5 — do not relax these)
+
+- Doses: the printed drug guide only: Davis's Drug Guide for Nurses (Lippincott pocket guide in the go-bag; Harriet Lane for children). Not Tarascon, which stopped in 2020. Never Wikipedia, never HISTORICAL docs, never AI models in tools/.
+- docs/HISTORICAL/ and Survivor Library: background/technique history only. Never for food preservation recipes or drug guidance. See docs/HISTORICAL/README-WARNING.txt.
+- Canning: 2015 USDA guide / NCHFP only (botulism is unforgiving).
+- Foraging: no positive multi-feature ID = don't eat. Mushrooms are expert-gated. Photos in docs/plant_id/ include deadly lookalikes on purpose.
+- Practice while it's easy: work through SKILLS_CHECKLIST.md — one drilled rep per core skill beats a terabyte of unread PDFs.

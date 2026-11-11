@@ -1,0 +1,8 @@
+# Python packages for the build machine (Python 3.14). Everything else is stdlib.
+# The Pi needs none of these: server/mcp_server.py is stdlib only.
+playwright==1.59.0   # tests (t5/t8/acceptance/plain), fix_l7_narrow, fetch scripts that drive Chrome
+numpy==2.4.6         # server/build_embeddings.py, server/validate_subset.py
+pillow==12.2.0       # build/gen_covers.py, tests/checks/fmt.py
+# Command-line tools used by build/fetch (BUILDING.md): pdftotext (poppler), rsync, sqlite3, ffmpeg/ffprobe, qpdf,
+# ocrmypdf, ghostscript, ImageMagick, coreutils (gsha256sum, gsplit), screen, wget, limactl (image build).
+# pagefind and kiwix-serve come from fetch/fetch_all.py; llamafile from fetch/download_tools.sh.

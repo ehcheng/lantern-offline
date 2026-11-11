@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map — Lantern</title>
+<link rel="icon" href="_app/brand/lantern-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_app/fonts/fonts.css">
+<link rel="stylesheet" href="_app/app.26829533.css">
+<link rel="stylesheet" href="_app/vendor/maplibre/maplibre-gl.css">
+<script src="_app/app.7858fbba.js" defer></script>
+<script src="_app/vendor/pmtiles/pmtiles.js" defer></script>
+<script src="_app/vendor/basemaps.js" defer></script>
+<script src="_app/index/places.js" defer></script>
+<style>
+  #map { height: 70vh; min-height: 380px; border-radius: 12px; border: 1px solid var(--l-line); margin: 16px 0; }
+  .m-msg { border: 1px solid var(--l-line); border-radius: 12px; padding: 20px; max-width: 640px; margin: 24px 0; }
+  .m-row { display: flex; gap: 10px; align-items: center; margin: 8px 0; }
+  .m-row[hidden] { display: none; }  /* #155: display:flex used to beat the hidden attribute */
+  .m-attr { font-size: 12px; margin: 4px 0 0; color: var(--l-muted); }
+  .m-attr a { color: inherit; }
+  .m-dl { max-width: 680px; margin-bottom: 40px; }
+  .m-dl li { display: flex; justify-content: space-between; padding: 6px 8px; border-bottom: 1px solid var(--l-line); }
+  .m-dl li a { text-decoration: none; }
+  .m-dis { color: var(--l-muted); }
+  .m-hint { background: var(--l-surface); color: var(--l-text); border: 1px solid var(--l-line); border-radius: 8px;
+    padding: 4px 8px; font-size: 13px; }
+  .m-hint[hidden] { display: none; }
+  /* a3 W2 (round 6): the home point is a labelled chip, not MapLibre's blue teardrop, which reads as "you are here" */
+  .m-home { background: var(--l-surface); color: var(--l-text); border: 1px solid var(--l-line); border-radius: 8px;
+    padding: 2px 8px; font-size: 12px; line-height: 1.3; text-align: center; max-width: 180px; position: relative; }
+  .m-home::after { content: ""; position: absolute; left: 50%; bottom: -7px; margin-left: -6px; border: 6px solid transparent;
+    border-bottom: 0; border-top-color: var(--l-line); }
+  .m-home span { display: block; color: var(--l-muted); }
+  /* #188 (RT3 a3 N6): on a phone the 70vh map ran ~42 px under the fixed tab bar. Below 1024 px, size the map to the
+     space between the page header (~250 px incl. title and caption) and the tab bar plus its lifted centre disc.
+     ponytail: header height is a constant; measure it in JS if the header above the map grows. */
+  @media (max-width: 1023px) {
+    #map { height: calc(100svh - 250px - var(--l-tab-h) - var(--l-tab-lift) - env(safe-area-inset-bottom, 0px)); min-height: 300px; }
+  }
+</style>
+</head>
+<body class="has-sidebar">
+
+<aside class="l-sidebar">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <!--SIDEPILL--><button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+  <a class="l-cta-triage l-cta-triage--side" href="triage.html">
+    <span class="cross">+</span><span><b>Hurt or sick</b></span>
+  </a>
+  <!--NAV-->
+  <nav class="l-nav" aria-label="Primary">
+    <a href="index.html">Shelves</a>
+    <a href="search.html">Search</a>
+    <a href="audio.html">Listening</a>
+    <a href="chat.html" class="needs-chat">Ask</a>
+    <a href="map.html" class="needs-maps hide-direct" aria-current="page">Map</a>
+    <a href="kids.html">Kids</a>
+  </nav>
+  <!--/NAV-->
+  <div class="l-shelflist" id="sidebar-shelves"></div>
+  <!--SIDEFOOT-->
+  <div class="l-foot"><p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div></div>
+  <!--/SIDEFOOT-->
+</aside>
+
+<main>
+<header class="l-header">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+</header>
+
+<div class="l-wrap">
+  <h1 id="m-title" style="font-family:var(--l-font-display);margin:24px 0 4px">Map</h1>
+  <!-- round 8 a3 W2 (E6): the one small link to the Spanish view, as chat.html and plants.html have -->
+  <p style="text-align:right;margin:0 0 4px;font-size:15px"><a id="m-lang" href="map.html?lang=es" lang="es" hreflang="es">Español</a></p>
+  <!-- ?lang=es: the h1 turns Spanish while the page parses, before app.js (deferred) builds the breadcrumb from it -->
+  <script>if (/[?&]lang=es(?:&|$)/.test(location.search)) { document.getElementById('m-title').textContent = 'Mapa'; }</script>
+  <!-- a3 W2 (round 6): "cannot show where you are" sits above the map, where the eye lands first -->
+  <p class="l-caption" id="m-intro">The whole planet, streets and buildings, from this box — no internet.
+    <b id="nolocate">This map cannot show where you are.</b></p>
+  <div class="m-msg" id="msg" hidden></div>
+  <!-- a3 N5 (round 6): a real button, above the map so it never sits under the tab bar -->
+  <div class="m-row" id="satrow" hidden>
+    <button type="button" class="l-chip m-dis" id="satchip" disabled>Satellite photos (California): checking…</button>
+  </div>
+  <div id="map" hidden></div>
+  <p class="l-caption" id="medcap" style="max-width:640px">It has no place search: find a
+    town or street by dragging and zooming until its name shows. Red crosses mark hospitals, clinics, doctors and
+    pharmacies as OpenStreetMap listed them in September 2026, plus Stanford Hospital, which OpenStreetMap has only
+    as an area. Only some hospitals show at the opening view; more appear with each tap on +. A few clinics and
+    doctors show after 2 taps, most of them and the pharmacies after 3, so zoom in before you decide none is near;
+    places close and move, so check before you count on one.
+    For a dot that follows you, use Organic Maps or OsmAnd on an Android phone (files below).</p>
+
+  <h2 id="m-phone" style="font-family:var(--l-font-display);margin:24px 0 8px">Maps for your phone</h2>
+  <p class="l-caption" id="m-phonecap" style="max-width:640px">For turn-by-turn use in the field, copy a region file to
+    your phone and open it in the free <b>Organic Maps</b> app (Android installer in
+    <a href="tools/android/">tools/android/</a>, with install steps in its README). The same regions for
+    <b>OsmAnd</b> are listed second. Files are grouped by state/region.</p>
+  <details class="m-dl"><summary class="l-chip" id="m-show" style="margin:10px 0">Show region files</summary>
+    <ul id="dl" style="list-style:none;padding:0"><li class="m-dis">Loading…</li></ul>
+  </details>
+  <p class="m-attr" id="m-attr">Map data © <a href="LICENSES.html#maps-openstreetmap-protomaps-maplibre">OpenStreetMap</a> contributors (ODbL,
+    openstreetmap.org/copyright).
+    Satellite photos: USGS NAIP (public domain). Drawn by MapLibre GL (BSD-3), tiles by Protomaps.</p>
+
+  <h2 id="m-naut" style="font-family:var(--l-font-display);margin:24px 0 8px">Nautical charts</h2>
+  <p class="l-caption" id="m-nautcap" style="max-width:640px">US coastal and inland charts (NOAA ENC and RNC) are in
+    <a href="maps/noaa_charts/README.html">maps/noaa_charts/</a>. They need a chartplotter program on a laptop:
+    <b>OpenCPN</b>, Mac and Windows installers in <a href="tools/opencpn/">tools/opencpn/</a> with setup steps in its README.</p>
+</div>
+</main>
+
+<!--TABBAR-->
+<nav class="l-tabbar" aria-label="Tabs">
+  <a href="index.html" class="l-tab l-tab-home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path><path d="M10 20v-5.5h4V20"></path></svg><span class="l-tab-label">Home</span></a>
+  <a href="search.html" class="l-tab l-tab-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.75" cy="10.75" r="6.75"></circle><path d="M15.75 15.75 20.5 20.5"></path></svg><span class="l-tab-label">Search</span></a>
+  <a href="triage.html" class="l-tab l-tab-triage"><span class="cross"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></span><span class="l-tab-label">Hurt or sick</span></a>
+  <a href="audio.html" class="l-tab l-tab-listening"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"></path><path d="M4 14.5h2.5A1.5 1.5 0 0 1 8 16v3a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 4 19z"></path><path d="M20 14.5h-2.5A1.5 1.5 0 0 0 16 16v3a1.5 1.5 0 0 0 1.5 1.5h1A1.5 1.5 0 0 0 20 19z"></path></svg><span class="l-tab-label">Listening</span></a>
+  <details class="l-more"><summary class="l-tab l-tab-more" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect></svg><span class="l-tab-label">More</span></summary>
+    <div class="l-msheet">
+      <div class="l-msheet-head"><h2 class="l-msheet-title">More</h2></div>
+      <div class="l-msheet-body">
+        <div class="l-msheet-links">
+          <a href="chat.html" class="needs-chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17H6.5A2.5 2.5 0 0 1 4 14.5z"></path></svg>Ask</a>
+          <a href="map.html" class="needs-maps hide-direct" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5 6-2.5v13.5L15 20l-6-2.5L3 20z"></path><path d="M9 4v13.5M15 6.5V20"></path></svg>Map</a>
+          <a href="kids.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8z"></path></svg>Kids</a>
+          <a href="video.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="m10 9 5 3-5 3z"></path></svg>Video</a>
+          <a href="plants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"></path><path d="M5 19c3-4 6-7 9-9"></path></svg>Plants</a>
+          <a href="tools/suncalc.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg>Sun &amp; moon</a>
+          <a href="tools/convert.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"></path></svg>Converters</a>
+        </div>
+        <p class="l-caption">Shelves</p>
+        <div class="l-shelflist" data-fill="shelves"></div>
+        <p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div>
+      </div>
+      <div class="l-msheet-foot"><button class="l-pill" type="button" data-role="status" onclick="lanternToggleTheme()" aria-label="Server status. Switch theme"><span class="dot"></span>checking…</button></div>
+    </div>
+  </details>
+</nav>
+<!--/TABBAR-->
+
+<script type="module">
+(async function () {
+  const el = id => document.getElementById(id);
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  /* E6 (round 6, a3 for L4's Spanish doors): map.html?lang=es is the Spanish view (page text, hint, marker, map labels in
+     Spanish where OpenStreetMap has a name:es); without it the page stays English only */
+  const ES = /[?&]lang=es(?:&|$)/.test(location.search);
+  const tx = (en, es) => ES ? es : en;
+  if (ES) {
+    document.documentElement.lang = 'es';
+    document.title = 'Mapa — Lantern';
+    for (const a of document.querySelectorAll('a.l-wordmark')) { a.href = 'es.html'; }
+    Object.assign(el('m-lang'), { textContent: 'English', href: 'map.html', lang: 'en', hreflang: 'en' });
+    const T = {
+      'm-intro': 'Todo el planeta, con calles y edificios, desde esta caja, sin internet. ' +
+        '<b id="nolocate">Este mapa no puede mostrar dónde está usted.</b>',
+      'satchip': 'Fotos de satélite (California): comprobando…',
+      'medcap': 'No tiene buscador de lugares: para encontrar un pueblo o una calle, arrastre el mapa y acérquese hasta ' +
+        'que aparezca su nombre. Las cruces rojas marcan hospitales, clínicas, médicos y farmacias tal como los registró ' +
+        'OpenStreetMap en septiembre de 2026, más el Stanford Hospital, que OpenStreetMap solo tiene como un área. ' +
+        'En la vista inicial solo se ven algunos hospitales; con cada toque en + aparecen más. Algunas clínicas y ' +
+        'algunos médicos aparecen tras 2 toques, la mayoría de ellos y las farmacias tras 3, así que acérquese antes ' +
+        'de decidir que no hay ninguno cerca; los lugares cierran y se mudan, así que confírmelo antes de ' +
+        'contar con uno. Para un punto que le siga a usted, use Organic Maps u OsmAnd en un teléfono Android ' +
+        '(archivos abajo).',
+      'm-phone': 'Mapas para su teléfono',
+      'm-phonecap': 'Para ir paso a paso en el campo, copie el archivo de una región a su teléfono y ábralo en la app ' +
+        'gratuita <b>Organic Maps</b> (instalador para Android en <a href="tools/android/">tools/android/</a>, con los ' +
+        'pasos en su README, en inglés). Las mismas regiones para <b>OsmAnd</b> van en segundo lugar. Los archivos ' +
+        'están agrupados por estado o región.',
+      'm-show': 'Ver archivos de regiones',
+      'dl': '<li class="m-dis">Cargando…</li>',
+      'm-attr': 'Datos del mapa © colaboradores de <a href="LICENSES.html#maps-openstreetmap-protomaps-maplibre">' +
+        'OpenStreetMap</a> (ODbL, openstreetmap.org/copyright). Fotos de satélite: USGS NAIP (dominio público). Dibujado ' +
+        'con MapLibre GL (BSD-3), teselas de Protomaps.',
+      'm-naut': 'Cartas náuticas',
+      'm-nautcap': 'Las cartas de costa y aguas interiores de EE. UU. (NOAA ENC y RNC) están en ' +
+        '<a href="maps/noaa_charts/README.html">maps/noaa_charts/</a> (en inglés). Necesitan un programa de cartas náuticas en ' +
+        'una computadora portátil: <b>OpenCPN</b>, instaladores para Mac y Windows en ' +
+        '<a href="tools/opencpn/">tools/opencpn/</a>, con los pasos en su README (en inglés).'
+    };
+    for (const k in T) { el(k).innerHTML = T[k]; }
+    /* round 9 a3 W4: the desktop sidebar's "Operator" caption, worded as the phone More sheet has it */
+    for (const c of document.querySelectorAll('.l-foot .l-caption')) { c.textContent = 'Operador (en inglés)'; }
+  }
+  while (!window.lanternCaps) { await wait(40); }
+
+  /* downloads list: places.js is a <script> global (fetch is blocked on file://), so it works in both modes */
+  while (!window.LANTERN_PLACES) { await wait(40); }
+  const pl = window.LANTERN_PLACES;
+  const row = r => `<li><a href="${r.file}">${r.name}</a><span class="l-caption">${r.mb} MB</span></li>`;
+  el('dl').innerHTML = `<li class="l-caption">Organic Maps (.mwm)</li>` + pl.organicmaps.map(row).join('') +
+    `<li class="l-caption">OsmAnd (.obf.zip)</li>` + (pl.osmand || []).map(row).join('');
+
+  if (location.protocol === 'file:') {
+    el('msg').hidden = false;
+    el('medcap').hidden = true;  /* a3 N6 (round 6): no map here, so no crosses to describe */
+    el('msg').innerHTML = tx('<b>The interactive map needs the server.</b><p>Reading straight from ' +
+      'the drive, the planet file can’t stream. Join the LIBRARY wifi and open this page from ' +
+      'the box — or use the phone map files below.</p>',
+      '<b>El mapa interactivo necesita el servidor.</b><p>Leyendo directamente del disco, el archivo del planeta ' +
+      'no se puede cargar. Conéctese al wifi LIBRARY y abra esta página desde la caja, o use los archivos de mapas ' +
+      'para teléfono de abajo.</p>');
+    return;
+  }
+  /* wait for the maps probe (planet.pmtiles range request) to settle */
+  let t0 = Date.now();
+  while (!window.lanternCaps().maps && Date.now() - t0 < 8000) { await wait(250); }
+  if (!window.lanternCaps().maps) {
+    el('msg').hidden = false;
+    el('medcap').hidden = true;
+    el('msg').innerHTML = tx('<b>The planet file isn’t answering.</b><p>maps/pmtiles/planet.pmtiles ' +
+      'is missing or the server can’t do range requests.</p>',
+      '<b>El archivo del planeta no responde.</b><p>maps/pmtiles/planet.pmtiles falta o el servidor no admite ' +
+      'peticiones por rangos.</p>');
+    return;
+  }
+
+  const mlMod = await import('./_app/vendor/maplibre/maplibre-gl.mjs');
+  const maplibregl = mlMod.default || mlMod;
+  const protocol = new pmtiles.Protocol();
+  maplibregl.addProtocol('pmtiles', protocol.tile);
+
+  const light = document.documentElement.getAttribute('data-theme') === 'light' ||
+    !matchMedia('(prefers-color-scheme: dark)').matches;
+  const flavorName = light ? 'light' : 'dark';
+  const base = location.origin + location.pathname.replace(/[^\/]*$/, '');
+  let home = { lon: -122.236, lat: 37.485, name: 'home' };
+  try {
+    const cfg = await fetch('_app/config.json').then(r => r.json());
+    if (cfg.homeRegion) { home = { lon: cfg.homeRegion.lon, lat: cfg.homeRegion.lat, name: cfg.homeRegion.name }; }
+  } catch (e) {}
+
+  /* #188 (RT3 a3 W1): the stock pois layer (vendor basemaps.js, left unmodified) filters out hospital, clinic, doctors
+     and pharmacy, and its sprite has no icon for them. Draw them in our own layer: same name/font as the stock pois,
+     a red-cross icon drawn below, and placed last so it wins label collisions against shops and cafes. */
+  /* round 9 a3 W3: hospitals the OSM pois layer lacks (tagged only as landuse), drawn the same way from this list */
+  const EXTRA_MED = [{ type: 'Feature', geometry: { type: 'Point', coordinates: [-122.1752, 37.4335] },
+    properties: { name: 'Stanford Hospital' } }];
+  function withMedical(layers) {
+    const poi = layers.find(l => l.id === 'pois') || { layout: {}, paint: {} };
+    const med = (id, src, more) => Object.assign({
+      id, type: 'symbol', source: src, minzoom: 12,
+      layout: { 'icon-image': 'lantern-med', 'icon-allow-overlap': true, 'text-field': poi.layout['text-field'],
+        'text-font': poi.layout['text-font'], 'text-size': 12, 'text-max-width': 8, 'text-offset': [1.1, 0],
+        /* a3 N8 (round 6): in dense streets the name can lose the label collision; the cross still shows */
+        'text-optional': true,
+        'text-justify': 'auto', 'text-variable-anchor': ['left', 'right'] },
+      paint: { 'text-color': light ? '#B3261E' : '#FF8A80',
+        'text-halo-color': poi.paint['text-halo-color'] || (light ? '#ffffff' : '#000000'), 'text-halo-width': 1.5 }
+    }, more);
+    return layers.concat([med('lantern-medical', 'protomaps', { 'source-layer': 'pois',
+      filter: ['in', ['get', 'kind'], ['literal', ['hospital', 'clinic', 'doctors', 'pharmacy']]] }),
+      med('lantern-medical-extra', 'lantern-extra', {})]);
+  }
+  function medIcon() {
+    const n = 32, c = document.createElement('canvas'); c.width = c.height = n;
+    const g = c.getContext('2d');
+    g.fillStyle = '#B3261E'; g.beginPath(); g.arc(n / 2, n / 2, n / 2 - 1, 0, 2 * Math.PI); g.fill();
+    g.strokeStyle = '#ffffff'; g.lineWidth = 2; g.stroke();
+    g.fillStyle = '#ffffff'; g.fillRect(n / 2 - 3, 7, 6, n - 14); g.fillRect(7, n / 2 - 3, n - 14, 6);
+    return g.getImageData(0, 0, n, n);
+  }
+
+  el('map').hidden = false;
+  el('satrow').hidden = false;
+  /* a3 W2/N5 (round 6): the caption and the satellite button now sit above the map, and the Spanish text is longer,
+     so on a phone size the map to the space left above the tab bar instead of the #188 constant (kept as the fallback) */
+  const tabbar = document.querySelector('.l-tabbar');
+  if (tabbar && matchMedia('(max-width: 1023px)').matches) {
+    const room = tabbar.getBoundingClientRect().top - el('map').getBoundingClientRect().top - 16;
+    if (room > 300) { el('map').style.height = room + 'px'; }
+  }
+  const map = new maplibregl.Map({
+    container: 'map',
+    style: {
+      version: 8,
+      glyphs: base + '_app/vendor/basemaps-assets/fonts/{fontstack}/{range}.pbf',
+      sprite: base + '_app/vendor/basemaps-assets/sprites/v4/' + flavorName,
+      sources: { protomaps: { type: 'vector', url: 'pmtiles://' + base + 'maps/pmtiles/planet.pmtiles',
+        /* round 10 a3 N4: the usual Spanish form, «© colaboradores de OpenStreetMap» */
+        attribution: tx('© <a href="LICENSES.html#maps-openstreetmap-protomaps-maplibre">OpenStreetMap</a> contributors',
+          '© colaboradores de <a href="LICENSES.html#maps-openstreetmap-protomaps-maplibre">OpenStreetMap</a>') +
+          ' · Protomaps' },
+        'lantern-extra': { type: 'geojson', data: { type: 'FeatureCollection', features: EXTRA_MED } } },
+      layers: withMedical(basemaps.layers('protomaps', basemaps.namedFlavor(flavorName), { lang: tx('en', 'es') }))
+    },
+    center: [home.lon, home.lat],
+    /* a3 W1 (round 6): open at z12, so hospitals show at once; a few clinics and doctors after 2 taps on + (z14), and
+       most of them with the pharmacies, which sit almost only in z15 tiles (redteam_20261026_a3_medzoom9.log), after 3 */
+    zoom: 12,
+    /* #155: always-open attribution, no maplibre.org link (default customAttribution), out from under the tab bar */
+    attributionControl: false,
+    /* round 7 a3 W2: control labels (title, aria-label) and the canvas name in Spanish on ?lang=es; MapLibre keeps
+       its English defaults for any key not given here */
+    locale: ES ? { 'NavigationControl.ZoomIn': 'Acercar', 'NavigationControl.ZoomOut': 'Alejar',
+      'NavigationControl.ResetBearing': 'Arrastre para girar el mapa; toque para volver al norte',
+      'AttributionControl.ToggleAttribution': 'Mostrar u ocultar los créditos', 'Map.Title': 'Mapa',
+      'Marker.Title': 'Marcador del mapa', 'Popup.Close': 'Cerrar' } : undefined,
+    /* #155: the font set covers U+0000-FFFF only; emoji in labels (U+1F300+) asked for a range that 404s.
+       Point those at a range that exists: the glyph is simply absent, no request error. */
+    transformRequest: (url, type) => {
+      const m = type === 'Glyphs' && url.match(/\/(\d+)-\d+\.pbf$/);
+      return (m && +m[1] > 65535) ? { url: url.replace(/\d+-\d+\.pbf$/, '0-255.pbf') } : { url };
+    }
+  });
+  map.addImage('lantern-med', medIcon(), { pixelRatio: 2 });
+  map.addControl(new maplibregl.AttributionControl({ compact: false }), 'top-left');
+  map.addControl(new maplibregl.NavigationControl());
+  /* #180 (a3 W1): bottom-left sat under the fixed tab bar at first load on a phone; top-left stacks under the attribution */
+  map.addControl(new maplibregl.ScaleControl(), 'top-left');
+  /* #197 (RT4 a3 W2): the medical layer starts at z12 and the map opens at z11, so the first view showed no crosses and
+     no reason why. z11 tiles hold almost none (1 hospital in the 9 home tiles, fix_j7_medzoom.py), so a lower minzoom
+     would not help: say it on the map until the reader zooms in. */
+  const medHint = document.createElement('div');
+  medHint.className = 'maplibregl-ctrl m-hint';
+  map.addControl({ onAdd: () => medHint, onRemove: () => medHint.remove() }, 'bottom-left');
+  /* #208 (RT5 a3 W1): hospitals show from z12, clinics and doctors from z14 (z13 tiles hold almost none; fix_k8_map.py).
+     Round 6 a3 W1: pharmacies only from z15, so the hint stays until z15 and says what is still to come.
+     Round 8 a3 W1 (#244): z12 tiles hold only some hospitals (188 at z12, 351 at z14, 401 at z15 in 16 city windows;
+     Redwood City Kaiser from z14), so the hint promises more hospitals at every step.
+     Round 9 a3 W1: at z14 only 17% of clinics and 5% of doctors draw (383 and 416 at z15, a3_medzoom9 in 56 windows),
+     so the z14 hint names them too. */
+  const medHintShow = () => {
+    const z = map.getZoom();
+    medHint.hidden = z >= 15;
+    medHint.textContent = z < 12 ? tx('Zoom in to see hospitals and pharmacies (red crosses)',
+        'Acérquese para ver hospitales y farmacias (cruces rojas)')
+      : z < 14 ? tx('Zoom in more for more hospitals, and for clinics, doctors and pharmacies (red crosses)',
+        'Acérquese más para ver más hospitales, y también clínicas, médicos y farmacias (cruces rojas)')
+      : tx('Zoom in one more step for most clinics and doctors, the pharmacies and the smallest hospitals (red crosses)',
+        'Acérquese un paso más para ver la mayoría de clínicas y médicos, las farmacias y los hospitales más pequeños (cruces rojas)');
+  };
+  map.on('zoom', medHintShow); medHintShow();
+  /* a3 W2 (round 6): the stock blue teardrop read as "you are here"; a labelled chip says what the point is */
+  const homeEl = document.createElement('div');
+  homeEl.className = 'm-home';
+  homeEl.textContent = home.name;
+  homeEl.appendChild(document.createElement('span')).textContent =
+    tx('map start, not your location', 'inicio del mapa, no es su ubicación');
+  new maplibregl.Marker({ element: homeEl, anchor: 'bottom', offset: [0, -7] }).setLngLat([home.lon, home.lat]).addTo(map);
+
+  /* satellite raster layer: only if the mbtiles→pmtiles conversion has run */
+  try {
+    const r = await fetch('maps/pmtiles/satellite_ca.pmtiles', { headers: { Range: 'bytes=0-127' } });
+    if (r.status === 206) {
+      const chip = el('satchip');
+      chip.classList.remove('m-dis');
+      chip.disabled = false;
+      chip.setAttribute('aria-pressed', 'false');
+      chip.textContent = tx('Satellite photos (California): off', 'Fotos de satélite (California): apagadas');
+      let on = false;
+      chip.onclick = () => {
+        if (!map.getSource('sat')) {
+          map.addSource('sat', { type: 'raster', attribution: tx('Imagery: USGS NAIP', 'Imágenes: USGS NAIP'),
+            url: 'pmtiles://' + base + 'maps/pmtiles/satellite_ca.pmtiles', tileSize: 256 });
+          map.addLayer({ id: 'sat', type: 'raster', source: 'sat',
+            paint: { 'raster-opacity': 1 } }, map.getStyle().layers.find(l => l.type === 'symbol')?.id);
+        }
+        on = !on;
+        map.setLayoutProperty('sat', 'visibility', on ? 'visible' : 'none');
+        chip.setAttribute('aria-pressed', String(on));
+        chip.textContent = tx('Satellite photos (California): ', 'Fotos de satélite (California): ') +
+          (on ? tx('on', 'encendidas') : tx('off', 'apagadas'));
+      };
+    } else { el('satchip').textContent = tx('Satellite photos (California) — not installed yet', 'Fotos de satélite (California): aún no instaladas'); }
+  } catch (e) { el('satchip').textContent = tx('Satellite photos (California) — not installed yet', 'Fotos de satélite (California): aún no instaladas'); }
+})();
+</script>
+<noscript><p style="margin:20px">The map needs JavaScript. Phone map files are in
+  <a href="maps/organicmaps/">maps/organicmaps/</a>.</p></noscript>
+</body>
+</html>

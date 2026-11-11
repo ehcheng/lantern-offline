@@ -1,0 +1,12 @@
+Lantern Offline Survival Resource
+Copyright 2026 Eric Cheng
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This repository contains no third-party files. The build downloads these third-party components, each under its own
+license: pdf.js, MapLibre GL JS, PMTiles, the Protomaps basemap style with its glyphs and icons, the Newsreader,
+Atkinson Hyperlegible and Libre Baskerville fonts, Pagefind and kiwix-tools. sources.json gives the version, download
+address, checksum and license of each one.
+
+The library content that a build downloads (books, archives, maps, models) is also outside this license.
+library/LICENSES.md lists the terms for each source.

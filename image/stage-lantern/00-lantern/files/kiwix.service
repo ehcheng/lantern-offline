@@ -1,0 +1,24 @@
+[Unit]
+Description=Kiwix ZIM server
+# RequiresMountsFor, not Requires=data.mount: data.mount doesn't exist until
+# firstboot writes the fstab entry (generators already ran on first boot), so
+# a hard Requires can never start. RequiresMountsFor is a no-op when /data
+# isn't in fstab (first boot: firstboot mounts it manually, ordered Before us)
+# and waits for the generated data.mount on every later boot.
+RequiresMountsFor=/data
+After=lantern-firstboot.service
+
+[Service]
+Type=simple
+# library.xml does NOT exist otherwise (red-team finding 3): rebuild from
+# whatever ZIMs are on the data partition, every start. The '+' runs this step
+# as root: a /data made by firstboot is root:root 755, so as www-data it could
+# not write library.xml and kiwix crash-looped (1.0.4 card-boot test, 11-06).
+ExecStartPre=+/bin/sh -c 'rm -f /data/library.xml; for z in /data/library/zim/*.zim; do [ -e "$z" ] && /usr/local/bin/kiwix-manage /data/library.xml add "$z"; done; true'
+ExecStart=/usr/local/bin/kiwix-serve --library /data/library.xml --port 8080 --address 0.0.0.0
+Restart=on-failure
+RestartSec=5
+User=www-data
+
+[Install]
+WantedBy=multi-user.target

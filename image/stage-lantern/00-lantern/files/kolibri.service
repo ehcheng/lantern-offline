@@ -1,0 +1,28 @@
+[Unit]
+Description=Kolibri learning platform
+# RequiresMountsFor, not Requires=data.mount: data.mount doesn't exist until
+# firstboot writes the fstab entry (generators already ran on first boot), so
+# a hard Requires can never start. RequiresMountsFor is a no-op when /data
+# isn't in fstab (first boot: firstboot mounts it manually, ordered Before us)
+# and waits for the generated data.mount on every later boot.
+RequiresMountsFor=/data
+After=lantern-firstboot.service
+
+[Service]
+Type=simple
+Environment=KOLIBRI_HOME=/data/kolibri_data
+# FIXES #151 (a8 F1, b4 F1/F5). Kolibri reads every option as KOLIBRI_<OPTION>
+# (kolibri/utils/options.py:872). [Deployment] DISABLE_PING: "Turn off the
+# statistics pingback" (options.py:676). [Paths] AUTOMATIC_PROVISION_FILE
+# (options.py:642): at start, while is_provisioned is false, kolibri/utils/
+# main.py:244 provisions facility + superuser from this JSON, so the open
+# /en/setup/ wizard never appears. lantern-firstboot.sh writes the file.
+Environment=KOLIBRI_DISABLE_PING=1
+Environment=KOLIBRI_AUTOMATIC_PROVISION_FILE=/etc/lantern/kolibri-provision.json
+ExecStart=/opt/kolibri/bin/kolibri start --foreground --port 8081
+Restart=on-failure
+RestartSec=10
+User=lantern
+
+[Install]
+WantedBy=multi-user.target

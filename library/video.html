@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video — Lantern</title>
+<link rel="icon" href="_app/brand/lantern-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_app/fonts/fonts.css">
+<link rel="stylesheet" href="_app/app.26829533.css">
+<script src="_app/app.7858fbba.js" defer></script>
+<style>
+  .v-player { margin: 16px 0; }
+  .v-player video { width: 100%; max-height: 70vh; background: #000; border-radius: 10px; }
+  .v-now { font-family: var(--l-font-display); font-size: 18px; margin: 8px 0 20px; }
+  .v-list { list-style: none; padding: 0; margin: 0 0 40px; max-width: 680px; }
+  .v-list li a { display: flex; justify-content: space-between; gap: 10px; padding: 10px;
+    border-bottom: 1px solid var(--l-line); text-decoration: none; color: inherit; border-radius: 6px; }
+  .v-list li a.is-playing { background: var(--l-surface1, rgba(128,128,128,.12)); font-weight: bold; }
+</style>
+</head>
+<body class="has-sidebar">
+
+<aside class="l-sidebar">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <!--SIDEPILL--><button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+  <a class="l-cta-triage l-cta-triage--side" href="triage.html">
+    <span class="cross">+</span><span><b>Hurt or sick</b></span>
+  </a>
+  <!--NAV-->
+  <nav class="l-nav" aria-label="Primary">
+    <a href="index.html">Shelves</a>
+    <a href="search.html">Search</a>
+    <a href="audio.html">Listening</a>
+    <a href="chat.html" class="needs-chat">Ask</a>
+    <a href="map.html" class="needs-maps hide-direct">Map</a>
+    <a href="kids.html">Kids</a>
+  </nav>
+  <!--/NAV-->
+  <div class="l-shelflist" id="sidebar-shelves"></div>
+  <!--SIDEFOOT-->
+  <div class="l-foot"><p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div></div>
+  <!--/SIDEFOOT-->
+</aside>
+
+<main>
+<header class="l-header">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <button class="l-pill" data-role="status" onclick="lanternToggleTheme()"><span class="dot"></span>checking…</button>
+</header>
+
+<div class="l-wrap">
+  <h1 style="font-family:var(--l-font-display);margin:24px 0 4px">Video</h1>
+  <p class="l-caption">Old instructional films (Prelinger Archives), Khan Academy lessons and preschool clips. Playback picks up where you left off.</p>
+  <p class="l-caption" id="showall" hidden><a href="video.html">Show all videos</a></p>
+  <div class="v-player" id="playerwrap" hidden>
+    <video id="video" controls preload="metadata"></video>
+    <div class="v-now" id="now"></div>
+  </div>
+  <div id="list"></div>
+  <noscript><p>This page needs JavaScript. The films themselves are in
+    <a href="video/prelinger/">video/prelinger/</a>.</p></noscript>
+</div>
+</main>
+
+<!--TABBAR-->
+<nav class="l-tabbar" aria-label="Tabs">
+  <a href="index.html" class="l-tab l-tab-home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path><path d="M10 20v-5.5h4V20"></path></svg><span class="l-tab-label">Home</span></a>
+  <a href="search.html" class="l-tab l-tab-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.75" cy="10.75" r="6.75"></circle><path d="M15.75 15.75 20.5 20.5"></path></svg><span class="l-tab-label">Search</span></a>
+  <a href="triage.html" class="l-tab l-tab-triage"><span class="cross"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></span><span class="l-tab-label">Hurt or sick</span></a>
+  <a href="audio.html" class="l-tab l-tab-listening"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"></path><path d="M4 14.5h2.5A1.5 1.5 0 0 1 8 16v3a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 4 19z"></path><path d="M20 14.5h-2.5A1.5 1.5 0 0 0 16 16v3a1.5 1.5 0 0 0 1.5 1.5h1A1.5 1.5 0 0 0 20 19z"></path></svg><span class="l-tab-label">Listening</span></a>
+  <details class="l-more"><summary class="l-tab l-tab-more"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect></svg><span class="l-tab-label">More</span></summary>
+    <div class="l-msheet">
+      <div class="l-msheet-head"><h2 class="l-msheet-title">More</h2></div>
+      <div class="l-msheet-body">
+        <div class="l-msheet-links">
+          <a href="chat.html" class="needs-chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17H6.5A2.5 2.5 0 0 1 4 14.5z"></path></svg>Ask</a>
+          <a href="map.html" class="needs-maps hide-direct"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5 6-2.5v13.5L15 20l-6-2.5L3 20z"></path><path d="M9 4v13.5M15 6.5V20"></path></svg>Map</a>
+          <a href="kids.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8z"></path></svg>Kids</a>
+          <a href="video.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="m10 9 5 3-5 3z"></path></svg>Video</a>
+          <a href="plants.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"></path><path d="M5 19c3-4 6-7 9-9"></path></svg>Plants</a>
+          <a href="tools/suncalc.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg>Sun &amp; moon</a>
+          <a href="tools/convert.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"></path></svg>Converters</a>
+        </div>
+        <p class="l-caption">Shelves</p>
+        <div class="l-shelflist" data-fill="shelves"></div>
+        <p class="l-caption">Operator</p><div class="l-shelflist"><a href="_app/runbook.html">Operator runbook</a><a href="_app/skills.html">Skills checklist</a><a href="_app/purchases.html">Purchases &amp; print plan</a><a href="_app/about.html">About Lantern</a><a href="_app/known_gaps.html">Known gaps</a><a href="LICENSES.html">Licenses</a><a href="index_v1.html">Plain version</a></div>
+      </div>
+      <div class="l-msheet-foot"><button class="l-pill" type="button" data-role="status" onclick="lanternToggleTheme()" aria-label="Server status. Switch theme"><span class="dot"></span>checking…</button></div>
+    </div>
+  </details>
+</nav>
+<!--/TABBAR-->
+
+<script>
+(function () {
+  'use strict';
+  function el(id) { return document.getElementById(id); }
+  var FILMS = null, cur = -1;
+  var video = el('video');
+
+  /* FIXES #161: audio/video rows carry a real title in titles.json (gen_media_titles.py); the file-name
+     fallback below is only for an index built without it */
+  function label(f) {
+    if (!/^video\/(prelinger|preschool|khan_academy)\//.test(f.p) || !f.t) { return pretty(f.p); }   /* FIXES #175/#178: Khan rows print t */
+    var raw = f.p.split('/').pop().replace(/\.mp4$/i, '').replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    raw = raw.charAt(0).toUpperCase() + raw.slice(1);
+    if (f.t === raw || /^(Math|Science) \d\d /.test(f.t)) { return pretty(f.p); }   /* an index built without media_titles.json carries the file name */
+    return f.t.replace(/\s\(Khan Academy: [^)]*\)$/, '');   /* the group header already names the series */
+  }
+  function pretty(p) {
+    if (/^video\/(khan_academy|preschool)\//.test(p)) {
+      /* CD3WD names: "math_01_arith_001_Basic_Addition", "_ed_sch_presch_read_words_nv_no_voice_medium_163340_bridge_n" */
+      return p.split('/').pop().replace(/\.mp4$/i, '')
+        .replace(/^.*_[0-9]{3,}_/, '')
+        .replace(/(^|_)(dvdp|pal|ntsc|ed|presch|video|sch|voice|nv|no_voice|n|we|cr)(?=_|$)/g, '')
+        .replace(/_+/g, ' ').trim() || p.split('/').pop();
+    }
+    return p.split('/').pop().replace(/\.mp4$/i, '')
+      .replace(/^[0-9]+_/, '')                       /* leading catalog number */
+      .replace(/_[A-Z]?[0-9_]{4,}$/, '')             /* trailing reel/timecode junk */
+      .replace(/_/g, ' ');
+  }
+
+  function play(i, resumeAt) {
+    cur = i;
+    video.src = FILMS[i].p;
+    el('playerwrap').hidden = false;
+    el('now').textContent = label(FILMS[i]);
+    video.play();
+    if (resumeAt) {
+      video.addEventListener('loadedmetadata', function once() {
+        video.removeEventListener('loadedmetadata', once);
+        if (resumeAt < (video.duration || Infinity) - 5) { video.currentTime = resumeAt; }
+      });
+    }
+    var rows = el('list').querySelectorAll('a');
+    for (var j = 0; j < rows.length; j++) { rows[j].className = rows[j].getAttribute('data-i') === String(i) ? 'is-playing' : ''; }
+    try { el('playerwrap').scrollIntoView({ block: 'nearest' }); } catch (e) {}
+  }
+
+  var saveT = 0;
+  video.addEventListener('timeupdate', function () {
+    var now = Date.now();
+    if (now - saveT < 5000 || cur < 0) { return; }
+    saveT = now;
+    window.lanternPositions.set(FILMS[cur].p, {
+      kind: 'video', time: Math.floor(video.currentTime), title: label(FILMS[cur])
+    });
+  });
+
+  /* one collapsible group per folder under video/ (Prelinger, Khan discs, preschool);
+     ?g=video/khan_academy opens every group under that prefix (Kids tiles) */
+  function groupOf(p) { var d = p.split('/'); d.pop(); return d.join('/'); }
+  /* FIXES #186 (a4 F1/F4): headings and hidden title cards from media_titles.json, stamped by gen_shelves.py */
+  /*VGROUPS*/
+  var GROUP_TITLE = {"video/khan_academy/1101_PRIMARY_MATH/math01": "Khan Academy › Arithmetic", "video/khan_academy/1101_PRIMARY_MATH/math02": "Khan Academy › Developmental math, lessons 1 to 153 except 113, 116, 119, 123 and 124", "video/khan_academy/1103_JHS_MATH03/math02_4_": "Khan Academy › Developmental math, lessons 195 to 196", "video/khan_academy/1103_JHS_MATH03/math03_2250MB": "Khan Academy › Developmental math 2", "video/khan_academy/1103_JHS_MATH03/math04_pre_algebra_1120MB": "Khan Academy › Pre-algebra", "video/khan_academy/1103_JHS_MATH03/math05_pre_algebra_we_1000MB": "Khan Academy › Pre-algebra worked examples, MTEL, lessons 1 to 10", "video/khan_academy/1106_JHS_ALGEBRA": "Khan Academy › Pre-algebra worked examples, MTEL, lesson 11", "video/khan_academy/1106_JHS_ALGEBRA/math06_brain_teasers_440MB": "Khan Academy › Brain teasers", "video/khan_academy/1106_JHS_ALGEBRA/math07_algebra_core_3800MB": "Khan Academy › Algebra", "video/khan_academy/1108_JHS_MATH08/math02_02_": "Khan Academy › Developmental math, lessons 113, 116, 119, 123, 124 and 154 to 187", "video/khan_academy/1108_JHS_MATH08/math08_we_ca_710MB": "Khan Academy › Algebra I worked examples, California Standards Test", "video/khan_academy/1108_JHS_MATH08/math09_algebra_we_2_1130MB": "Khan Academy › Algebra worked examples, CK-12, lessons 86 to 107", "video/khan_academy/1108_JHS_MATH08/math10_algebra_we_830MB": "Khan Academy › Algebra II worked examples, California Standards Test · GMAT problem solving", "video/khan_academy/1108_JHS_MATH08/math_singapore_990MB": "Khan Academy › Singapore Math", "video/khan_academy/1109_JHS_MATH09_ALGEBRA": "Khan Academy › Algebra worked examples, CK-12, lessons 1 to 85", "video/khan_academy/1111_JHS_MATH11_ALGEBRA": "Khan Academy › Algebra worked examples 4 · GMAT problem solving", "video/khan_academy/1112_JHS_MATH12_GEOMETRY/math02_3_": "Khan Academy › Developmental math, lessons 188 to 194", "video/khan_academy/1112_JHS_MATH12_GEOMETRY/math12_13_geometry": "Khan Academy › Geometry · Geometry worked examples, California Standards Test", "video/khan_academy/1115_HS_TRI_PROB_STATS/math14_trigonometry_1770MB": "Khan Academy › Trigonometry", "video/khan_academy/1115_HS_TRI_PROB_STATS/math15_probability_1650MB": "Khan Academy › Probability · GMAT problem solving", "video/khan_academy/1115_HS_TRI_PROB_STATS/math16_stats_2_640MB": "Khan Academy › Statistics, lessons 61 to 68", "video/khan_academy/1116_HS_STATS": "Khan Academy › Statistics, lessons 1 to 60", "video/khan_academy/1117_HS_PRECALC/math17_precalculus_2000MB": "Khan Academy › Precalculus", "video/khan_academy/1117_HS_PRECALC/math_tests_3_2010MB": "Khan Academy › IIT JEE test prep", "video/khan_academy/1118_HS_CALC": "Khan Academy › Calculus, lessons 1 to 101", "video/khan_academy/1124_HS_CALC2": "Khan Academy › Calculus, lessons 102 to 184", "video/khan_academy/1148_JHS_SCIENCE": "Khan Academy › Junior high science: physics, biology, chemistry, cosmology and astronomy", "video/khan_academy/1149_HS_SCIENCE": "Khan Academy › High school science: physics, biology, chemistry, cosmology and astronomy", "video/prelinger": "Old educational films (1920s to 1970s)", "video/preschool/100212_PRESCHOOL/dvd_player/_read/a_z/___a_z": "Preschool clips › PAL disc › Reading › Letters A to Z › voice and text", "video/preschool/100212_PRESCHOOL/dvd_player/_read/a_z/a_z_lv_late_voice_": "Preschool clips › PAL disc › Reading › Letters A to Z › late voice", "video/preschool/100212_PRESCHOOL/dvd_player/_read/a_z/a_z_nv_no_voice_": "Preschool clips › PAL disc › Reading › Letters A to Z › no voice", "video/preschool/100212_PRESCHOOL/dvd_player/_read/words/__words_/__short": "Preschool clips › PAL disc › Reading › Words › short words", "video/preschool/100212_PRESCHOOL/dvd_player/_read/words/__words_/_medium": "Preschool clips › PAL disc › Reading › Words › medium words", "video/preschool/100212_PRESCHOOL/dvd_player/_read/words/__words_/long": "Preschool clips › PAL disc › Reading › Words › long words", "video/preschool/100212_PRESCHOOL/dvd_player/_read/words/_words_random_test_": "Preschool clips › PAL disc › Reading › Words › random test", "video/preschool/100212_PRESCHOOL/dvd_player/count/__voice_and_text": "Preschool clips › PAL disc › Counting › voice and text", "video/preschool/100212_PRESCHOOL/dvd_player/count/__voice_no_text": "Preschool clips › PAL disc › Counting › voice, no text", "video/preschool/100212_PRESCHOOL/dvd_player/count/_text_no_voice": "Preschool clips › PAL disc › Counting › text, no voice", "video/preschool/100212_PRESCHOOL/dvd_player/count/no_text_no_voice": "Preschool clips › PAL disc › Counting › no text, no voice", "video/preschool/100212_PRESCHOOL/dvd_player/count/random_test_": "Preschool clips › PAL disc › Counting › random test", "video/preschool/100212_PRESCHOOL/dvd_player/tell_the_time_/12_hour_system/__voice": "Preschool clips › PAL disc › Telling the time › 12-hour clock › voice and text", "video/preschool/100212_PRESCHOOL/dvd_player/tell_the_time_/12_hour_system/_text_no_voice": "Preschool clips › PAL disc › Telling the time › 12-hour clock › text, no voice", "video/preschool/100212_PRESCHOOL/dvd_player/tell_the_time_/12_hour_system/no_text_no_ voice": "Preschool clips › PAL disc › Telling the time › 12-hour clock › no text, no voice", "video/preschool/100212_PRESCHOOL/dvd_player/tell_the_time_/24_hour_system/__voice": "Preschool clips › PAL disc › Telling the time › 24-hour clock › voice and text", "video/preschool/100212_PRESCHOOL/dvd_player/tell_the_time_/24_hour_system/_text_no_voice": "Preschool clips › PAL disc › Telling the time › 24-hour clock › text, no voice", "video/preschool/100212_PRESCHOOL/dvd_player/tell_the_time_/24_hour_system/no_text_no_voice": "Preschool clips › PAL disc › Telling the time › 24-hour clock › no text, no voice", "video/preschool/100212_PRESCHOOL/dvd_player/tell_the_time_/random_test_12_hour": "Preschool clips › PAL disc › Telling the time › random test, 12-hour clock", "video/preschool/100212_PRESCHOOL/dvd_player/z_alice_in_wonderland": "Preschool clips › PAL disc › Alice in Wonderland", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/__read/a_z/___a_z": "Preschool clips › NTSC disc › Reading › Letters A to Z › voice and text", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/__read/a_z/a_z_lv_late_voice_": "Preschool clips › NTSC disc › Reading › Letters A to Z › late voice", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/__read/a_z/a_z_nv_no_voice_": "Preschool clips › NTSC disc › Reading › Letters A to Z › no voice", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/__read/words/__words_/__short": "Preschool clips › NTSC disc › Reading › Words › short words", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/__read/words/__words_/_medium": "Preschool clips › NTSC disc › Reading › Words › medium words", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/__read/words/__words_/long": "Preschool clips › NTSC disc › Reading › Words › long words", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/__read/words/_words_random_test_": "Preschool clips › NTSC disc › Reading › Words › random test", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/__read/words/words_nv_no_voice_/__short": "Preschool clips › NTSC disc › Reading › Words › no voice › short words", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/__read/words/words_nv_no_voice_/_medium": "Preschool clips › NTSC disc › Reading › Words › no voice › medium words", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/__read/words/words_nv_no_voice_/long": "Preschool clips › NTSC disc › Reading › Words › no voice › long words", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/count/__voice_and_text": "Preschool clips › NTSC disc › Counting › voice and text", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/count/__voice_no_text": "Preschool clips › NTSC disc › Counting › voice, no text", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/count/_text_no_voice": "Preschool clips › NTSC disc › Counting › text, no voice", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/count/no_text_no_voice": "Preschool clips › NTSC disc › Counting › no text, no voice", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/count/random_test_": "Preschool clips › NTSC disc › Counting › random test", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/tell_the_time_/12_hour_system/__voice": "Preschool clips › NTSC disc › Telling the time › 12-hour clock › voice and text", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/tell_the_time_/12_hour_system/_text_no_voice": "Preschool clips › NTSC disc › Telling the time › 12-hour clock › text, no voice", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/tell_the_time_/12_hour_system/no_text_no_ voice": "Preschool clips › NTSC disc › Telling the time › 12-hour clock › no text, no voice", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/tell_the_time_/24_hour_system/__voice": "Preschool clips › NTSC disc › Telling the time › 24-hour clock › voice and text", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/tell_the_time_/24_hour_system/_text_no_voice": "Preschool clips › NTSC disc › Telling the time › 24-hour clock › text, no voice", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/tell_the_time_/24_hour_system/no_text_no_voice": "Preschool clips › NTSC disc › Telling the time › 24-hour clock › no text, no voice", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/tell_the_time_/random_test_12_hour": "Preschool clips › NTSC disc › Telling the time › random test, 12-hour clock", "video/preschool/100213_PRESCHOOL_NTSC_READ/dvd_player_/zzz_3_bears_stories_sample_": "Preschool clips › NTSC disc › The Three Bears, story sample"};
+  var HIDE = {"video/khan_academy/1101_PRIMARY_MATH/math02/math_02_dev_math_061_Multiplying_Fractions_Word_Problem.mp4": 1, "video/khan_academy/1101_PRIMARY_MATH/math02/math_02_dev_math_085_Comparing_Decimals_4.mp4": 1, "video/khan_academy/1101_PRIMARY_MATH/math02/math_02_dev_math_145_Identity_property_of_1_second_example.mp4": 1, "video/khan_academy/1101_PRIMARY_MATH/math02/math_02_dev_math_150_Order_of_Operations_1.mp4": 1, "video/khan_academy/1101_PRIMARY_MATH/math02/math_02_dev_math_151_Order_of_Operations_2_old.mp4": 1, "video/khan_academy/1108_JHS_MATH08/math09_algebra_we_2_1130MB/math_09_algebra_wrkd_exampl_2_ck12org_104_Adding_Rational_Expressions_Example_3.mp4": 1, "video/khan_academy/1112_JHS_MATH12_GEOMETRY/math12_13_geometry/math_13_geometry_wrkd_exampl_1_cf_stds_test_006_CA_Geometry_More_on_congruent_and_similar_triangles.mp4": 1, "video/khan_academy/1116_HS_STATS/math_16_Statistics_004_Statistics_Sample_Variance.mp4": 1, "video/khan_academy/1116_HS_STATS/math_16_Statistics_030_Confidence_Interval_1.mp4": 1, "video/khan_academy/1117_HS_PRECALC/math_tests_3_2010MB/math_Test_Prep_IIT_JEEs_019_IIT_JEE_Symmetric_and_Skew_Symmetric_Matrices.mp4": 1, "video/khan_academy/1118_HS_CALC/math_18_Calculus_008_Proof_lim_sin_x_x.mp4": 1, "video/khan_academy/1118_HS_CALC/math_18_Calculus_016_Calculus_Derivatives_1_(new_1).mp4": 1, "video/khan_academy/1148_JHS_SCIENCE/1149_titles.mp4": 1, "video/khan_academy/1149_HS_SCIENCE/1149_titles.mp4": 1, "video/khan_academy/1149_HS_SCIENCE/Science_03_Physics_128_Magnetism_9_Electric_Motors.mp4": 1, "video/preschool/100212_PRESCHOOL/title.mp4": 1, "video/preschool/100213_PRESCHOOL_NTSC_READ/title.mp4": 1};
+  var SORTAS = {"video/khan_academy/1116_HS_STATS/math_16_Statistics_057_Proof_pt_2_Minimizing_Squared_Error_to_Line.mp4": "video/khan_academy/1116_HS_STATS/math_16_Statistics_053_Proof_pt_1_Minimizing_Squared_Error_to_Regression_Line.mp4~", "video/prelinger/201293_Emergency_First_Aid_P2_Bandaging.mp4": "video/prelinger/0994_Emergency_First_Aid_", "video/preschool/100212_PRESCHOOL/dvd_player/count/no_text_no_voice/count_ntnv_addition_1_4s_dvdp_pal_ed_presch_video.mp4": "video/preschool/100212_PRESCHOOL/dvd_player/count/no_text_no_voice/count_ntnv_addition_1_10s_dvdp_pal_ed_presch_video.mp4~"};
+  var GSORT = {"video/khan_academy/1103_JHS_MATH03/math02_4_": "video/khan_academy/1101_PRIMARY_MATH/math02~3", "video/khan_academy/1108_JHS_MATH08/math02_02_": "video/khan_academy/1101_PRIMARY_MATH/math02~1", "video/khan_academy/1108_JHS_MATH08/math09_algebra_we_2_1130MB": "video/khan_academy/1109_JHS_MATH09_ALGEBRA~", "video/khan_academy/1112_JHS_MATH12_GEOMETRY/math02_3_": "video/khan_academy/1101_PRIMARY_MATH/math02~2", "video/khan_academy/1115_HS_TRI_PROB_STATS/math16_stats_2_640MB": "video/khan_academy/1116_HS_STATS~"};
+  /*/VGROUPS*/
+  /* preschool disc folders (CD3WD 100212 PAL / 100213 NTSC): "dvd_player/_read/a_z/a_z_nv_no_voice_" -> words */
+  var PRE = { 'preschool': 'Preschool clips', '100212_PRESCHOOL': 'PAL disc', '100213_PRESCHOOL_NTSC_READ': 'NTSC disc',
+    'read': 'Reading', 'a_z': 'Letters A to Z', 'a_z_lv_late_voice': 'late voice', 'a_z_nv_no_voice': 'no voice',
+    'words': 'Words', 'words_random_test': 'random test', 'words_nv_no_voice': 'no voice', 'short': 'short words',
+    'medium': 'medium words', 'long': 'long words', 'count': 'Counting', 'voice_and_text': 'voice and text',
+    'voice_no_text': 'voice, no text', 'text_no_voice': 'text, no voice', 'no_text_no_voice': 'no text, no voice',
+    'no_text_no_ voice': 'no text, no voice', 'random_test': 'random test', 'tell_the_time': 'Telling the time',
+    '12_hour_system': '12-hour clock', '24_hour_system': '24-hour clock', 'voice': 'with voice',
+    'random_test_12_hour': 'random test, 12-hour clock', 'z_alice_in_wonderland': 'Alice in Wonderland',
+    'zzz_3_bears_stories_sample': 'Three Bears story sample' };
+  function groupLabel(g) {
+    var d = g.replace(/^video\//, '').split('/');
+    if (d[0] === 'preschool') {
+      return d.map(function (x) { var k = x.replace(/^_+|_+$/g, ''); return k === 'dvd_player' ? '' : (PRE[k] || PRE[x] || k.replace(/_/g, ' ')); })
+        .filter(function (x) { return x; }).join(' › ');
+    }
+    return d.map(function (x) { return x.replace(/^[0-9]+_/, '').replace(/_[0-9]+MB$/, '').replace(/_/g, ' '); }).join(' › ');
+  }
+  /* FIXES #161 (a4 W8): the 1940s first-aid films teach iodine on wounds and rigid splints for every fracture */
+  var PRELINGER_NOTE = '<p class="l-caption" style="padding:6px 0 10px;margin:0">Films from the 1920s to the 1970s, kept for their trade and farming skills. ' +
+    'Their first-aid advice (iodine on wounds, splint every fracture, nuclear "duck and cover") is out of date: for an injury or illness use ' +
+    '<a href="triage.html">Hurt or sick</a> and the current first-aid books. Two of the first-aid films are silent.</p>';   /* above the list: inside ul.v-list its link took the film-row style */
+  function render() {
+    var want = (location.search.match(/[?&]g=([^&]+)/) || [])[1];
+    want = want ? decodeURIComponent(want) : '';
+    var h = '', g = null, shown = 0;
+    for (var i = 0; i < FILMS.length; i++) {
+      var gi = groupOf(FILMS[i].p);
+      if (want && gi.indexOf(want) !== 0) { continue; }   /* a4 W5: ?g= shows only that set, not 29 other headers */
+      if (gi !== g) {
+        if (g !== null) { h += '</ul></details>'; }
+        g = gi; shown++;
+        var open = want ? gi.indexOf(want) === 0 : gi === 'video/prelinger';
+        h += '<details' + (open ? ' open' : '') + '><summary style="cursor:pointer;padding:10px 0;font-family:var(--l-font-display)">' +
+          window.lanternEsc(GROUP_TITLE[gi] || groupLabel(gi)) + '</summary>' + (gi === 'video/prelinger' ? PRELINGER_NOTE : '') + '<ul class="v-list">';
+      }
+      h += '<li><a href="#" data-i="' + i + '"><span>' + window.lanternEsc(label(FILMS[i])) +
+        '</span><span>▸</span></a></li>';
+    }
+    if (want && !shown) { want = ''; render(); return; }   /* unknown ?g= : fall back to everything */
+    el('showall').hidden = !want;
+    if (g !== null) { h += '</ul></details>'; }
+    el('list').innerHTML = h;
+    el('list').addEventListener('click', function (e) {
+      var a = e.target;
+      while (a && !a.getAttribute) { a = a.parentNode; }
+      while (a && a.getAttribute && a.getAttribute('data-i') === null) { a = a.parentNode; }
+      if (!a || !a.getAttribute) { return; }
+      e.preventDefault();
+      var i = parseInt(a.getAttribute('data-i'), 10);
+      var pos = window.lanternPositions.get(FILMS[i].p);
+      play(i, pos && pos.time);
+    });
+  }
+
+  (function ready() {
+    if (!window.lanternLoadIndex) { setTimeout(ready, 40); return; }
+    window.lanternLoadIndex('titles', function (t) {
+      FILMS = [];
+      t = t || [];
+      for (var i = 0; i < t.length; i++) {
+        if (t[i].p && t[i].p.indexOf('video/') === 0 && !HIDE[t[i].p]) { FILMS.push(t[i]); }
+      }
+      FILMS.sort(function (a, b) {
+        var ga = groupOf(a.p), gb = groupOf(b.p);
+        /* a4 r9 N1: GSORT (stamped by gen_shelves) moves Khan groups filed on a later disc next to their course */
+        var gs = typeof GSORT === 'object' ? GSORT : {}, ka = gs[ga] || ga, kb = gs[gb] || gb;
+        if (ga !== gb) { return (ga === 'video/prelinger' ? '' : ka) < (gb === 'video/prelinger' ? '' : kb) ? -1 : 1; }
+        var so = typeof SORTAS === 'object' ? SORTAS : {};  /* a4 W2: gen_shelves stamps SORTAS in VGROUPS for parts filed out of order */
+        return (so[a.p] || a.p).localeCompare(so[b.p] || b.p, 'en', { numeric: true });  /* numeric-aware: lesson and chapter numbers keep course order (alice_2 before alice_12) */
+      });
+      render();
+    });
+  })();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+# Lima VM for building the Lantern boot image (BUILD_PLAN C0/C1).
+# pi-gen needs privileged loop mounts -> impossible in macOS Docker, fine in
+# a Linux VM. Usage:
+#   limactl start --name=lantern-build image/lima-lantern.yaml
+#   limactl shell lantern-build bash /workspace/image/build_boot_image.sh
+# Image lands in /workspace/image/deploy/ (= repo dir on the Mac).
+vmType: vz
+os: Linux
+arch: aarch64
+images:
+  - location: https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-arm64.img
+    arch: aarch64
+cpus: 6
+memory: 8GiB
+disk: 80GiB
+mounts:
+  # REPO_ROOT is set at create time:
+  #   limactl create --name lantern-build --set ".mounts[0].location=\"$PWD\"" image/lima-lantern.yaml
+  - location: "REPO_ROOT"
+    mountPoint: /workspace
+    writable: true
+provision:
+  - mode: system
+    script: |
+      #!/bin/bash
+      set -e
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update
+      apt-get install -y git quilt coreutils parted qemu-user-static debootstrap \
+        zerofree zip dosfstools libarchive-tools libcap2-bin rsync grep udev xz-utils \
+        curl xxd file kmod bc pigz arch-test systemd-container

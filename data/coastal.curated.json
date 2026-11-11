@@ -1,0 +1,290 @@
+{
+  "_comment": "Coastal foraging ID — curated 2026-09-17 (BUILD_PLAN B3). Schema matches plants.curated.json + kind 'regulated' (render danger color). BIOTOXIN RULE: paralytic shellfish poison and domoic acid are invisible, tasteless, and NOT destroyed by cooking; every filter-feeding bivalve carries the warning. CA annual mussel quarantine May 1 - Oct 31. Laws referenced are CA CDFW rules as of 2026 — verify season/limits against current regs when online. Shellfish labels (J4, FIXES #196): bivalves carry a conditional green label (NOV–APR ONLY, NO ADVISORY / ONLY IF NO ADVISORY / ONLY WITH OFFICIAL ALL-CLEAR) instead of EDIBLE COOKED, and an optional 'verdict' string that gen_species_readme.py writes after the label on the drive README line 2.",
+  "alaria_marginata": {
+    "kind": "edible",
+    "label": "EDIBLE",
+    "note": "Winged kelp. Edible raw or dried; midrib and wings. Cut above the holdfast so it regrows; harvest from clean open coast, never near outfalls. Español — alga alada (alga marina): comestible. Córtela por encima del disco de fijación, solo en costa abierta y limpia, nunca cerca de desagües.",
+    "lookalike": "kombu_laminaria",
+    "es": [
+      "alga alada",
+      "alga marina",
+      "algas marinas"
+    ]
+  },
+  "bay_mussel": {
+    "kind": "edible",
+    "label": "NOV–APR ONLY, NO ADVISORY",
+    "note": "Filter feeder — BIOTOXIN RISK: paralytic shellfish poison and domoic acid are invisible and NOT destroyed by cooking. California quarantines sport mussel harvest May 1 - Oct 31 every year. Winter only, clean water. Red-brown water is a warning, but clear water is NOT an all-clear: most toxic blooms are invisible, and unsafe levels sometimes occur outside the quarantine months. Español — mejillones: comestibles solo cocidos, del 1 de noviembre al 30 de abril, y solo si no hay aviso sanitario. Riesgo de biotoxinas: la cocción no las destruye. En California, cuarentena del 1 de mayo al 31 de octubre; fuera de esos meses a veces también hay niveles peligrosos, y el agua clara no garantiza seguridad.",
+    "lookalike": "california_mussel",
+    "es": [
+      "mejillón de bahía",
+      "mejillón",
+      "mejillones",
+      "mariscos"
+    ],
+    "verdict": "edible cooked only Nov 1 – Apr 30 (California quarantine May 1 – Oct 31) and only when no health advisory is out; cooking does NOT remove the toxins"
+  },
+  "black_turban_snail": {
+    "kind": "edible",
+    "label": "EDIBLE COOKED",
+    "note": "Abundant on rocky intertidal. Boil to extract from shell. Grazer, so lower biotoxin risk than bivalves, but avoid during major blooms; clear water is NOT an all-clear (CDPH). Español — caracol de mar: cocer; evite durante floraciones tóxicas (avisos sanitarios); el agua clara no garantiza seguridad.",
+    "lookalike": null,
+    "es": [
+      "caracol turbante negro",
+      "caracol de mar",
+      "caracoles",
+      "mariscos"
+    ]
+  },
+  "bull_kelp": {
+    "kind": "edible",
+    "label": "EDIBLE",
+    "note": "Annual kelp; blade, stipe and bulb all edible (pickles, dried). Harvest drift or cut blades only from attached plants; check current CDFW kelp rules. Español — kelp toro (alga marina): comestible. Recoja algas arrastradas a la orilla o corte solo hojas de plantas fijas; consulte las normas vigentes de CDFW sobre algas.",
+    "lookalike": "giant_kelp",
+    "es": [
+      "kelp toro",
+      "alga marina",
+      "algas marinas"
+    ]
+  },
+  "california_mussel": {
+    "kind": "edible",
+    "label": "NOV–APR ONLY, NO ADVISORY",
+    "note": "Filter feeder — BIOTOXIN RISK: paralytic shellfish poison and domoic acid are invisible and NOT destroyed by cooking. California quarantines sport mussel harvest May 1 - Oct 31 every year. The classic PSP death vector on this coast — treat the quarantine as absolute; unsafe levels sometimes occur outside it too. Español — mejillones: comestibles solo cocidos, del 1 de noviembre al 30 de abril, y solo si no hay aviso sanitario. Riesgo de biotoxinas: la cocción no las destruye. En California, cuarentena del 1 de mayo al 31 de octubre: respétela sin excepción; fuera de ella a veces también hay niveles peligrosos.",
+    "lookalike": "bay_mussel",
+    "es": [
+      "mejillón de California",
+      "mejillón",
+      "mejillones",
+      "mariscos"
+    ],
+    "verdict": "edible cooked only Nov 1 – Apr 30 (California quarantine May 1 – Oct 31) and only when no health advisory is out; cooking does NOT remove the toxins"
+  },
+  "dulse_palmaria": {
+    "kind": "edible",
+    "label": "EDIBLE",
+    "note": "Red-purple fronds. Edible raw or dried; pan-fried it crisps like bacon. Harvest from clean, well-flushed rocky shore. Español — dulse (alga roja): comestible. Solo de costas rocosas limpias y bien batidas por el mar.",
+    "lookalike": "nori_porphyra",
+    "es": [
+      "dulse",
+      "alga roja",
+      "algas marinas"
+    ]
+  },
+  "dungeness_crab": {
+    "kind": "edible",
+    "label": "EDIBLE COOKED",
+    "note": "Rules apply: in California a season, a limit of ten, and no take from San Francisco and San Pablo bays (CDFW 2025 regs p.42, T14 CCR §29.85(b)); Washington's 2016-17 rules kept males only (WA shellfish guide p.132). Check current rules. Domoic acid builds up in the 'butter' (viscera) and can reach unsafe levels in the meat too — during a domoic acid advisory do not eat it at all; at any other time discard the viscera and the cooking water and eat only the meat. Español — cangrejo: Riesgo de biotoxinas (ácido domoico): la cocción no las destruye; durante un aviso sanitario no lo coma; en otro momento deseche las vísceras al capturarlo y coma solo la carne.",
+    "lookalike": "red_rock_crab",
+    "es": [
+      "cangrejo Dungeness",
+      "cangrejo",
+      "cangrejos",
+      "mariscos"
+    ]
+  },
+  "gaper_clam": {
+    "kind": "edible",
+    "label": "ONLY IF NO ADVISORY",
+    "note": "Filter feeder — BIOTOXIN RISK: toxins are invisible and NOT destroyed by cooking. May 1 – Oct 31 (the CA quarantine months) remove and discard the dark viscera (guts) and eat only the white meat; any other time still heed advisories, and when offline and in doubt do the same. Deep burrower (1-2 ft); neck shows as a large dimple at low tide. Clean sand out of siphon well. Español — almejas: comestibles solo cocidas y solo si no hay aviso sanitario. Riesgo de biotoxinas: la cocción no las destruye. Del 1 de mayo al 31 de octubre (cuarentena de California) deseche las vísceras oscuras y coma solo la carne blanca; en cualquier otra época respete también los avisos sanitarios y, sin conexión y con dudas, haga lo mismo.",
+    "lookalike": null,
+    "es": [
+      "almeja gaper",
+      "almeja",
+      "almejas",
+      "mariscos"
+    ],
+    "verdict": "edible cooked only when no health advisory is out; cooking does NOT remove the toxins; May 1 – Oct 31 eat only the white meat"
+  },
+  "giant_kelp": {
+    "kind": "edible",
+    "label": "EDIBLE",
+    "note": "Perennial kelp with gas floats along fronds. Young blades edible fresh or dried. Prefer drift-cast fresh material; cutting attached plants is regulated. Español — kelp gigante (alga marina): comestible. Prefiera algas frescas arrastradas a la orilla; cortar plantas fijas está regulado.",
+    "lookalike": "bull_kelp",
+    "es": [
+      "kelp gigante",
+      "sargazo gigante",
+      "alga marina",
+      "algas marinas"
+    ]
+  },
+  "gooseneck_barnacle": {
+    "kind": "regulated",
+    "label": "REGULATED",
+    "note": "DO NOT TAKE in California: gooseneck barnacles live between the tides, where only listed species may be taken, and barnacles are not on the list (CDFW 2025 regs p.35, T14 CCR §29.05(b)). Washington's 2016-17 rules allowed a daily limit (WA shellfish guide p.130); check current local rules. Where legal: boil 5 min, peel the leathery skin, eat the stalk. Filter feeder on exposed rock — lower risk than bivalves but respect bloom advisories. Sharp rocks and surf kill harvesters: never turn your back on the sea. Español — percebes: NO TOMAR en California (no están en la lista de especies permitidas entre mareas). Donde sea legal: cocer 5 minutos; riesgo de biotoxinas menor que en almejas y mejillones, pero respete los avisos sanitarios.",
+    "lookalike": null,
+    "es": [
+      "percebe",
+      "percebes",
+      "mariscos"
+    ]
+  },
+  "kombu_laminaria": {
+    "kind": "edible",
+    "label": "EDIBLE",
+    "note": "Broad single blade from a short stipe. Classic soup/stock kelp, best dried. Cut above the holdfast from clean open coast. Español — kombu (alga marina): comestible. Córtela por encima del disco de fijación, solo en costa abierta y limpia.",
+    "lookalike": "alaria_marginata",
+    "es": [
+      "kombu",
+      "alga marina",
+      "algas marinas"
+    ]
+  },
+  "littleneck_clam_native": {
+    "kind": "edible",
+    "label": "ONLY IF NO ADVISORY",
+    "note": "Filter feeder — BIOTOXIN RISK: toxins are invisible and NOT destroyed by cooking. May 1 – Oct 31 (the CA quarantine months) remove and discard the dark viscera (guts) and eat only the white meat; any other time still heed advisories, and when offline and in doubt do the same. Rounded shell with concentric and radiating lines (Manila has these too). Tell them apart: native littleneck is rounded with FUSED siphon tips, 6-10 in deep in gravel-mud; Manila is oblong with SPLIT siphon tips, within 4 in of the surface. Español — almejas: comestibles solo cocidas y solo si no hay aviso sanitario. Riesgo de biotoxinas: la cocción no las destruye. Del 1 de mayo al 31 de octubre (cuarentena de California) deseche las vísceras oscuras y coma solo la carne blanca; en cualquier otra época respete también los avisos sanitarios y, sin conexión y con dudas, haga lo mismo.",
+    "lookalike": "manila_clam",
+    "es": [
+      "almeja littleneck nativa",
+      "almeja",
+      "almejas",
+      "mariscos"
+    ],
+    "verdict": "edible cooked only when no health advisory is out; cooking does NOT remove the toxins; May 1 – Oct 31 eat only the white meat"
+  },
+  "manila_clam": {
+    "kind": "edible",
+    "label": "ONLY IF NO ADVISORY",
+    "note": "Filter feeder — BIOTOXIN RISK: toxins are invisible and NOT destroyed by cooking. May 1 – Oct 31 (the CA quarantine months) remove and discard the dark viscera (guts) and eat only the white meat; any other time still heed advisories, and when offline and in doubt do the same. Introduced, now the common market clam; oblong shell, often purple inside near hinge, siphon tips split, within 4 in of the surface. Español — almejas: comestibles solo cocidas y solo si no hay aviso sanitario. Riesgo de biotoxinas: la cocción no las destruye. Del 1 de mayo al 31 de octubre (cuarentena de California) deseche las vísceras oscuras y coma solo la carne blanca; en cualquier otra época respete también los avisos sanitarios y, sin conexión y con dudas, haga lo mismo.",
+    "lookalike": "littleneck_clam_native",
+    "es": [
+      "almeja japonesa",
+      "almeja de Manila",
+      "almeja",
+      "almejas",
+      "mariscos"
+    ],
+    "verdict": "edible cooked only when no health advisory is out; cooking does NOT remove the toxins; May 1 – Oct 31 eat only the white meat"
+  },
+  "monkeyface_prickleback": {
+    "kind": "edible",
+    "label": "EDIBLE COOKED",
+    "note": "Eel-like intertidal fish caught by poke-poling rock crevices at low tide. Mild white flesh. License required; not a biotoxin accumulator. Español — pez cara de mono: comestible cocido; se necesita licencia.",
+    "lookalike": null,
+    "es": [
+      "pez cara de mono",
+      "pescado"
+    ]
+  },
+  "moon_snail_lewisii": {
+    "kind": "edible",
+    "label": "EDIBLE COOKED",
+    "note": "Large predatory snail of sand flats. California: limit five, and moon snails may not be taken north of the Golden Gate Bridge (CDFW 2025 regs p.38, T14 CCR §29.71). Foot is edible sliced and pounded. Eats clams, so can secondarily carry biotoxin during blooms — avoid then; clear water is NOT an all-clear (CDPH). Español — caracol luna: cocer; en California, límite de cinco y prohibido tomarlo al norte del puente Golden Gate; evite durante floraciones tóxicas (avisos sanitarios); el agua clara no garantiza seguridad.",
+    "lookalike": null,
+    "es": [
+      "caracol luna",
+      "caracol de mar",
+      "caracoles",
+      "mariscos"
+    ]
+  },
+  "nori_porphyra": {
+    "kind": "edible",
+    "label": "EDIBLE",
+    "note": "Thin, dark, rubbery sheets on mid-tide rocks. The sushi seaweed; dry and toast. Harvest from clean water only — thin blades absorb pollutants fast. Español — nori (alga marina): comestible. Solo de aguas limpias: las hojas finas absorben contaminantes rápido.",
+    "lookalike": "dulse_palmaria",
+    "es": [
+      "nori",
+      "alga roja",
+      "algas marinas"
+    ]
+  },
+  "pacific_oyster": {
+    "kind": "edible",
+    "label": "ONLY IF NO ADVISORY",
+    "note": "Filter feeder — BIOTOXIN RISK: toxins are invisible and NOT destroyed by cooking; heed shellfish advisories. Also Vibrio risk in warm months — cook thoroughly, never raw in summer. DO NOT TAKE wild Pacific oysters between the tides in California: from the high-tide mark to 1,000 ft seaward of low tide only listed species may be taken, and the list names native oysters only (CDFW 2025 regs p.35, T14 CCR §29.05(b)(1)); the Pacific oyster is not native. Most beds are private leases. Elsewhere, check local rules. Español — ostras: comestibles solo cocidas y solo si no hay aviso sanitario. Riesgo de biotoxinas: la cocción no las destruye; respete los avisos sanitarios; riesgo de Vibrio en verano — nunca crudas. En California NO tome ostras del Pacífico silvestres entre mareas: desde la marca de marea alta hasta 1,000 pies mar adentro de la marea baja solo se pueden tomar las especies de la lista, y la lista solo nombra las ostras nativas (reglamento CDFW 2025, p. 35); la ostra del Pacífico no es nativa.",
+    "lookalike": null,
+    "es": [
+      "ostra del Pacífico",
+      "ostra",
+      "ostras",
+      "ostiones",
+      "mariscos"
+    ],
+    "verdict": "edible cooked only when no health advisory is out; cooking does NOT remove the toxins"
+  },
+  "purple_sea_urchin": {
+    "kind": "edible",
+    "label": "EDIBLE",
+    "note": "The gonads (uni) are eaten raw or cooked; crack the test from below. Overpopulated on this coast — harvest guilt-free where legal. Spines are brittle, not venomous; tweeze splinters promptly. Español — erizo de mar: comestible (gónadas).",
+    "lookalike": null,
+    "es": [
+      "erizo de mar morado",
+      "erizo de mar",
+      "erizos",
+      "mariscos"
+    ]
+  },
+  "purple_shore_crab": {
+    "kind": "edible",
+    "label": "EDIBLE COOKED",
+    "note": "Small under-rock crab; more effort than meat. Domoic acid builds up in crab viscera (guts) and can reach unsafe levels in the meat too (CDPH p.1): during a domoic acid advisory do not eat it at all; at any other time remove and discard the viscera right after capture, then boil the cleaned body for stock — never boil whole or use the guts. Cook thoroughly — crabs carry lung fluke on some coasts. Español — cangrejo: Riesgo de biotoxinas (ácido domoico): la cocción no las destruye; durante un aviso sanitario no lo coma; en otro momento deseche las vísceras al capturarlo. Nunca lo hierva entero ni use las vísceras. Cuézalo bien: en algunas costas los cangrejos tienen la duela del pulmón.",
+    "lookalike": "red_rock_crab",
+    "es": [
+      "cangrejo de orilla",
+      "cangrejo",
+      "cangrejos",
+      "mariscos"
+    ]
+  },
+  "razor_clam_pacific": {
+    "kind": "edible",
+    "label": "ONLY WITH OFFICIAL ALL-CLEAR",
+    "note": "Filter feeder — SEVERE BIOTOXIN RISK: razor clams hold domoic acid in their meat for over a year after a bloom, far longer than other shellfish, and cooking does NOT destroy it. Only harvest with a current all-clear from health authorities; when offline and in doubt, do not eat. Español — navajas: Riesgo GRAVE de biotoxinas: la cocción no las destruye; el ácido domoico permanece en la carne más de un año; sin aviso oficial de seguridad, no las coma.",
+    "lookalike": null,
+    "es": [
+      "navaja del Pacífico",
+      "almeja navaja",
+      "navajas",
+      "almejas",
+      "mariscos"
+    ],
+    "verdict": "edible cooked only with a current all-clear from health authorities; cooking does NOT remove domoic acid, which stays in the meat for over a year"
+  },
+  "red_abalone": {
+    "kind": "regulated",
+    "label": "REGULATED",
+    "note": "DO NOT TAKE: the California red abalone fishery is CLOSED statewide (since 2018, closure repeatedly extended). Possession is a serious offense. The rules on the shelf (CDFW 2025, T14 CCR §29.15(b)) keep the closure only until April 1, 2026 unless a later amendment extends it, and that date has passed: treat it as closed until you can check current rules. ID only. In a true long-term survival situation the meat is edible, but the closure exists because the population collapsed. Español — abulón: NO TOMAR; pesca cerrada en California (las reglas del estante llegan al 1 de abril de 2026: trátela como cerrada hasta confirmar las reglas vigentes).",
+    "lookalike": null,
+    "es": [
+      "abulón rojo",
+      "abulón",
+      "mariscos"
+    ]
+  },
+  "red_rock_crab": {
+    "kind": "edible",
+    "label": "EDIBLE COOKED",
+    "note": "Chunky red-brown crab with black-tipped claws; open season is broader than Dungeness. Domoic acid builds up in crab viscera and can reach unsafe levels in the meat too (CDPH p.1): during a domoic acid advisory do not eat it at all; at any other time remove and discard the viscera right after capture and eat only the meat. Español — cangrejo: riesgo de biotoxinas (ácido domoico): la cocción no las destruye; durante un aviso sanitario no lo coma; en otro momento deseche las vísceras al capturarlo y coma solo la carne.",
+    "lookalike": "dungeness_crab",
+    "es": [
+      "cangrejo de roca",
+      "cangrejo",
+      "cangrejos",
+      "mariscos"
+    ]
+  },
+  "sea_lettuce_ulva": {
+    "kind": "edible",
+    "label": "EDIBLE",
+    "note": "Bright green translucent sheets. Edible raw or dried, but it thrives on nutrient pollution — never harvest from harbors, bays near outfalls, or stagnant warm water. Español — lechuga de mar (alga marina): comestible; nunca de aguas contaminadas.",
+    "lookalike": null,
+    "es": [
+      "lechuga de mar",
+      "alga verde",
+      "algas marinas"
+    ]
+  },
+  "sea_palm_postelsia": {
+    "kind": "regulated",
+    "label": "REGULATED",
+    "note": "DO NOT TAKE: sea palm may not be cut or disturbed in California, and take or possession is prohibited (CDFW 2025 regs, T14 CCR §30.10, p.44 and the summary table p.54). ID only — the little palm-tree kelp of pounded surf rock. Populations recover poorly from cutting. Español — palma de mar: NO TOMAR; en California está prohibido cortarla o tenerla.",
+    "lookalike": null,
+    "es": [
+      "palma de mar",
+      "alga marina",
+      "algas marinas"
+    ]
+  }
+}

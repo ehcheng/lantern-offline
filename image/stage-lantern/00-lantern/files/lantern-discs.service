@@ -1,0 +1,13 @@
+[Unit]
+Description=Lantern: mount library disc images read-only under /srv/discs for nginx /discs/
+RequiresMountsFor=/data
+After=lantern-firstboot.service
+Before=nginx.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/opt/lantern/lantern-discs.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<!-- HISTORICAL interstitial (BUILD_PLAN A3). Every h:1 link routes here with
+     ?f=<library-relative path>. Warning text is VERBATIM from
+     docs/HISTORICAL/README-WARNING.txt — keep in sync if that file changes.
+     Design decisions (red-team finding 20, accepted):
+     - Full page, not a dismissable modal: no outside-tap dismiss possible.
+     - JS-off is a dead-end BY DESIGN (safer): the warning shows, plus an
+       explanation that the target path sits in the address bar after ?f=.
+       We never render an auto-link without JS.
+     - The continue link is only built for allowed historical prefixes;
+       anything else gets a "not a historical path" notice. -->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Historical document warning — Lantern</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="app.css">
+<script src="app.js" defer></script>
+<style>
+  .h-box { max-width: 680px; margin: 40px auto; padding: 0 16px; }
+  .h-warn { border: 2px solid var(--l-danger); border-radius: 12px; padding: 20px 24px; }
+  .h-text { font-size: 14px; line-height: 1.5; }
+  .h-text p { margin: 12px 0 0; }
+  .h-text ul { margin: 6px 0 0; padding-left: 20px; }
+  /* H28: stay-out on the left, triage on the right (same + icon as landing) */
+  .h-actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+  #continue { margin-top: 20px; }
+  /* phones: keep back-left / triage-right on one row, compact the text */
+  @media (max-width: 560px) {
+    .h-warn { padding: 14px 16px; }
+    .h-text { font-size: 13px; line-height: 1.4; }
+    .h-actions { flex-wrap: nowrap; gap: 8px; }
+    .h-actions > a { flex: 1 1 0; min-width: 0; font-size: 14px; }
+    .h-actions .l-cta-triage--side b { font-size: 14px; }
+    .h-actions .l-cta-triage--side { gap: 8px; }
+  }
+  /* in the modal the exits stay pinned so they never scroll off the panel;
+     continue is NOT pinned — reach it only by scrolling past the warning */
+  html.embed .h-actions { position: sticky; bottom: 0; background: var(--l-ground); padding: 10px 0; margin-top: 8px; }
+  .h-target { font-family: var(--l-font-mono, monospace); font-size: 13px; color: var(--l-muted); word-break: break-all; margin-top: 16px; }
+  /* FIXES #277 (r10 b3 N-02): the Spanish warning is in the HTML, so it needs no script. Shown by the page's own script
+     (html.es) or, with JS off, by the #es fragment the Spanish shelf links carry (and the small "Español" link). One rule
+     per selector: a browser without :has() drops only that rule. */
+  #es, .h-es-only { display: none; }
+  #es:target, html.es #es { display: block; }
+  html.es .h-actions.h-es-only { display: flex; }
+  body:has(#es:target) .h-actions.h-es-only { display: flex; }
+  html.es p.h-es-only { display: block; }
+  body:has(#es:target) p.h-es-only { display: block; }
+  html.es .h-en { display: none; }
+  body:has(#es:target) .h-en { display: none; }
+</style>
+</head>
+<body>
+<div class="h-box">
+  <div class="h-en">
+  <span class="l-badge l-badge--hist" id="h-badge">HISTORICAL</span>
+  <div class="h-warn" style="margin-top:12px">
+    <b id="h-head" style="font-family:var(--l-font-display);font-size:20px">Old text. Do not treat anyone from it.</b>
+    <!-- H32: same words as README-WARNING.txt, reflowed — the file's hard
+         line feeds overflowed the modal panel on phones. FIXES #254 (a7a W8): the
+         folder paths the file names are links here, and work with JS off. -->
+    <div class="h-text" id="h-text">
+    <p><b>*** HISTORICAL DOCUMENTS — DO NOT USE FOR PATIENT CARE ***</b></p>
+    <p>Everything in this folder is pre-2010 and kept for background/context only.
+    Medical practice has changed. These documents contain guidance now known to
+    be outdated or harmful (old tourniquet doctrine, outdated drug choices and
+    doses, obsolete resuscitation ratios).</p>
+    <p>For actual care, use instead:</p>
+    <ul>
+      <li><a href="../docs/medical/tccc/TCCC_Guidelines_2024-01-25.pdf">TCCC Guidelines 2024</a> (current trauma standard)</li>
+      <li><a href="../docs/medical/msf/msf_clinical_guidelines.pdf">MSF Clinical Guidelines</a> (current)</li>
+      <li>WHO current references: <a href="shelf/docs_medical.html">the Medical shelf</a></li>
+      <li><a href="../triage.html">Symptom triage</a> (current sources only)</li>
+    </ul>
+    <p>Never take a drug or dose from a HISTORICAL document.</p>
+    </div>
+  </div>
+  </div>
+  <div id="es" lang="es">
+  <span class="l-badge l-badge--hist">HISTÓRICO</span>
+  <div class="h-warn" style="margin-top:12px">
+    <b style="font-family:var(--l-font-display);font-size:20px">Texto antiguo. No atienda a nadie con él.</b>
+    <div class="h-text">
+    <p><b>*** DOCUMENTOS HISTÓRICOS: NO LOS USE PARA ATENDER A NADIE ***</b></p>
+    <p>Todo lo de esta carpeta es de antes de 2010 y se guarda solo como contexto. La práctica médica ha cambiado.
+    Estos documentos traen indicaciones que hoy se sabe que son anticuadas o dañinas (la vieja doctrina del torniquete,
+    medicamentos y dosis anticuados, proporciones de reanimación obsoletas).</p>
+    <p>Para atender de verdad, use en cambio:</p>
+    <ul>
+      <li><a href="../docs/medical/tccc/TCCC_Guidelines_2024-01-25.pdf" lang="en">Guías TCCC 2024</a> (el estándar actual para heridas graves, en inglés)</li>
+      <li><a href="../docs/medical/msf/msf_clinical_guidelines.pdf" lang="en">Guías clínicas de MSF</a> (actuales, en inglés)</li>
+      <li>Referencias actuales de la OMS: <a href="shelf/docs_medical.html" lang="en">el estante de medicina</a> (en inglés)</li>
+      <li><a href="../triage_es.html">Guía de síntomas</a> (solo fuentes actuales)</li>
+    </ul>
+    <p>Nunca tome un medicamento ni una dosis de un documento HISTÓRICO.</p>
+    </div>
+  </div>
+  </div>
+
+  <div id="continue"></div>
+  <p class="h-target" id="target"></p>
+  <div class="h-actions h-en">
+    <a class="l-btn" id="h-back" href="../index.html">Back to the library</a>
+    <a class="l-cta-triage l-cta-triage--side" id="h-triage" href="../triage.html"><span class="cross">+</span><span><b>Someone is hurt — go to triage</b></span></a>
+  </div>
+  <div class="h-actions h-es-only" lang="es">
+    <a class="l-btn" id="h-back-es" href="../es.html">Volver a la biblioteca</a>
+    <a class="l-cta-triage l-cta-triage--side" id="h-triage-es" href="../triage_es.html"><span class="cross">+</span><span><b>Alguien está herido o enfermo: ir al triaje</b></span></a>
+  </div>
+  <noscript>
+    <p class="h-target h-en">JavaScript is off, so this page will not build the link for you.
+    The document you asked for is named in the address bar after <b>?f=</b> —
+    if you still want it after reading the warning above, copy that path and
+    open it by hand from the library folder.</p>
+    <p class="h-en" style="text-align:right;font-size:15px"><a href="#es" lang="es" hreflang="es">Español</a></p>
+    <p class="h-target h-es-only" lang="es">JavaScript está desactivado, así que esta página no le arma el enlace.
+    El documento que pidió aparece en la barra de direcciones después de <b>?f=</b>:
+    si después de leer la advertencia todavía lo quiere, copie esa ruta y
+    ábralo a mano desde la carpeta de la biblioteca.</p>
+  </noscript>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  /* Only genuine historical content may pass through.
+     GENERATED between the markers by gen_shelves.py from the SHELVES
+     historical flags — do not hand-edit the array. */
+  /*ALLOWED*/
+  var ALLOWED = ['docs/survivor_library/', 'docs/HISTORICAL/', 'docs/cd3wd/2012/health/', '_app/shelf/docs_survivor_library', '_app/shelf/docs_HISTORICAL'];
+  /*/ALLOWED*/
+  var m = location.search.match(/[?&]f=([^&]+)/);
+  var f = m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : null;
+  var tgt = document.getElementById('target');
+  /* embed=1: this page is inside app.js's warning modal (H6). Same gate,
+     same text — only the shell changes: "Back to the library" closes the
+     modal (postMessage — file:// iframes can't touch parent JS), and the
+     continue/triage links break out of the iframe. */
+  var EMBED = /[?&]embed=1/.test(location.href);   /* href: app.js appends &embed=1 after a #es fragment too */
+  /* FIXES #242 (a7a W2): a Spanish reader gets this warning in Spanish and the Spanish triage. Spanish when this page's
+     own ?lang=es (or spa) says so; with no lang, when the page that sent the reader is Spanish (in the modal: the parent
+     page's lang or ?lang; else the referrer). The English page shows no Spanish otherwise (E6). */
+  var ES = (function () {
+    if (/^#es\b/.test(location.hash)) { return true; }
+    if (/[?&]lang=(es|spa)(&|$)/.test(location.search)) { return true; }
+    if (/[?&]lang=/.test(location.search)) { return false; }
+    try {
+      if (parent !== window && (/^es\b/i.test(parent.document.documentElement.lang || '') ||
+          /[?&]lang=(es|spa)(&|$)/.test(parent.location.search))) { return true; }
+    } catch (err) {}
+    return /[?&]lang=(es|spa)(&|$)|\/(es|es_v1|triage_es|triage_es_v1|es_docs)\.html/.test(document.referrer || '');
+  })();
+  var T = ES ? {
+    back: 'Volver a la biblioteca', backEmbed: '← Volver (no abrir)', go: 'Ya lo leí: abrir el texto histórico →',
+    doc: 'Documento: ', notHist: 'La ruta pedida no es un documento histórico: '
+  } : {
+    back: 'Back to the library', backEmbed: '← Back (stay out)', go: 'I have read this — open the historical text →',
+    doc: 'Document: ', notHist: 'Requested path is not a historical document: '
+  };
+  if (ES) {
+    document.documentElement.lang = 'es';
+    document.documentElement.className += ' es';   /* CSS shows #es and the Spanish buttons, hides .h-en */
+    document.title = 'Advertencia: documento histórico — Lantern';
+  }
+  if (EMBED) {
+    document.documentElement.className += ' embed';
+    var backBtn = document.getElementById(ES ? 'h-back-es' : 'h-back');
+    if (backBtn) {
+      backBtn.textContent = T.backEmbed;
+      backBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        try { parent.postMessage('lantern-close-hist', '*'); } catch (err) {}
+      });
+    }
+    var triageBtn = document.getElementById(ES ? 'h-triage-es' : 'h-triage');
+    if (triageBtn) { triageBtn.target = '_top'; }
+    var hl = document.querySelectorAll('.h-text a');   /* the replacement links leave the modal too */
+    for (var j = 0; j < hl.length; j++) { hl[j].target = '_top'; }
+  }
+  if (!f) { return; }
+  var ok = false;
+  if (f.indexOf('..') === -1 && f.indexOf(':') === -1 && f.indexOf('//') === -1) {
+    for (var i = 0; i < ALLOWED.length; i++) {
+      if (f.indexOf(ALLOWED[i]) === 0) { ok = true; break; }
+    }
+  }
+  if (!ok) {
+    tgt.textContent = T.notHist + f;
+    return;
+  }
+  /* H11: the affirmative action is the solid accent button — the one
+     high-contrast element on the page, unmistakably "this is how you
+     continue". Shelf pages open in this frame; files pop a tab. */
+  var a = document.createElement('a');
+  a.className = 'l-btn l-btn--continue';
+  a.href = '../' + f;
+  a.textContent = T.go;
+  if (EMBED) {
+    if (/\.html$/.test(f.split('?')[0])) { a.target = '_top'; }
+    else {
+      a.target = '_blank'; a.rel = 'noopener';
+      a.addEventListener('click', function () {
+        try { parent.postMessage('lantern-close-hist', '*'); } catch (err) {}
+      });
+    }
+  }
+  document.getElementById('continue').appendChild(a);
+  tgt.textContent = T.doc + f;
+})();
+</script>
+</body>
+</html>

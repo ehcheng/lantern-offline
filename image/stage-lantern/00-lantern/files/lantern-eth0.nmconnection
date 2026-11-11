@@ -1,0 +1,13 @@
+[connection]
+id=lantern-eth0
+type=ethernet
+interface-name=eth0
+autoconnect-priority=10
+
+[ipv4]
+method=auto
+addresses=10.10.10.10/24
+may-fail=true
+
+[ipv6]
+method=auto

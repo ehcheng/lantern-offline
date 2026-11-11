@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lantern — Biblioteca en español</title>
+<!-- FIXES #206 (E6, 10-17): the Spanish landing page. The English front pages carry only one small "Español" link here.
+     One page for both modes: on the box app.js points the encyclopedia chips at kiwix; from a drive (file://) every link
+     is a plain file and the page works without scripts. Hand-written, except the block between the ENC markers, which
+     gen_shelves.py (patch_index) fills with the Spanish encyclopedias. -->
+<link rel="icon" href="_app/brand/lantern-icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="_app/fonts/fonts.css">
+<link rel="stylesheet" href="_app/app.26829533.css">
+<script src="_app/app.7858fbba.js" defer></script>
+<style>
+  .es-list { margin: 8px 0 0; padding-left: 20px; }
+  .es-list li { margin: 0 0 10px; }
+  .es-lang { font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+<header class="l-header">
+  <a class="l-wordmark" href="index.html"><svg class="l-mark" viewBox="0 0 100 144" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M27 3H73Q77 3 77 7V18Q92 25 92 45V109Q92 126 73 129H67V134H78Q80 134 80 137V142H20V137Q20 134 22 134H33V129Q8 128 8 109V45Q8 25 23 18V7Q23 3 27 3ZM33 10V15H67V10ZM37 27Q19 27 19 46V107Q19 117 29 118H38L50 126L62 118H71Q81 117 81 107V46Q81 27 63 27Z"/><path fill-rule="evenodd" d="M50 43C45 54 34 66 34 78C34 88 40 95 47 96C40 90 47 82 50 77C53 83 60 90 53 96C61 95 66 88 66 78C66 66 55 53 50 43Z"/><path d="M24 99C33 98 43 101 48 107V120C41 114 33 112 24 112ZM52 107C57 101 67 98 76 99V112C67 112 59 114 52 120Z"/></svg>Lantern</a>
+  <a class="es-lang" href="index.html" lang="en" hreflang="en">English</a>
+</header>
+<div class="l-wrap">
+  <p class="l-caption" style="margin-top:16px"><a href="index.html">Lantern</a> › Español</p>
+  <h1 style="font-family:var(--l-font-display);margin:8px 0 4px">Biblioteca en español</h1>
+  <p style="max-width:640px;color:var(--l-text2)">La biblioteca está casi toda en inglés. Esta página reúne lo que hay en español:
+    la guía de emergencias, los libros de salud de Hesperian, las enciclopedias, el buscador y unas notas de la biblioteca.</p>
+
+  <a class="l-cta-triage" href="triage_es.html">
+    <span class="cross">+</span>
+    <span><b>Alguien está herido o enfermo</b>
+    <span>Guía de síntomas en español: qué hacer ahora.</span></span>
+  </a>
+  <p class="l-caption">Desde el disco, sin programas: <a href="triage_es_v1.html">versión sencilla de la guía</a>.</p>
+
+  <form class="l-search" action="search.html" method="get" style="margin:24px 0">
+    <label for="q">Buscar en español (necesita el servidor)</label>
+    <input type="search" id="q" name="q" placeholder="quemaduras, agua, hongos, conservas…" autocomplete="off">
+    <input type="hidden" name="lang" value="spa">
+  </form>
+  <p><a class="needs-chat" href="chat.html?lang=es">Preguntar en español</a>: escriba la pregunta en español y la página
+    muestra las tarjetas de emergencia y una lista de páginas de la biblioteca. No cita el texto: abra la página para leerlo.
+    Necesita el servidor.</p>
+
+  <h2>Salud</h2>
+  <ul class="es-list">
+    <li><a href="mirrors/hesperian/es.hesperian.org/hhg/Nuevo_Donde_no_hay_doctor.html">Nuevo Donde no hay doctor</a>
+      (Hesperian, copia local; se abre también desde el disco).</li>
+    <li><a href="mirrors/hesperian/es.hesperian.org/hhg/HealthWiki.html">Todos los libros de Hesperian en español</a>:
+      dentista, parteras, mujeres, salud ambiental.</li>
+    <li>Hongos: <a href="triage_es.html#poison">envenenamiento y hongos</a>; el veredicto en español de cada hongo está en
+      <a href="plants.html?lang=es#plants/amanita_death_cap">plantas y costa</a> (con el servidor) o, desde el disco,
+      <a href="docs/plant_id/amanita_death_cap/README.txt">oronja verde (README.txt)</a> y
+      <a href="docs/plant_id/README.txt">la lista de todas las especies</a> (cada hongo tiene una línea «Español —» en el README.txt de su carpeta).</li>
+    <li>Mordedura de perro o murciélago, rabia: <a href="triage_es.html#bite">mordeduras</a>.</li>
+    <li>Mpox: <a href="mirrors/hesperian/es.hesperian.org/hhg/Viruela_s%C3%ADmica.html">viruela símica</a>.</li>
+  </ul>
+  <div class="l-notice-dosing" style="margin-top:12px">
+    <b>Las páginas, los resúmenes y el buscador de esta biblioteca nunca indican dosis de medicamentos.</b>
+    Los libros de medicina del estante sí las traen: para cualquier dosis use la guía impresa de medicamentos
+    (Davis's, Lippincott de bolsillo).
+  </div>
+
+  <h2>Agua</h2>
+  <ul class="es-list">
+    <li><a href="triage_es.html#water">¿Es segura esta agua?</a> El agua del calentador se puede tomar. La del tanque del inodoro
+      (no la de la taza) también, pero solo si nadie ha puesto pastillas de limpieza ni productos químicos en el tanque; la hoja de
+      la EPA del estante de agua dice que no se tome el agua del tanque del inodoro, así que trátela antes si puede:
+      <a href="mirrors/ready_gov/www.ready.gov/sites/default/files/2023-01/ready-gov_nuclear-detonation-safety_flyer_spanish.pdf">hoja de Ready.gov</a> ·
+      <a href="docs/water/epa_emergency_disinfection_drinking_water.pdf#page=2" lang="en" hreflang="en">EPA, página 2 del PDF (en inglés)</a>.</li>
+  </ul>
+
+  <h2>Comida</h2>
+  <ul class="es-list">
+    <li>Mariscos (mejillones, almejas, ostras) y algas: la toxina paralizante y el ácido domoico no se destruyen al cocinar;
+      California prohíbe recoger mejillones del 1 de mayo al 31 de octubre. El veredicto por especie está en
+      <a href="plants.html?lang=es">plantas y costa</a> (pestaña Coastal; cada especie tiene su línea en español) o, desde el disco,
+      <a href="docs/coastal_id/README.txt">la lista de mariscos y algas (README.txt)</a>.</li>
+    <li>Cultivos que dan comida pronto: <a href="docs/homesteading_extension/cultivos_de_cosecha_rapida.html">nota de la biblioteca</a>.</li>
+    <li>Conservar carne con sal: <a href="docs/food_preservation/conservar_carne_con_sal.html">nota de la biblioteca</a>.</li>
+    <li>Secar tomates, frutas y frijoles sin electricidad (FAO):
+      <a href="docs/cd3wd/2012/agriculture/_ag_fruit_veg_process_ss_es_unfao_lp_107730_.pdf">Procesamiento de frutas y hortalizas</a>
+      (1993; secadores solares en la página 100 del PDF, tomates deshidratados en la 214) ·
+      <a href="docs/cd3wd/2012/agriculture/_ag_drying_grains_natural_solar_low_temp_9_es_unfao_lp_106140_.pdf">Secado de granos: natural, solar y a bajas temperaturas</a> (1991) ·
+      <a href="docs/cd3wd/2012/agriculture/_ag_grains_drying_trigo_maize_soya_frejol_es_unfao_lp_108470_.pdf">Cosecha de granos: trigo, maíz, fréjol y soya</a>
+      (1984; fréjol desde la página 66 del PDF).</li>
+    <li>Comida sin electricidad, qué tirar después de un apagón, latas hinchadas o abolladas:
+      <a href="mirrors/ready_gov/www.ready.gov/es/alimentos.html">Ready.gov, «Alimentos»</a>.</li>
+  </ul>
+
+  <h2>Fuego, luz y energía</h2>
+  <ul class="es-list">
+    <li>Encender fuego con leña mojada: <a href="docs/military_manuals/encender_fuego_con_lena_mojada.html">nota de la biblioteca</a>.</li>
+    <li>Fuego en la cocina y prevención de incendios: Hesperian,
+      <a href="mirrors/hesperian/es.hesperian.org/hhg/A_Community_Guide_to_Environmental_Health:Protecci%C3%B3n_contra_incendios.html">Protección contra incendios</a>;
+      sartén con aceite en llamas: <a href="triage_es.html#fire">fuego de grasa</a>.</li>
+    <li>Generador: solo al aire libre, <a href="mirrors/ready_gov/www.ready.gov/es/apagones.html">Ready.gov, «Apagones»</a>.</li>
+    <li>Cargar el teléfono con la batería del carro sin dejar el carro sin arranque:
+      <a href="docs/energy/cargar_el_telefono_con_la_bateria_del_carro.html">nota de la biblioteca</a>.</li>
+  </ul>
+
+  <!-- FIXES #220 (a7b F8, a7a F6): routes to the maps in both modes; the interactive map opens in its Spanish view -->
+  <h2>Mapas</h2>
+  <ul class="es-list">
+    <li class="hide-direct"><a href="map.html?lang=es">Mapa interactivo</a> de todo el mundo, sin internet (necesita el servidor).</li>
+    <li>Mapas topográficos de California en PDF (USGS, en inglés), una hoja por zona con el nombre del lugar: carpeta
+      <a href="maps/topo_ca/">maps/topo_ca/</a>, por ejemplo <a href="maps/topo_ca/CA_Salinas.pdf">CA_Salinas.pdf</a>.
+      Se abren también desde el disco.</li>
+    <li>Mapas para el teléfono, sin internet: archivos de Organic Maps (.mwm) en <a href="maps/organicmaps/">maps/organicmaps/</a>
+      y de OsmAnd (.obf.zip) en <a href="maps/osmand/">maps/osmand/</a>. Cópielos al teléfono una vez.</li>
+  </ul>
+
+  <!-- FIXES #220 (a7a F5, a7b F6): topics with no Spanish source yet, so a reader does not search in vain.
+       FIXES #232 (a7a W8, a7b F5, F8): the bicycle line promised puncture repair on a page that has none; the Spanish
+       Wikilibros and MedlinePlus routes need the server, so the drive reader is told the English fallback. -->
+  <h2>Sin fuente en español todavía</h2>
+  <p style="max-width:640px">Para estos temas la biblioteca solo tiene fuentes en inglés:
+    arreglar un tubo de agua roto o con fugas: <a href="docs/shelter/fm_3-34.471_plumbing.pdf#page=78" lang="en" hreflang="en">manual FM 3-34.471, «Basic Plumbing Repairs and Maintenance», página 78 del PDF</a> ·
+    radio de banda ciudadana (CB), canal 9 de emergencia: <a href="docs/comms/cfr47_part95_personal_radio_gmrs_frs_2024.pdf#page=21" lang="en" hreflang="en">reglamento de la FCC, parte 95, página 21 del PDF</a> ·
+    matemáticas para niños: <a href="video.html?g=video/khan_academy" lang="en" hreflang="en">lecciones en video de Khan Academy</a> ·
+    refugio con una sábana o una lona y palos: <a href="docs/military_manuals/fm_21-76_survival.pdf#page=48" lang="en" hreflang="en">manual FM 21-76, «Poncho Lean-To», página 48 del PDF</a>.</p>
+  <p style="max-width:640px">Estos temas tienen fuente en español solo con el servidor (Wikilibros, MedlinePlus); desde el disco, solo en inglés:</p>
+  <ul class="es-list">
+    <li>Reparar la bicicleta: Wikilibros, «Manual de la bicicleta»:
+      <a href="search.html?lang=spa&amp;q=Arreglar%20un%20pinchazo" data-kiwix="/content/wikibooks_es_all_nopic_2025-10/Manual_de_la_bicicleta/Arreglar_un_pinchazo">«Arreglar un pinchazo»</a> y
+      <a href="search.html?lang=spa&amp;q=Reparar%20una%20cadena%20rota" data-kiwix="/content/wikibooks_es_all_nopic_2025-10/Manual_de_la_bicicleta/Reparar_una_cadena_rota">«Reparar una cadena rota»</a> (necesita el servidor).
+      Desde el disco: <a href="mirrors/sheldonbrown/www.sheldonbrown.com/on-road-repairs.html" lang="en" hreflang="en">Sheldon Brown, «On-Road Repairs»</a>, en inglés: herramientas y cadena; su artículo sobre pinchazos no está en la caja.</li>
+    <li>Calmar a un bebé que llora: MedlinePlus,
+      <a href="search.html?lang=spa&amp;q=Llanto%20excesivo%20en%20beb%C3%A9s" data-kiwix="/content/medlineplus.gov_es_all_2024-12/medlineplus.gov/spanish/ency/article/003023.htm">«Llanto excesivo en bebés»</a> (necesita el servidor).
+      Si el bebé tiene fiebre, no quiere mamar o está muy dormido: <a href="triage_es.html#child">niño enfermo</a>.</li>
+    <li>Encender fuego sin fósforos: Wikilibros,
+      <a href="search.html?lang=spa&amp;q=T%C3%A9cnicas%20para%20hacer%20fuego" data-kiwix="/content/wikibooks_es_all_nopic_2025-10/T%C3%A9cnicas_de_supervivencia/T%C3%A9cnicas_para_hacer_fuego">«Técnicas para hacer fuego»</a> (necesita el servidor).
+      Desde el disco: <a href="docs/military_manuals/fm_21-76_survival.pdf#page=84" lang="en" hreflang="en">manual FM 21-76, «How to Light a Fire», página 84 del PDF</a>, en inglés.</li>
+    <li>Usar la brújula y el mapa: Wikilibros,
+      <a href="search.html?lang=spa&amp;q=Orientaci%C3%B3n" data-kiwix="/content/wikibooks_es_all_nopic_2025-10/Excursionismo/Orientaci%C3%B3n">«Excursionismo/Orientación»</a>, sección «Brújula» (necesita el servidor).
+      Desde el disco: <a href="docs/navigation/tc_3-25.26_map_reading_land_nav.pdf#page=91" lang="en" hreflang="en">TC 3-25.26, «Navigation Equipment and Methods», página 91 del PDF</a>, en inglés.</li>
+  </ul>
+
+  <!--ENC-->
+<section class="l-enc needs-enc" id="enciclopedias"><h2>Enciclopedias</h2><p class="l-caption">5 enciclopedias en español, servidas por la caja Lantern. <span class="l-badge show-direct">NECESITA EL SERVIDOR</span> Desde el disco se abren con el programa Kiwix (<a href="tools/kiwix_desktop/">tools/kiwix_desktop/</a>) o con la aplicación Kiwix para Android (<a href="tools/android/">tools/android/</a>); los archivos están en <a href="zim/">zim/</a>.</p><div class="l-enc-list"><a class="l-chip" href="search.html?lang=spa" data-kiwix="/viewer#wikipedia_es_top_nopic_2026-07"><b>Wikipedia en español (lo mejor)</b></a>
+<a class="l-chip" href="search.html?lang=spa" data-kiwix="/viewer#wikipedia_es_medicine_maxi_2026-04">Wikipedia Médica</a>
+<a class="l-chip" href="search.html?lang=spa" data-kiwix="/viewer#wikibooks_es_all_nopic_2025-10">Wikilibros</a>
+<a class="l-chip" href="search.html?lang=spa" data-kiwix="/viewer#vikidia_es_all_nopic_2026-09">Vikidia (niños)</a>
+<a class="l-chip" href="search.html?lang=spa" data-kiwix="/viewer#medlineplus.gov_es_all_2024-12">MedlinePlus (español)</a>
+<a class="l-chip" href="search.html?lang=spa" data-kiwix="/"><b>Todas las enciclopedias →</b></a></div></section>
+<!--/ENC-->
+
+  <h2>Documentos</h2>
+  <ul class="es-list">
+    <li><a href="_app/shelf/es_docs.html">Todos los documentos en español</a>: manuales prácticos de CD3WD y libros de texto.</li>
+  </ul>
+
+  <h2>Herramientas</h2>
+  <ul class="es-list">
+    <li>Traductor sin internet, inglés y español (Argos, para instalar en una computadora):
+      <a href="tools/argos/README.html" lang="en" hreflang="en">instrucciones (en inglés)</a>, carpeta <a href="tools/argos/">tools/argos/</a>.</li>
+  </ul>
+
+  <h2 id="sin-caja">Sin la caja de Wi-Fi</h2>
+  <p style="max-width:640px">Si el Pi funciona pero no hay red LIBRARY: conecte una computadora con un cable al puerto Ethernet del Pi,
+    ponga la conexión con cable en la dirección 10.10.10.20, máscara 255.255.255.0, y abra http://10.10.10.10 (el nombre
+    library.lan no funciona así). Sin el Pi: una computadora con Linux lee el disco de respaldo (el SSD); abra la carpeta de la
+    biblioteca y después es.html, esta página. Los PDF, las fotos de plantas y las copias de sitios web se abren como archivos.
+    Las enciclopedias (archivos .zim) necesitan el programa Kiwix de <a href="tools/kiwix_desktop/">tools/kiwix_desktop/</a>,
+    o la aplicación Kiwix de <a href="tools/android/">tools/android/</a> en un teléfono Android. Las computadoras Mac y Windows
+    no leen ese disco sin programas extra. Pasos completos, en inglés:
+    <a href="_app/runbook.html#part-2-when-it-does-not-work" lang="en" hreflang="en">manual del operador, parte 2, paso 4</a>.</p>
+
+  <p class="l-caption" style="margin:32px 0"><a href="index.html" lang="en" hreflang="en">English: library front page</a></p>
+</div>
+</main>
+
+<!--TABBAR-->
+<nav class="l-tabbar" aria-label="Pestañas" lang="es">
+  <a href="es.html" class="l-tab l-tab-home" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 9.5V20h13V9.5"></path><path d="M10 20v-5.5h4V20"></path></svg><span class="l-tab-label">Inicio</span></a>
+  <a href="search.html?lang=spa" class="l-tab l-tab-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.75" cy="10.75" r="6.75"></circle><path d="M15.75 15.75 20.5 20.5"></path></svg><span class="l-tab-label">Buscar</span></a>
+  <a href="triage_es.html" class="l-tab l-tab-triage"><span class="cross"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"></path></svg></span><span class="l-tab-label">Herido o enfermo</span></a>
+  <a href="audio.html" class="l-tab l-tab-listening"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"></path><path d="M4 14.5h2.5A1.5 1.5 0 0 1 8 16v3a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 4 19z"></path><path d="M20 14.5h-2.5A1.5 1.5 0 0 0 16 16v3a1.5 1.5 0 0 0 1.5 1.5h1A1.5 1.5 0 0 0 20 19z"></path></svg><span class="l-tab-label">Escuchar</span></a>
+  <details class="l-more"><summary class="l-tab l-tab-more"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="2"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="2"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="2"></rect></svg><span class="l-tab-label">Más</span></summary>
+    <div class="l-msheet">
+      <div class="l-msheet-head"><h2 class="l-msheet-title">Más</h2></div>
+      <div class="l-msheet-body">
+        <div class="l-msheet-links">
+          <a href="chat.html?lang=es" class="needs-chat"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17H6.5A2.5 2.5 0 0 1 4 14.5z"></path></svg>Preguntar</a>
+          <a href="map.html?lang=es" class="needs-maps hide-direct"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5 6-2.5v13.5L15 20l-6-2.5L3 20z"></path><path d="M9 4v13.5M15 6.5V20"></path></svg>Mapa</a>
+          <a href="kids.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9-4.3-4.1 5.9-.8z"></path></svg>Niños</a>
+          <a href="video.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="m10 9 5 3-5 3z"></path></svg>Videos</a>
+          <a href="plants.html?lang=es"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"></path><path d="M5 19c3-4 6-7 9-9"></path></svg>Plantas</a>
+          <a href="tools/suncalc.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"></path></svg>Sol y luna</a>
+          <a href="tools/convert.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"></path></svg>Conversiones</a>
+          <a href="index.html" lang="en" hreflang="en"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"></path><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"></path></svg>English</a>
+        </div>
+      </div>
+      <div class="l-msheet-foot"><button class="l-pill" type="button" data-role="status" onclick="lanternToggleTheme()" aria-label="Estado del servidor. Cambiar tema"><span class="dot"></span>…</button></div>
+    </div>
+  </details>
+</nav>
+<!--/TABBAR-->
+</body>
+</html>

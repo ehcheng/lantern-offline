@@ -1,0 +1,608 @@
+{
+  "about": "This file has two lists. 'sources' are the third-party files the build needs. fetch/fetch_all.py downloads each one, checks its sha256 and copies it into a folder that git ignores. 'content' has one entry for each folder of the reference library (2026-11-08, about 1.2 TB), with the script that fetches it, its license and its status. Content has no checksums, because Kiwix, archive.org and the mirrored websites change their files over time. The pins were last checked on 2026-11-10. Nobody has checked the license lines marked 'verify' against the source's own terms. Read them before you give away or sell a box, and see library/LICENSES.md for the obligations.",
+  "sources": [
+    {
+      "name": "pdf.js",
+      "version": "6.3.289",
+      "license": "Apache-2.0",
+      "url": "https://github.com/mozilla/pdf.js/releases/download/v6.3.289/pdfjs-6.3.289-dist.zip",
+      "sha256": "98c5832ffe7af4edd59853476a478c0d4d4d76dd49c1701f4c86f7182725cdf9",
+      "files": {
+        "build/pdf.mjs": "library/_app/vendor/pdfjs/pdf.mjs",
+        "build/pdf.worker.mjs": "library/_app/vendor/pdfjs/pdf.worker.mjs",
+        "LICENSE": "library/_app/vendor/pdfjs/LICENSE"
+      },
+      "note": "Version 6 ships only as ES modules. The release zip has no older .min.js build."
+    },
+    {
+      "name": "MapLibre GL JS",
+      "version": "6.10.0",
+      "license": "BSD-3-Clause",
+      "url": "https://github.com/maplibre/maplibre-gl-js/releases/download/v6.10.0/dist.zip",
+      "sha256": "36d658ece5fc5d9f740badb44e47d9ad9ce5fd6d33ec337ac14b339c8cc23b48",
+      "files": {
+        "dist/maplibre-gl.mjs": "library/_app/vendor/maplibre/maplibre-gl.mjs",
+        "dist/maplibre-gl-shared.mjs": "library/_app/vendor/maplibre/maplibre-gl-shared.mjs",
+        "dist/maplibre-gl-worker.mjs": "library/_app/vendor/maplibre/maplibre-gl-worker.mjs",
+        "dist/maplibre-gl.css": "library/_app/vendor/maplibre/maplibre-gl.css"
+      },
+      "note": "Version 6 ships only as ES modules. maplibre-gl.mjs loads the shared chunk and the worker from the same folder."
+    },
+    {
+      "name": "PMTiles JS",
+      "version": "4.5.0",
+      "license": "BSD-3-Clause",
+      "url": "https://unpkg.com/pmtiles@4.5.0/dist/pmtiles.js",
+      "sha256": "caf981bc46f6327ee7e65d5dc964d89d38a69f60edca2bd4c5c890c21b554c6c",
+      "dest": "library/_app/vendor/pmtiles/pmtiles.js"
+    },
+    {
+      "name": "Protomaps basemaps style",
+      "version": "5.7.2",
+      "license": "BSD-3-Clause",
+      "url": "https://unpkg.com/@protomaps/basemaps@5.7.2/dist/basemaps.js",
+      "sha256": "551864f01da1bfe3005e99987197f22f56d0c35f9a10fa1727a889e2434af16d",
+      "dest": "library/_app/vendor/basemaps.js",
+      "note": "UMD build that sets the global 'basemaps'. planet.pmtiles uses Protomaps Basemap v4, which is why the sprites below are from sprites/v4."
+    },
+    {
+      "name": "Protomaps basemaps assets (glyphs and sprites)",
+      "version": "commit 028c18f7 (2025-10-31)",
+      "license": "OFL-1.1 (fonts), MIT (sprites, derived from tangrams/icons)",
+      "url": "https://codeload.github.com/protomaps/basemaps-assets/tar.gz/028c18f713baecad011301ff7a69acc39bcc2ae7",
+      "sha256": "57e40e8c512bd8042d0a3a251f19d0d1c8523ad963c666c3c6643bada4dc92d0",
+      "files": {
+        "basemaps-assets-028c18f713baecad011301ff7a69acc39bcc2ae7/fonts/OFL.txt": "library/_app/vendor/basemaps-assets/fonts/OFL.txt",
+        "basemaps-assets-028c18f713baecad011301ff7a69acc39bcc2ae7/fonts/Noto Sans Regular/": "library/_app/vendor/basemaps-assets/fonts/Noto Sans Regular/",
+        "basemaps-assets-028c18f713baecad011301ff7a69acc39bcc2ae7/fonts/Noto Sans Medium/": "library/_app/vendor/basemaps-assets/fonts/Noto Sans Medium/",
+        "basemaps-assets-028c18f713baecad011301ff7a69acc39bcc2ae7/fonts/Noto Sans Italic/": "library/_app/vendor/basemaps-assets/fonts/Noto Sans Italic/",
+        "basemaps-assets-028c18f713baecad011301ff7a69acc39bcc2ae7/fonts/Noto Sans Devanagari Regular v1/": "library/_app/vendor/basemaps-assets/fonts/Noto Sans Devanagari Regular v1/",
+        "basemaps-assets-028c18f713baecad011301ff7a69acc39bcc2ae7/sprites/v4/": "library/_app/vendor/basemaps-assets/sprites/v4/"
+      },
+      "note": "The project publishes no releases, so this pins a commit. map.html builds the glyph and sprite URLs from location.origin, because MapLibre needs absolute URLs."
+    },
+    {
+      "name": "MapLibre GL JS license text",
+      "version": "v6.10.0",
+      "license": "BSD-3-Clause",
+      "url": "https://raw.githubusercontent.com/maplibre/maplibre-gl-js/v6.10.0/LICENSE.txt",
+      "sha256": "ee5fc05a0677eaf69601d2c7db0d9ecd6cc27c3abc1d0733bc9ed34707cf8ef2",
+      "dest": "library/_app/vendor/maplibre/LICENSE.txt"
+    },
+    {
+      "name": "PMTiles license text",
+      "version": "commit 5897a82a",
+      "license": "BSD-3-Clause",
+      "url": "https://raw.githubusercontent.com/protomaps/PMTiles/5897a82a16b233abac7b8f339c019b931c2bbf54/LICENSE",
+      "sha256": "0371c38f338835f7fc13ed71176f3d92144e22c8b736a31cced57adbbeb647b3",
+      "dest": "library/_app/vendor/pmtiles/LICENSE"
+    },
+    {
+      "name": "Protomaps basemaps license text",
+      "version": "commit f7bcb486",
+      "license": "BSD-3-Clause (code), CC0 (style design)",
+      "url": "https://raw.githubusercontent.com/protomaps/basemaps/f7bcb4869434030ba23271f43e9dbcf6bfc5d63f/LICENSE.md",
+      "sha256": "74f975cfedd168098c43b5cfd6e587e40604684c4ffcec3e90d24b3b09c061b0",
+      "dest": "library/_app/vendor/basemaps-LICENSE.md"
+    },
+    {
+      "name": "Tangrams icons license text (basemaps sprites)",
+      "version": "commit 92510779",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/tangrams/icons/92510779634f4a006c61ea70e50cb8c52c765a81/LICENSE.md",
+      "sha256": "46d0ca73c10d7366ef7bf3932d8508267096393ccc9ef3a41d1b1d1fe37023f1",
+      "dest": "library/_app/vendor/basemaps-assets/sprites/LICENSE.md"
+    },
+    {
+      "name": "Pagefind license text",
+      "version": "v1.5.2",
+      "license": "MIT",
+      "url": "https://raw.githubusercontent.com/CloudCannon/pagefind/v1.5.2/LICENSE",
+      "sha256": "4736929bfded122bd969f0621a0d917484b126d981270d68a63ed42cb55503d5",
+      "dest": "library/_app/vendor/pagefind-LICENSE"
+    },
+    {
+      "name": "Newsreader newsreader-italic-vietnamese",
+      "version": "Google Fonts v26",
+      "license": "OFL-1.1",
+      "url": "https://fonts.gstatic.com/s/newsreader/v26/cY9CfjOCX1hbuyalUrK439vCgYhCBJWxZCPp.woff2",
+      "sha256": "d5a170a88bdb4e21bcc743e8cf1a64835c8351f8e1d32dadd9cac77f2e718fbb",
+      "dest": "library/_app/fonts/newsreader-italic-vietnamese.woff2"
+    },
+    {
+      "name": "Newsreader newsreader-italic-latin-ext",
+      "version": "Google Fonts v26",
+      "license": "OFL-1.1",
+      "url": "https://fonts.gstatic.com/s/newsreader/v26/cY9CfjOCX1hbuyalUrK439vCgIhCBJWxZCPp.woff2",
+      "sha256": "750e9629f56ae71980f1dde315f5bdb6c81b49b13a8fec3246a4392853aa7ccd",
+      "dest": "library/_app/fonts/newsreader-italic-latin-ext.woff2"
+    },
+    {
+      "name": "Newsreader newsreader-italic-latin",
+      "version": "Google Fonts v26",
+      "license": "OFL-1.1",
+      "url": "https://fonts.gstatic.com/s/newsreader/v26/cY9CfjOCX1hbuyalUrK439vCjohCBJWxZA.woff2",
+      "sha256": "a99fb127682b9af538780d21420037452197b0d37dfd273eb108f8a3665d5501",
+      "dest": "library/_app/fonts/newsreader-italic-latin.woff2"
+    },
+    {
+      "name": "Newsreader newsreader-normal-vietnamese",
+      "version": "Google Fonts v26",
+      "license": "OFL-1.1",
+      "url": "https://fonts.gstatic.com/s/newsreader/v26/cY9AfjOCX1hbuyalUrK439HyjIJFJpeBZQ.woff2",
+      "sha256": "68ef9a14f1462e2218ecd03c39d26236402ff6a9e78da39ba5591a430a229824",
+      "dest": "library/_app/fonts/newsreader-normal-vietnamese.woff2"
+    },
+    {
+      "name": "Newsreader newsreader-normal-latin-ext",
+      "version": "Google Fonts v26",
+      "license": "OFL-1.1",
+      "url": "https://fonts.gstatic.com/s/newsreader/v26/cY9AfjOCX1hbuyalUrK439DyjIJFJpeBZQ.woff2",
+      "sha256": "cbca001188852d514d8654be7ddc97868f039bdf986b926ec5c985c117853cfd",
+      "dest": "library/_app/fonts/newsreader-normal-latin-ext.woff2"
+    },
+    {
+      "name": "Newsreader newsreader-normal-latin",
+      "version": "Google Fonts v26",
+      "license": "OFL-1.1",
+      "url": "https://fonts.gstatic.com/s/newsreader/v26/cY9AfjOCX1hbuyalUrK4397yjIJFJpc.woff2",
+      "sha256": "01817351be3edfc1714fe6d60ddea6a22a169a5ebd033b50c7f9495e5d9c386a",
+      "dest": "library/_app/fonts/newsreader-normal-latin.woff2"
+    },
+    {
+      "name": "Atkinson Hyperlegible atkinson-400-latin-ext",
+      "version": "Google Fonts v12",
+      "license": "OFL-1.1",
+      "url": "https://fonts.gstatic.com/s/atkinsonhyperlegible/v12/9Bt23C1KxNDXMspQ1lPyU89-1h6ONRlW45G07JIoWQeCbGWn.woff2",
+      "sha256": "e15e89caea888e8df98f6705fc0a5968aa4f62076da8fe9667c8dd4a197ff4ef",
+      "dest": "library/_app/fonts/atkinson-400-latin-ext.woff2"
+    },
+    {
+      "name": "Atkinson Hyperlegible atkinson-400-latin",
+      "version": "Google Fonts v12",
+      "license": "OFL-1.1",
+      "url": "https://fonts.gstatic.com/s/atkinsonhyperlegible/v12/9Bt23C1KxNDXMspQ1lPyU89-1h6ONRlW45G04pIoWQeCbA.woff2",
+      "sha256": "a60206dd4793eb886952e48dc3e1c1d59942c004b2ab1e0086e7ccd156a7852d",
+      "dest": "library/_app/fonts/atkinson-400-latin.woff2"
+    },
+    {
+      "name": "Atkinson Hyperlegible atkinson-700-latin-ext",
+      "version": "Google Fonts v12",
+      "license": "OFL-1.1",
+      "url": "https://fonts.gstatic.com/s/atkinsonhyperlegible/v12/9Bt73C1KxNDXMspQ1lPyU89-1h6ONRlW45G8Wbc9eiWPRl-uFV24.woff2",
+      "sha256": "69b1029853229409286380f46b81a137c566825a0b1cd458f2a3536df8459805",
+      "dest": "library/_app/fonts/atkinson-700-latin-ext.woff2"
+    },
+    {
+      "name": "Atkinson Hyperlegible atkinson-700-latin",
+      "version": "Google Fonts v12",
+      "license": "OFL-1.1",
+      "url": "https://fonts.gstatic.com/s/atkinsonhyperlegible/v12/9Bt73C1KxNDXMspQ1lPyU89-1h6ONRlW45G8Wbc9dCWPRl-uFQ.woff2",
+      "sha256": "1cc7c0c5fbf16d1be3cb6d95c89fc0afd0e11f264e239ac97c64a326c5d88fe4",
+      "dest": "library/_app/fonts/atkinson-700-latin.woff2"
+    },
+    {
+      "name": "Libre Baskerville latin (wght 400-700)",
+      "version": "Google Fonts v24",
+      "license": "OFL-1.1",
+      "url": "https://fonts.gstatic.com/s/librebaskerville/v24/kmKnZrc3Hgbbcjq75U4uslyuy4kn0qNZaxMaC82U.woff2",
+      "sha256": "b62b98ef69e6e55b28b9bcac84513eb1bdd1d312a344b1c76e979219923224a5",
+      "dest": "library/_app/fonts/LibreBaskerville-Variable.woff2",
+      "note": "The 1.0.5 library used a 64 KB woff2 converted by hand from the full TTF, which has no download address. This is the Google Fonts latin subset of the same variable font. Only the Lantern wordmark uses it."
+    },
+    {
+      "name": "Newsreader OFL text",
+      "version": "google/fonts commit 5bb28733",
+      "license": "OFL-1.1",
+      "url": "https://raw.githubusercontent.com/google/fonts/5bb28733cec313b63fbd415b574b5ae35c8aa8b8/ofl/newsreader/OFL.txt",
+      "sha256": "fdfad38143ec470553cae82a1e45320bdd1b9ec70415d37bd0171051d8a4ded8",
+      "dest": "library/_app/fonts/Newsreader-OFL.txt"
+    },
+    {
+      "name": "AtkinsonHyperlegible OFL text",
+      "version": "google/fonts commit 5bb28733",
+      "license": "OFL-1.1",
+      "url": "https://raw.githubusercontent.com/google/fonts/5bb28733cec313b63fbd415b574b5ae35c8aa8b8/ofl/atkinsonhyperlegible/OFL.txt",
+      "sha256": "f32d22b3908fcad2c86a74000614ec22e6a7f66ea7e867e616026a27aebdc143",
+      "dest": "library/_app/fonts/AtkinsonHyperlegible-OFL.txt"
+    },
+    {
+      "name": "LibreBaskerville OFL text",
+      "version": "google/fonts commit 5bb28733",
+      "license": "OFL-1.1",
+      "url": "https://raw.githubusercontent.com/google/fonts/5bb28733cec313b63fbd415b574b5ae35c8aa8b8/ofl/librebaskerville/OFL.txt",
+      "sha256": "3624eddd4c8f8a908130a417ae7cd089c9da69899c4e0ca1a5217d0a6fae16fd",
+      "dest": "library/_app/fonts/LibreBaskerville-OFL.txt"
+    },
+    {
+      "name": "Pagefind darwin-arm64",
+      "version": "1.5.2",
+      "license": "MIT",
+      "url": "https://github.com/CloudCannon/pagefind/releases/download/v1.5.2/pagefind-v1.5.2-aarch64-apple-darwin.tar.gz",
+      "sha256": "7286f394a349bd37677d44a65a20078a02b1747da0b0814d83403bf86be17abe",
+      "files": {
+        "pagefind": "build/bin/pagefind/darwin-arm64/pagefind"
+      }
+    },
+    {
+      "name": "Pagefind linux-arm64",
+      "version": "1.5.2",
+      "license": "MIT",
+      "url": "https://github.com/CloudCannon/pagefind/releases/download/v1.5.2/pagefind-v1.5.2-aarch64-unknown-linux-musl.tar.gz",
+      "sha256": "f50ec608bcbf431cebd84e0efa3a5b041ee63df2ad81f138023e0cfd2f509424",
+      "files": {
+        "pagefind": "build/bin/pagefind/linux-arm64/pagefind"
+      }
+    },
+    {
+      "name": "Pagefind linux-x86_64",
+      "version": "1.5.2",
+      "license": "MIT",
+      "url": "https://github.com/CloudCannon/pagefind/releases/download/v1.5.2/pagefind-v1.5.2-x86_64-unknown-linux-musl.tar.gz",
+      "sha256": "afb824a9e7f64905a934900481cea5be679c03975e527329e0e5e6cc70f5feda",
+      "files": {
+        "pagefind": "build/bin/pagefind/linux-x86_64/pagefind"
+      }
+    },
+    {
+      "name": "kiwix-tools macos-arm64",
+      "version": "3.8.2",
+      "license": "GPL-3.0",
+      "url": "https://download.kiwix.org/release/kiwix-tools/kiwix-tools_macos-arm64-3.8.2.tar.gz",
+      "sha256": "5c64d43176627e558a117146b02ea36b7da2b0cd3a332cbff075cde05d9585f9",
+      "files": {
+        "kiwix-tools_macos-arm64-3.8.2/": "build/bin/kiwix-tools_macos-arm64-3.8.2/"
+      },
+      "note": "kiwix-serve for the build machine, used by server/serve_kiwix_dev.sh and build/fetch_kiwix_catalog.sh."
+    },
+    {
+      "name": "kiwix-tools linux-aarch64",
+      "version": "3.8.2",
+      "license": "GPL-3.0",
+      "url": "https://download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-aarch64-3.8.2.tar.gz",
+      "sha256": "a9898fc5363437327350db669bbc03dcc7ecfd498dae727d7184bebe77019514",
+      "files": {
+        "kiwix-tools_linux-aarch64-3.8.2/": "build/bin/kiwix-tools_linux-aarch64-3.8.2/"
+      }
+    },
+    {
+      "name": "kiwix-tools linux-x86_64",
+      "version": "3.8.2",
+      "license": "GPL-3.0",
+      "url": "https://download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-x86_64-3.8.2.tar.gz",
+      "sha256": "b0ae98dd344aa0469a15ab42feff6d5aafb79541a82fb4e2647c74b073123815",
+      "files": {
+        "kiwix-tools_linux-x86_64-3.8.2/": "build/bin/kiwix-tools_linux-x86_64-3.8.2/"
+      }
+    }
+  ],
+  "content": [
+    {
+      "dest": "zim/ (Wikimedia: Wikipedia EN full, medicine, simple; Wikibooks, Wikiversity, Wikisource, Wikivoyage, Wiktionary; Spanish Wikipedia top and medicine, Wikibooks ES, Vikidia ES)",
+      "fetch": [
+        "fetch/download_zims.sh",
+        "fetch/download_zims_es.sh",
+        "fetch/download_maps_datasets.sh (queue_zims)"
+      ],
+      "license": "CC BY-SA 4.0 (text; media carry their own licenses)",
+      "status": "scripted",
+      "note": "File names carry a date. When download.kiwix.org drops one, take the newest file in the same folder."
+    },
+    {
+      "dest": "zim/ (Stack Exchange: DIY, Electronics, Ham Radio, Gardening, Outdoors, Medical Sciences, Physics, Chemistry)",
+      "fetch": [
+        "fetch/download_maps_datasets.sh (queue_zims)"
+      ],
+      "license": "CC BY-SA 4.0",
+      "status": "scripted"
+    },
+    {
+      "dest": "zim/gutenberg_en_all_2025-11.zim",
+      "size_gb": 206,
+      "fetch": [
+        "fetch/download_zims.sh"
+      ],
+      "license": "Public domain in the US; Project Gutenberg trademark terms (library/LICENSES.md)",
+      "status": "scripted"
+    },
+    {
+      "dest": "zim/ (Appropedia, Energypedia, PhET)",
+      "fetch": [
+        "fetch/download_zims.sh",
+        "fetch/download_maps_datasets.sh"
+      ],
+      "license": "CC BY-SA 4.0 (Appropedia, Energypedia: verify), CC BY 4.0 (PhET)",
+      "status": "scripted"
+    },
+    {
+      "dest": "zim/ifixit_en_all_2025-12.zim",
+      "fetch": [
+        "fetch/download_zims.sh"
+      ],
+      "license": "CC BY-NC-SA 3.0 (noncommercial)",
+      "status": "scripted"
+    },
+    {
+      "dest": "zim/ (zimgit post-disaster, knots, medicine, water, food preparation)",
+      "fetch": [
+        "fetch/download_zims.sh"
+      ],
+      "license": "Collections of published documents, mixed licenses (verify per document)",
+      "status": "scripted"
+    },
+    {
+      "dest": "zim/trueprepper.com_en_all_2026-05.zim",
+      "size_gb": 1.3,
+      "fetch": [
+        "fetch/download_zims.sh"
+      ],
+      "license": "Website copyright of its owner; ZIM published by Kiwix (verify before giving or selling a box)",
+      "status": "scripted"
+    },
+    {
+      "dest": "zim/medlineplus.gov_es_all_2024-12.zim",
+      "fetch": [
+        "fetch/download_zims_es.sh"
+      ],
+      "license": "US government, mostly public domain; some licensed parts (verify)",
+      "status": "scripted"
+    },
+    {
+      "dest": "zim/ted_mul_*_2026-04.zim (biology, chemistry, health care, medicine, physics)",
+      "fetch": [
+        "fetch/download_tier3.sh"
+      ],
+      "license": "CC BY-NC-ND 4.0 (noncommercial, no derivatives)",
+      "status": "scripted"
+    },
+    {
+      "dest": "zim/batteryuniversity_en_2026-09.zim",
+      "size_gb": 0.02,
+      "fetch": [],
+      "license": "Copyrighted site",
+      "status": "dropped",
+      "note": "A private crawl of a copyrighted website. Public builds leave it out."
+    },
+    {
+      "dest": "maps/osmand, maps/organicmaps, maps/geofabrik, maps/pmtiles (planet basemap)",
+      "size_gb": 305,
+      "fetch": [
+        "fetch/download_maps_datasets.sh",
+        "fetch/download_organicmaps.sh",
+        "fetch/download_planet_pmtiles.sh"
+      ],
+      "license": "ODbL 1.0, © OpenStreetMap contributors (keep the attribution); Protomaps build tools BSD-3-Clause",
+      "status": "scripted",
+      "note": "The OsmAnd file list comes from OsmAnd's live index. The US pmtiles extract needs the pmtiles command-line tool (brew install pmtiles)."
+    },
+    {
+      "dest": "maps/noaa_charts",
+      "fetch": [
+        "fetch/download_noaa_charts.sh"
+      ],
+      "license": "US government, public domain",
+      "status": "scripted"
+    },
+    {
+      "dest": "maps/topo_ca",
+      "fetch": [
+        "fetch/download_topo_ca.py"
+      ],
+      "license": "USGS, public domain",
+      "status": "scripted"
+    },
+    {
+      "dest": "maps/satellite_ca (and the Bay Area MBTiles)",
+      "fetch": [
+        "fetch/download_satellite_ca.py",
+        "fetch/download_satellite.sh"
+      ],
+      "license": "USGS USGSImageryOnly (NAIP), public domain",
+      "status": "scripted"
+    },
+    {
+      "dest": "datasets/climate_normals, datasets/ephemeris, datasets/fcc, datasets/dailymed",
+      "size_gb": 20.6,
+      "fetch": [
+        "fetch/download_maps_datasets.sh"
+      ],
+      "license": "NOAA NCEI, JPL DE440s, FCC ULS, NLM DailyMed: US government, public domain",
+      "status": "scripted",
+      "note": "DailyMed is kept out of search and out of the title list on purpose, because the library's own pages never give drug doses."
+    },
+    {
+      "dest": "docs/cd3wd",
+      "size_gb": 141,
+      "fetch": [
+        "fetch/fix_cd3wd_isos.sh",
+        "fetch/download_tier3.sh",
+        "fetch/cd3wd_extract.py"
+      ],
+      "license": "Compiled development documents, free distribution, mixed per document (verify before selling)",
+      "status": "scripted",
+      "note": "The archive.org item CD3WD12 (2012) and the 2015 disc ISOs. The scripts read the file lists from the archive.org metadata API when they run."
+    },
+    {
+      "dest": "docs/survivor_library",
+      "size_gb": 117,
+      "fetch": [
+        "fetch/download_survivor.sh"
+      ],
+      "license": "Scans of pre-1950 books, public domain in the US (verify per item)",
+      "status": "scripted",
+      "note": "The archive.org item survival.library. The script reads its file list when it runs. The site shows these books only behind the HISTORICAL warning."
+    },
+    {
+      "dest": "docs/mit_ocw",
+      "size_gb": 12.4,
+      "fetch": [
+        "fetch/download_ocw.sh"
+      ],
+      "license": "CC BY-NC-SA 4.0 (noncommercial)",
+      "status": "scripted"
+    },
+    {
+      "dest": "docs/plant_id, docs/coastal_id",
+      "fetch": [
+        "fetch/download_plant_images.py",
+        "fetch/download_coastal_images.py"
+      ],
+      "license": "Wikimedia Commons, per image (each folder's CREDITS.txt)",
+      "status": "scripted",
+      "note": "The species notes are in this repository: data/plants.curated.json and data/coastal.curated.json."
+    },
+    {
+      "dest": "docs/sanitation, docs/comms, docs/emergency_mgmt",
+      "fetch": [
+        "fetch/download_g2.sh",
+        "fetch/fetch_fema.py"
+      ],
+      "license": "Mostly US government public domain and humanitarian publications (library/LICENSES.md, G2 shelves)",
+      "status": "scripted"
+    },
+    {
+      "dest": "docs/medical/tccc",
+      "fetch": [
+        "fetch/download_tccc_cpgs.sh"
+      ],
+      "license": "US government (Joint Trauma System), public domain",
+      "status": "scripted"
+    },
+    {
+      "dest": "docs/foraging_coastal",
+      "fetch": [
+        "fetch/download_coastal_pdfs.sh"
+      ],
+      "license": "US and California government publications (verify)",
+      "status": "scripted"
+    },
+    {
+      "dest": "docs/medical (other), docs/homesteading_extension, docs/grain_processing, docs/textiles, docs/security, docs/death_care, docs/military_manuals, docs/energy, docs/nuclear, docs/navigation, docs/shelter, docs/water, docs/fire_safety, docs/food_preservation, docs/HISTORICAL",
+      "size_gb": 0.7,
+      "fetch": [
+        "docs/sources/download_log.md (filename and source URL per PDF; no script)"
+      ],
+      "license": "Mixed: US government public domain, extension services, WHO/ICRC/IFRC (often CC BY-NC-SA), one Interweave title (copyright) (library/LICENSES.md, R6 content)",
+      "status": "partial",
+      "note": "About 65 files (0.4 GB) have a source URL in docs/sources/download_log.md. Check each row first, because some rows are failed or replaced downloads. About 105 files (0.3 GB) have no recorded URL, and public builds leave them out. The library's own notes for these shelves are in data/library_notes/."
+    },
+    {
+      "dest": "docs/school_textbooks",
+      "size_gb": 5.1,
+      "fetch": [
+        "fetch/fix_cd3wd_isos.sh (the 2015 disc ISOs)"
+      ],
+      "license": "Siyavula, OpenStax and other open textbooks, mostly CC BY (verify per book)",
+      "status": "partial",
+      "note": "The 966 PDFs come from the CD3WD 2015 disc ISOs. Nobody scripted the step that copied them onto this shelf."
+    },
+    {
+      "dest": "kolibri_data",
+      "size_gb": 105,
+      "fetch": [
+        "fetch/import_kolibri.sh"
+      ],
+      "license": "Per channel: Khan Academy CC BY-NC-SA, CK-12 custom noncommercial, EngageNY CC BY-NC-SA (library/LICENSES.md)",
+      "status": "scripted",
+      "note": "Needs Kolibri 0.19.5 in a virtual environment. Set KOLIBRI to its path."
+    },
+    {
+      "dest": "mirrors/hesperian",
+      "size_gb": 1.6,
+      "fetch": [
+        "fetch/download_mirrors.sh"
+      ],
+      "license": "Hesperian Health Guides terms (library/LICENSES.md)",
+      "status": "scripted"
+    },
+    {
+      "dest": "mirrors/ready_gov, mirrors/nchfp",
+      "size_gb": 2.3,
+      "fetch": [
+        "fetch/download_mirrors.sh"
+      ],
+      "license": "US government public domain (ready.gov); nchfp.uga.edu (USDA-funded, verify reuse terms)",
+      "status": "scripted"
+    },
+    {
+      "dest": "mirrors/journeytoforever, mirrors/sheldonbrown",
+      "fetch": [
+        "fetch/download_mirrors.sh"
+      ],
+      "license": "Website copyright of their owners: a personal offline copy (verify before giving or selling a box)",
+      "status": "scripted"
+    },
+    {
+      "dest": "mirrors/meshtastic_docs, mirrors/aredn_docs, mirrors/meshtastic_aredn",
+      "fetch": [
+        "fetch/download_mirrors.sh"
+      ],
+      "license": "Project documentation and firmware releases under the projects' own licenses (verify)",
+      "status": "scripted"
+    },
+    {
+      "dest": "video/prelinger",
+      "size_gb": 1.8,
+      "fetch": [
+        "fetch/download_tier3.sh"
+      ],
+      "license": "Prelinger Archives, public domain",
+      "status": "scripted"
+    },
+    {
+      "dest": "video/khan_academy, video/preschool",
+      "size_gb": 47,
+      "fetch": [
+        "fetch/khan_transcode.sh"
+      ],
+      "license": "Khan Academy CC BY-NC-SA (noncommercial)",
+      "status": "scripted",
+      "note": "Transcoded from the CD3WD 2015 disc ISOs (fix_cd3wd_isos.sh). Mount the ISOs and set M, as the top of the script explains."
+    },
+    {
+      "dest": "audio/librivox",
+      "size_gb": 13.7,
+      "fetch": [
+        "fetch/download_librivox.sh"
+      ],
+      "license": "Public domain (LibriVox)",
+      "status": "scripted",
+      "note": "The shelf README with the list of 52 books is data/library_notes/audio/librivox/README.md."
+    },
+    {
+      "dest": "tools/llamafile, tools/models, tools/piper, tools/argos, tools/whisper",
+      "fetch": [
+        "fetch/download_tools.sh",
+        "fetch/argos_wheels.sh",
+        "fetch/download_nomic.sh"
+      ],
+      "license": "llamafile Apache-2.0; Llama 3.1 and 3.2 Community Licenses (texts fetched beside the models, 'Built with Llama'); Piper MIT and per-voice licenses; Argos MIT and per-model licenses; Whisper MIT; Nomic embed Apache-2.0 (verify the voices and translation models)",
+      "status": "scripted"
+    },
+    {
+      "dest": "tools/video_players",
+      "fetch": [
+        "fetch/download_video_players.sh"
+      ],
+      "license": "VLC GPL-2.0; Material Files GPL-3.0",
+      "status": "scripted"
+    },
+    {
+      "dest": "tools/android, tools/kiwix_desktop, tools/opencpn",
+      "size_gb": 0.87,
+      "fetch": [],
+      "license": "Each app's own license (Organic Maps Apache-2.0, OsmAnd GPL-3.0 parts, Kiwix GPL-3.0, OpenCPN GPL-2.0: verify)",
+      "status": "manual",
+      "note": "No download address was recorded. Get the current release from each project's website. The folder READMEs in data/library_notes/tools/ say what goes in each folder."
+    },
+    {
+      "dest": "tools/README.md, tools/convert.html, tools/suncalc.html, tools/verify_manifest.sh and the content folders' READMEs and notes",
+      "size_gb": 0,
+      "fetch": [
+        "data/library_notes/ (this repository), installed by build/b5_reseal.sh"
+      ],
+      "license": "Apache-2.0 (this repository)",
+      "status": "scripted"
+    }
+  ]
+}

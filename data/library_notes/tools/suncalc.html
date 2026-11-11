@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sun &amp; Moon Calculator (offline)</title>
+<style>
+ body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:40rem;margin:0 auto;padding:1rem;line-height:1.5;font-size:18px}
+ label{display:block;margin:.6rem 0 .1rem}
+ input{font-size:1em;padding:.3em;width:11em}
+ button{font-size:1em;padding:.4em 1.2em;margin-top:.8rem}
+ table{border-collapse:collapse;margin-top:1rem}
+ td,th{border:1px solid #ccc;padding:.4em .8em;text-align:left}
+ .note{color:#666;font-size:.85em}
+</style>
+</head>
+<body>
+<h1>Sun &amp; Moon</h1>
+<p>Sunrise, sunset, solar noon, day length, moon phase. Works fully offline.
+Times shown in this device's local time zone.</p>
+
+<label>Latitude (+N, −S)</label><input id="lat" type="number" step="any" value="40.0">
+<label>Longitude (+E, −W)</label><input id="lon" type="number" step="any" value="-105.0">
+<label>Date</label><input id="date" type="date">
+<br><button onclick="calc()">Calculate</button>
+<p class="note">Tip: your latitude/longitude is on any paper map, in Organic Maps
+(long-press a point), or from a GPS receiver. US longitudes are negative.</p>
+
+<div id="out"></div>
+
+<script>
+// NOAA solar equations (Meeus, simplified). Accuracy ~1 min for |lat| < 72.
+function calc(){
+ var lat=+document.getElementById('lat').value,
+     lon=+document.getElementById('lon').value,
+     ds=document.getElementById('date').value;
+ if(!ds){alert('Pick a date');return;}
+ var d=new Date(ds+'T12:00:00');
+ // Julian day
+ var jd=d.getTime()/86400000+2440587.5;
+ var T=(jd-2451545)/36525;
+ var L0=(280.46646+T*(36000.76983+T*0.0003032))%360;
+ var M=357.52911+T*(35999.05029-0.0001537*T);
+ var e=0.016708634-T*(0.000042037+0.0000001267*T);
+ var Mr=M*Math.PI/180;
+ var C=Math.sin(Mr)*(1.914602-T*(0.004817+0.000014*T))
+      +Math.sin(2*Mr)*(0.019993-0.000101*T)+Math.sin(3*Mr)*0.000289;
+ var trueLong=L0+C;
+ var omega=125.04-1934.136*T;
+ var lambda=trueLong-0.00569-0.00478*Math.sin(omega*Math.PI/180);
+ var eps0=23+(26+(21.448-T*(46.815+T*(0.00059-T*0.001813)))/60)/60;
+ var eps=eps0+0.00256*Math.cos(omega*Math.PI/180);
+ var er=eps*Math.PI/180, lr=lambda*Math.PI/180;
+ var decl=Math.asin(Math.sin(er)*Math.sin(lr)); // radians
+ // equation of time (minutes)
+ var y=Math.tan(er/2);y*=y;
+ var L0r=L0*Math.PI/180;
+ var eot=4*(180/Math.PI)*(y*Math.sin(2*L0r)-2*e*Math.sin(Mr)
+        +4*e*y*Math.sin(Mr)*Math.cos(2*L0r)
+        -0.5*y*y*Math.sin(4*L0r)-1.25*e*e*Math.sin(2*Mr));
+ // hour angle for sunrise/set (zenith 90.833° = refraction + solar radius)
+ var latr=lat*Math.PI/180;
+ var cosH=(Math.cos(90.833*Math.PI/180)/(Math.cos(latr)*Math.cos(decl))
+          -Math.tan(latr)*Math.tan(decl));
+ var out='<table><tr><th>Quantity</th><th>Value</th></tr>';
+ var solarNoonUTCmin=720-4*lon-eot; // minutes UTC
+ function fmt(minUTC){
+   var t=new Date(d); t.setUTCHours(0,0,0,0); t=new Date(t.getTime()+minUTC*60000);
+   return t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+ }
+ if(cosH>1){ out+='<tr><td colspan=2>Polar night — sun does not rise this day.</td></tr>'; }
+ else if(cosH<-1){ out+='<tr><td colspan=2>Midnight sun — sun does not set this day.</td></tr>'; }
+ else{
+   var H=Math.acos(cosH)*180/Math.PI; // degrees
+   var rise=solarNoonUTCmin-4*H, set=solarNoonUTCmin+4*H;
+   var dayMin=8*H;
+   out+='<tr><td>Sunrise</td><td>'+fmt(rise)+'</td></tr>'
+      +'<tr><td>Solar noon</td><td>'+fmt(solarNoonUTCmin)+'</td></tr>'
+      +'<tr><td>Sunset</td><td>'+fmt(set)+'</td></tr>'
+      +'<tr><td>Day length</td><td>'+Math.floor(dayMin/60)+' h '+Math.round(dayMin%60)+' min</td></tr>'
+      +'<tr><td>Sun max altitude</td><td>'+(90-Math.abs(lat-decl*180/Math.PI)).toFixed(1)+'°</td></tr>';
+ }
+ out+='<tr><td>Sun declination</td><td>'+(decl*180/Math.PI).toFixed(2)+'°</td></tr>';
+ // Moon phase: synodic approximation from known new moon 2000-01-06 18:14 UTC
+ var synodic=29.530588853;
+ var age=((jd-2451550.26)%synodic+synodic)%synodic;
+ var names=['New','Waxing crescent','First quarter','Waxing gibbous','Full','Waning gibbous','Last quarter','Waning crescent'];
+ var idx=Math.floor(((age/synodic)*8+0.5))%8;
+ var illum=(1-Math.cos(2*Math.PI*age/synodic))/2;
+ out+='<tr><td>Moon age</td><td>'+age.toFixed(1)+' days ('+names[idx]+')</td></tr>'
+    +'<tr><td>Moon illumination</td><td>'+Math.round(illum*100)+'%</td></tr></table>'
+    +'<p class="note">Solar times ±1–2 min typical; moon phase ±0.5 day (approximation). '
+    +'For high-precision ephemeris use datasets/ephemeris (DE440s).</p>';
+ document.getElementById('out').innerHTML=out;
+}
+document.getElementById('date').valueAsDate=new Date();
+</script>
+
+<p><a href="convert.html">Unit converters</a> · <a href="../index.html">Library home</a></p>
+</body>
+</html>
